@@ -1,4 +1,4 @@
 PyApex
 ======
 
-Python3 Library fro Apex equipments
+Python3 Library for controlling Apex equipments
