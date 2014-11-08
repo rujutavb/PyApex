@@ -1,7 +1,4 @@
-from PyApex.Constantes import *
-from PyApex.Errors import ApexError
 
-from math import log10 as log
 
 class Attenuator():
 
@@ -19,6 +16,10 @@ class Attenuator():
 
         
     def Send(self, Command):
+        from PyApex.Constantes import AP1000_ERROR_ARGUMENT_TYPE, AP1000_ERROR_BADCOMMAND
+        from PyApex.Errors import ApexError
+        from sys import exit
+        
         if not isinstance(Command, str):
             raise ApexError(AP1000_ERROR_ARGUMENT_TYPE, "Command")
             sys.exit()
@@ -30,6 +31,10 @@ class Attenuator():
 
 
     def Receive(self, ByteNumber=1024):
+        from PyApex.Constantes import AP1000_ERROR_ARGUMENT_TYPE, AP1000_ERROR_COMMUNICATION
+        from PyApex.Errors import ApexError
+        from sys import exit
+        
         if not isinstance(ByteNumber, int):
             raise ApexError(AP1000_ERROR_ARGUMENT_TYPE, "ByteNumber")
             sys.exit()
@@ -43,6 +48,11 @@ class Attenuator():
             
     
     def ConvertForWriting(self, Attenuation):
+        from PyApex.Constantes import AP1000_ERROR_ARGUMENT_VALUE, AP1000_ERROR_VARIABLE_NOT_DEFINED
+        from PyApex.Errors import ApexError
+        from sys import exit
+        from math import log10 as log
+        
         if self.Unit.lower() == "db":
             return Attenuation
         elif self.Unit.lower() == "%":
@@ -59,6 +69,10 @@ class Attenuator():
 
 
     def ConvertForReading(self, Attenuation):
+        from PyApex.Constantes import AP1000_ERROR_VARIABLE_NOT_DEFINED
+        from PyApex.Errors import ApexError
+        from sys import exit
+        
         if self.Unit.lower() == "%":
             return 10**(- Attenuation / 10)
         elif self.Unit.lower() == "db":
@@ -69,6 +83,10 @@ class Attenuator():
     
     
     def SetAttenuation(self, Attenuation, ChNumber=1):
+        from PyApex.Constantes import AP1000_ERROR_ARGUMENT_TYPE, AP1000_ERROR_ARGUMENT_VALUE
+        from PyApex.Errors import ApexError
+        from sys import exit
+        
         if not isinstance(Attenuation, (float, int)):
             raise ApexError(AP1000_ERROR_ARGUMENT_TYPE, "Attenuation")
             sys.exit()
@@ -93,6 +111,10 @@ class Attenuator():
     
     
     def GetAttenuation(self, ChNumber=1):
+        from PyApex.Constantes import AP1000_ERROR_ARGUMENT_TYPE, AP1000_ERROR_ARGUMENT_VALUE
+        from PyApex.Errors import ApexError
+        from sys import exit
+        
         if not isinstance(ChNumber, int):
             raise ApexError(AP1000_ERROR_ARGUMENT_TYPE, "ChNumber")
             sys.exit()
@@ -111,6 +133,10 @@ class Attenuator():
     
     
     def SetUnit(self, Unit):
+        from PyApex.Constantes import AP1000_ERROR_ARGUMENT_TYPE
+        from PyApex.Errors import ApexError
+        from sys import exit
+        
         if not isinstance(Unit, str):
             raise ApexError(AP1000_ERROR_ARGUMENT_TYPE, "Unit")
             sys.exit()
