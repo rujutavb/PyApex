@@ -2,23 +2,10 @@
 # -*- coding: <utf-8> -*-
 
 import socket
-import os, sys, re
-
-from PyApex.AP1000.PowerMeter import PowerMeter
-from PyApex.AP1000.Attenuator import Attenuator
-from PyApex.AP1000.TunableLaser import TunableLaser
-from PyApex.AP1000.ErbiumAmplifier import ErbiumAmplifier
-from PyApex.Constantes import *
-from PyApex.Errors import ApexError
+from PyApex.Common import Send, Receive
 
 class AP1000():
     '''
-    NAME
-        PyApex
-        
-    FILE
-        DIST_PYTHON/Lib/PyApex/__init__.py
-    
     DESCRIPTION
         Elementary functions to communicate with Apex AP1000 equipment
         this version can communicate with :
@@ -47,6 +34,10 @@ class AP1000():
         
 
     def Open(self):
+        '''
+        Open connexion to AP1000 equipment.
+        This method is called by the constructor of AP1000 class
+        '''
         self.Connexion = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
         self.Connexion.settimeout(10)
         self.Connexion.setblocking(True)
@@ -59,70 +50,64 @@ class AP1000():
                 print("Connected successfully to the equipment")
             except:
                 print("Cannot connect to the equipment")
-                sys.exit()
 
 
     def Close(self):
+        '''
+        Close connexion to AP1000 equipment
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_COMMUNICATION
+        from PyApex.Errors import ApexError
+        
         if not self.Simulation:
             try:
                 self.Connexion.close()
             except:
-                raise ApexError(AP1000_ERROR_COMMUNICATION, self.Connexion.getsockname()[0])
-                sys.exit()
+                raise ApexError(APXXXX_ERROR_COMMUNICATION, self.Connexion.getsockname()[0])
 
 
     def GetID(self):
+        '''
+        Return string ID of AP1000 equipment
+        '''
         if self.Simulation:
             return SimuAP1000_ID
         else:
-            self.Send("*IDN?\n")
-            ID = self.Receive()
+            Send(self.Connexion, "*IDN?\n")
+            ID = Receive(self.Connexion)
             return ID
 
 
     def Reset(self):
+        '''
+        Reset AP1000 equipment
+        '''
         if not self.Simulation:
-            self.Send("*RST\n")
+            Send(self.Connexion, "*RST\n")
 
 
-    def Send(self, Command):
-        if not isinstance(Command, str):
-            raise ApexError(AP1000_ERROR_ARGUMENT_TYPE, "Command")
-            sys.exit()
-        try:
-            self.Connexion.send(Command.encode('utf-8'))
-        except:
-            raise ApexError(AP1000_ERROR_BADCOMMAND, Command)
-            sys.exit()
-
-
-    def Receive(self, ByteNumber=1024):
-        if not isinstance(ByteNumber, int):
-            raise ApexError(AP1000_ERROR_ARGUMENT_TYPE, "ByteNumber")
-            sys.exit()
-        try:
-            data = self.Connexion.recv(ByteNumber)
-        except:
-            raise ApexError(AP1000_ERROR_COMMUNICATION, self.Connexion.getsockname()[0])
-            sys.exit()
-        else:
-            return data.decode('utf-8')
-
-      
     def SlotUsed(self, SlotNumber):
+        '''
+        Return a boolean indicated if slot 'SlotNumber' is used by AP1000 equipment
+            - if return True : Slot is used by a module
+            - if return False : Slot is not used
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Errors import ApexError
+        
         if not isinstance(SlotNumber, int):
-            raise ApexError(AP1000_ERROR_ARGUMENT_TYPE, "SlotNumber")
-            sys.exit()
+            self.Connexion.close()
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "SlotNumber")
         if SlotNumber < AP1000_SLOT_MIN or SlotNumber > AP1000_SLOT_MAX:
-            raise ApexError(AP1000_ERROR_ARGUMENT_VALUE, "SlotNumber")
-            sys.exit()
+            self.Connexion.close()
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "SlotNumber")
         
         if self.Simulation:
             ID = SimuAP1000_SlotUsed
         else:
             Command = "SLT[" + str(SlotNumber).zfill(2) + "]:EMPTY?\n"
-            self.Send(Command)
-            ID = self.Receive(10)
+            Send(self.Connexion, Command)
+            ID = Receive(self.Connexion, 10)
             
         if ID[:-1] == "0":
             return False
@@ -131,24 +116,30 @@ class AP1000():
 
 
     def SlotID(self, SlotNumber, Force=False):
+        '''
+        Return a string ID of the module selected by 'SlotNumber'
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Errors import ApexError
+        
         if not isinstance(SlotNumber, int):
-            raise ApexError(AP1000_ERROR_ARGUMENT_TYPE, "SlotNumber")
-            sys.exit()
+            self.Connexion.close()
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "SlotNumber")
         if SlotNumber < AP1000_SLOT_MIN or SlotNumber > AP1000_SLOT_MAX:
-            raise ApexError(AP1000_ERROR_ARGUMENT_VALUE, "SlotNumber")
-            sys.exit()
+            self.Connexion.close()
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "SlotNumber")
         
         if self.Simulation:
             ID = SimuAP1000_SlotID
         else:
-            if Force == True:
+            if Force:
                 SlotUsed = True
             else:
                 SlotUsed = self.SlotUsed(SlotNumber)
             if SlotUsed:
                 Command = "SLT[" + str(SlotNumber).zfill(2) + "]:IDN?\n"
-                Error = self.Send(Command)
-                ID = self.Receive()
+                Error = Send(self.Connexion, Command)
+                ID = Receive(self.Connexion)
             else:
                 return "Slot not used"
             
@@ -156,17 +147,24 @@ class AP1000():
 
 
     def SlotSN(self, SlotNumber, Force=False):
+        '''
+        Return the slot number (integer) of the module in the slot 'SlotNumber'
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE, AP1000_ERROR_SLOT_NOT_DEFINED
+        from PyApex.Errors import ApexError
+        import re
+        
         if not isinstance(SlotNumber, int):
-            raise ApexError(AP1000_ERROR_ARGUMENT_TYPE, "SlotNumber")
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "SlotNumber")
             sys.exit()
         if SlotNumber < AP1000_SLOT_MIN or SlotNumber > AP1000_SLOT_MAX:
-            raise ApexError(AP1000_ERROR_ARGUMENT_VALUE, "SlotNumber")
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "SlotNumber")
             sys.exit()
 
         if self.Simulation:
             SN = SimuAP1000_SlotID
         else:
-            SN = self.SlotID(SlotNumber, Force=True)
+            SN = self.SlotID(SlotNumber, Force=Force)
 
         try:
             SN = SN.lower().split("/")[2].split("-")
@@ -174,16 +172,24 @@ class AP1000():
             SN = int(re.findall("\d+", SN)[0])
             return int(SN)
         except:
+            self.Connexion.close() 
             raise ApexError(AP1000_ERROR_SLOT_NOT_DEFINED, SlotNumber)
-            sys.exit()
     
 
     def SlotType(self, SlotNumber):
+        '''
+        Return a string describing the module in the slot 'SlotNumber'
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Constants import AP1000_ERROR_SLOT_NOT_DEFINED, Modules
+        from PyApex.Errors import ApexError
+        import re
+        
         if not isinstance(SlotNumber, int):
-            raise ApexError(AP1000_ERROR_ARGUMENT_TYPE, "SlotNumber")
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "SlotNumber")
             sys.exit()
         if SlotNumber < AP1000_SLOT_MIN or SlotNumber > AP1000_SLOT_MAX:
-            raise ApexError(AP1000_ERROR_ARGUMENT_VALUE, "SlotNumber")
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "SlotNumber")
             sys.exit()
         
         if self.Simulation:
@@ -199,47 +205,81 @@ class AP1000():
             ID = int(re.findall("\d+", ID)[0])
             return Modules[ID]
         except:
+            self.Connexion.close()
             raise ApexError(AP1000_ERROR_SLOT_NOT_DEFINED, SlotNumber)
-            sys.exit()
 
 
     def PowerMeter(self, SlotNumber, Force=False):
-        if Force == True:
+        '''
+        Return a PowerMeter class for the module in the slot 'SlotNumber'
+        if Force is True, a PowerMeter class is returned even if the module isn't a PowerMeter
+        '''
+        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE
+        from PyApex.Errors import ApexError
+        from PyApex.AP1000.PowerMeter import PowerMeter
+        
+        if Force:
             return PowerMeter(self, SlotNumber, self.Simulation)
         if self.Simulation or self.SlotType(SlotNumber) == AP1000_PWM_NAME:
             return PowerMeter(self, SlotNumber, self.Simulation)
         else:
+            self.Connexion.close()
             raise ApexError(AP1000_ERROR_SLOT_NOT_GOOD_TYPE, SlotNumber)
-            sys.exit()
 
 
     def Attenuator(self, SlotNumber, Force=False):
-        if Force == True:
+        '''
+        Return an Attenuator class for the module in the slot 'SlotNumber'
+        if Force is True, a PowerMeter class is returned even if the module isn't an Attenuator
+        '''
+        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE
+        from PyApex.Errors import ApexError
+        from PyApex.AP1000.Attenuator import Attenuator
+        
+        if Force:
             return Attenuator(self, SlotNumber, self.Simulation)
         if self.Simulation or self.SlotType(SlotNumber) == AP1000_ATT_NAME:
             return Attenuator(self, SlotNumber, self.Simulation)
         else:
+            self.Connexion.close()
             raise ApexError(AP1000_ERROR_SLOT_NOT_GOOD_TYPE, SlotNumber)
-            sys.exit()
 
 
     def TunableLaser(self, SlotNumber, Force=False):
-        if Force == True:
+        '''
+        Return a Tunable Laser class for the module in the slot 'SlotNumber'
+        if Force is True, a PowerMeter class is returned even if the module isn't a Tunable Laser
+        '''
+        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE
+        from PyApex.Errors import ApexError
+        from PyApex.AP1000.TunableLaser import TunableLaser
+        
+        if Force:
             return TunableLaser(self, SlotNumber, self.Simulation)
         if self.Simulation or self.SlotType(SlotNumber) == AP1000_TLS_CBAND_NAME \
            or self.SlotType(SlotNumber) == AP1000_TLS_LBAND_NAME:
             return TunableLaser(self, SlotNumber, self.Simulation)
         else:
+            self.Connexion.close()
             raise ApexError(AP1000_ERROO_SLOT_NOT_GOOD_TYPE, SlotNumber)
 
 
     def ErbiumAmplifier(self, SlotNumber, Force=False):
-        if Force == True:
+        '''
+        Return an Erbium Amplifier class for the module in the slot 'SlotNumber'
+        if Force is True, a PowerMeter class is returned even if the module isn't an Erbium Amplifier
+        '''
+        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE
+        from PyApex.Errors import ApexError
+        from PyApex.AP1000.ErbiumAmplifier import ErbiumAmplifier
+        
+        if Force:
             return ErbiumAmplifier(self, SlotNumber, self.Simulation)
         if self.Simulation or self.SlotType(SlotNumber) == AP1000_EFA_PREAMP_NAME \
            or self.SlotType(SlotNumber) == AP1000_EFA_BOOST_NAME \
            or self.SlotType(SlotNumber) == AP1000_EFA_INLINE_NAME:
             return ErbiumAmplifier(self, SlotNumber, self.Simulation)
         else:
+            self.Connexion.close()
             raise ApexError(AP1000_ERROO_SLOT_NOT_GOOD_TYPE, SlotNumber)
 
