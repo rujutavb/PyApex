@@ -1,9 +1,4 @@
-import sys, re
 
-from PyApex.Constantes import *
-from PyApex.Errors import ApexError
-
-from math import log10 as log
 
 class ErbiumAmplifier():
 
@@ -24,6 +19,10 @@ class ErbiumAmplifier():
 
         
     def Send(self, Command):
+        from PyApex.Constantes import AP1000_ERROR_BADCOMMAND, AP1000_ERROR_ARGUMENT_TYPE
+        from PyApex.Errors import ApexError
+        from sys import exit
+        
         if not isinstance(Command, str):
             raise ApexError(AP1000_ERROR_ARGUMENT_TYPE, "Command")
             sys.exit()
@@ -35,6 +34,10 @@ class ErbiumAmplifier():
 
 
     def Receive(self, ByteNumber=1024):
+        from PyApex.Constantes import AP1000_ERROR_COMMUNICATION, AP1000_ERROR_ARGUMENT_TYPE
+        from PyApex.Errors import ApexError
+        from sys import exit
+        
         if not isinstance(ByteNumber, int):
             raise ApexError(AP1000_ERROR_ARGUMENT_TYPE, "ByteNumber")
             sys.exit()
@@ -48,6 +51,11 @@ class ErbiumAmplifier():
 
 
     def GetType(self):
+        from PyApex.Constantes import AP1000_ERROR_SLOT_TYPE_NOT_DEFINED
+        from PyApex.Errors import ApexError
+        from sys import exit
+        import re
+        
         if self.Simulation:
             ID = SimuEFA_SlotID
         else:
@@ -67,6 +75,11 @@ class ErbiumAmplifier():
             
     
     def ConvertForWriting(self, Power):
+        from PyApex.Constantes import AP1000_ERROR_ARGUMENT_VALUE, AP1000_ERROR_VARIABLE_NOT_DEFINED
+        from PyApex.Errors import ApexError
+        from sys import exit
+        from math import log10 as log
+        
         if self.Unit.lower() == "dbm":
             return Power
         elif self.Unit.lower() == "mw":
@@ -83,6 +96,10 @@ class ErbiumAmplifier():
 
 
     def ConvertForReading(self, Power):
+        from PyApex.Constantes import AP1000_ERROR_VARIABLE_NOT_DEFINED
+        from PyApex.Errors import ApexError
+        from sys import exit
+        
         if self.Unit.lower() == "mw":
             return 10**(Power / 10)
         elif self.Unit.lower() == "dbm":
@@ -115,6 +132,10 @@ class ErbiumAmplifier():
 
 
     def SetIPump(self, IPump):
+        from PyApex.Constantes import AP1000_ERROR_ARGUMENT_VALUE
+        from PyApex.Errors import ApexError
+        from sys import exit
+        
         if not isinstance(IPump, (float, int)):
             raise ApexError(AP1000_ERROR__ARGUMENT_TYPE, "IPump")
             sys.exit()
@@ -152,6 +173,10 @@ class ErbiumAmplifier():
     
     
     def SetUnit(self, Unit):
+        from PyApex.Constantes import AP1000_ERROR_ARGUMENT_VALUE
+        from PyApex.Errors import ApexError
+        from sys import exit
+        
         if not isinstance(Unit, str):
             raise ApexError(AP1000_ERROR_ARGUMENT_TYPE, "Unit")
             sys.exit()
