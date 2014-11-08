@@ -85,7 +85,7 @@ AP1000_TLS_FRMAX = [VACCUM_LIGHT_SPEED / AP1000_TLS_WLMAX[0], None, VACCUM_LIGHT
 # ------------------------------------------------------------------------------
 # [3370 : PRE-AMPLIFIER, 3371 : BOOSTER APMLIFIER, 3372 : IN-NINE AMPLIFIER]
 # MAX PUMP LASER CURRENT (mA)
-AP1000_EFA_IPMAX = [1000, 600, None]
+AP1000_EFA_IPMAX = [600, 1000, 600]
 
 #                               AP2050 CONSTANTS
 # ------------------------------------------------------------------------------
@@ -154,6 +154,8 @@ SimuTLS_Wavelength = "1553.310\n"
 SimuEFA_SlotID = "APEX-TECHNOLOGIES/3371/09-3371-A-000500/0.0\n"
 SimuEFA_InVoltage = "512\n"
 SimuEFA_OutVoltage = "624\n"
+SimuEFA_InPower = "-10\n"
+SimuEFA_OutPower = "15\n"
 
 SimuAP2050_ID = "APEX Technologies/2050-A/09-2050-A-000000/9.14\n"
 SimuAP2050_StartWavelength = "1526.000\n"
