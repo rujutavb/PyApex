@@ -1,3 +1,4 @@
+from PyApex.Common import Send, Receive
 
 
 class ErbiumAmplifier():
@@ -17,51 +18,19 @@ class ErbiumAmplifier():
     def __str__(self):
         return "Erbium Amplifier in slot " + str(self.SlotNumber)
 
-        
-    def Send(self, Command):
-        from PyApex.Constantes import AP1000_ERROR_BADCOMMAND, AP1000_ERROR_ARGUMENT_TYPE
-        from PyApex.Errors import ApexError
-        from sys import exit
-        
-        if not isinstance(Command, str):
-            raise ApexError(AP1000_ERROR_ARGUMENT_TYPE, "Command")
-            sys.exit()
-        try:
-            self.Connexion.send(Command.encode('utf-8'))
-        except:
-            raise ApexError(AP1000_ERROR_BADCOMMAND, Command)
-            sys.exit()
-
-
-    def Receive(self, ByteNumber=1024):
-        from PyApex.Constantes import AP1000_ERROR_COMMUNICATION, AP1000_ERROR_ARGUMENT_TYPE
-        from PyApex.Errors import ApexError
-        from sys import exit
-        
-        if not isinstance(ByteNumber, int):
-            raise ApexError(AP1000_ERROR_ARGUMENT_TYPE, "ByteNumber")
-            sys.exit()
-        try:
-            data = self.Connexion.recv(ByteNumber)
-        except:
-            raise ApexError(AP1000_ERROR_COMMUNICATION, self.Connexion.getsockname()[0])
-            sys.exit()
-        else:
-            return data.decode('utf-8')
-
 
     def GetType(self):
         from PyApex.Constantes import AP1000_ERROR_SLOT_TYPE_NOT_DEFINED
+        from PyApex.Constantes import AP1000_EFA_PREAMP, AP1000_EFA_BOOST, AP1000_EFA_INLINE
         from PyApex.Errors import ApexError
-        from sys import exit
         import re
         
         if self.Simulation:
             ID = SimuEFA_SlotID
         else:
             Command = "SLT[" + str(self.SlotNumber).zfill(2) + "]:IDN?\n"
-            self.Send(Command)
-            ID = self.Receive()
+            Send(self.Connexion, Command)
+            ID = Receive(self.Connexion)
 
         if re.findall(str(AP1000_EFA_PREAMP), ID.split("/")[1]) != []:
             return 0
@@ -70,14 +39,13 @@ class ErbiumAmplifier():
         elif re.findall(str(AP1000_EFA_INLINE), ID.split("/")[1]) != []:
             return 2
         else:
+            self.Connexion.close()
             raise ApexError(AP1000_ERROR_SLOT_TYPE_NOT_DEFINED, self.SlotNumber)
-            sys.exit()
-            
+   
     
     def ConvertForWriting(self, Power):
-        from PyApex.Constantes import AP1000_ERROR_ARGUMENT_VALUE, AP1000_ERROR_VARIABLE_NOT_DEFINED
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_VALUE, APXXXX_ERROR_VARIABLE_NOT_DEFINED
         from PyApex.Errors import ApexError
-        from sys import exit
         from math import log10 as log
         
         if self.Unit.lower() == "dbm":
@@ -86,27 +54,26 @@ class ErbiumAmplifier():
             try:
                 log(Power)
             except:
-                raise ApexError(AP1000_ERROR_ARGUMENT_VALUE, "Power")
-                sys.exit()
+                self.Connexion.close()
+                raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Power")
             else:
                 return -10 * log(Power/100)
         else:
-            raise ApexError(AP1000_ERROR_VARIABLE_NOT_DEFINED, "self.Unit")
-            sys.exit()
+            self.Connexion.close()
+            raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.Unit")
 
 
     def ConvertForReading(self, Power):
-        from PyApex.Constantes import AP1000_ERROR_VARIABLE_NOT_DEFINED
+        from PyApex.Constantes import APXXXX_ERROR_VARIABLE_NOT_DEFINED
         from PyApex.Errors import ApexError
-        from sys import exit
         
         if self.Unit.lower() == "mw":
             return 10**(Power / 10)
         elif self.Unit.lower() == "dbm":
             return Power
         else:
-            raise ApexError(AP1000_ERROR_VARIABLE_NOT_DEFINED, "self.Unit")
-            sys.exit()
+            self.Connexion.close()
+            raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.Unit")
 
 
     def GetInVoltage(self):
@@ -114,8 +81,8 @@ class ErbiumAmplifier():
             InVoltage = SimuEFA_InVoltage
         else:
             Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:POWERINVALUE\n"
-            self.Send(Command)
-            InVoltage = self.Receive()
+            Send(self.Connexion, Command)
+            InVoltage = Receive(self.Connexion)
 
         return int(InVoltage[:-1])
 
@@ -125,27 +92,27 @@ class ErbiumAmplifier():
             InVoltage = SimuEFA_OutVoltage
         else:
             Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:POWEROUTVALUE\n"
-            self.Send(Command)
-            InVoltage = self.Receive()
+            Send(self.Connexion, Command)
+            InVoltage = Receive(self.Connexion)
 
         return int(InVoltage[:-1])
 
 
     def SetIPump(self, IPump):
-        from PyApex.Constantes import AP1000_ERROR_ARGUMENT_VALUE
+        from PyApex.Constantes import APXXXX_ERROR__ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyAPex.Constantes import AP1000_EFA_IPMAX
         from PyApex.Errors import ApexError
-        from sys import exit
         
         if not isinstance(IPump, (float, int)):
-            raise ApexError(AP1000_ERROR__ARGUMENT_TYPE, "IPump")
-            sys.exit()
+            self.Connexion.close()
+            raise ApexError(APXXXX_ERROR__ARGUMENT_TYPE, "IPump")
         if IPump > AP1000_EFA_IPMAX[self.Type] or IPump < 0:
-            raise ApexError(AP1000_ERROR_ARGUMENT_VALUE, "IPump")
-            sys.exit()
+            self.Connexion.close()
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "IPump")
 
         if not self.Simulation:
             Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:PUMP" + ("%.1f" % IPump) + "\n"
-            self.Send(Command)
+            Send(self.Connexion, Command)
 
         self.IPump = IPump
     
@@ -155,8 +122,8 @@ class ErbiumAmplifier():
             Power = SimuEFA_InPower
         else:
             Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:INDB?\n"
-            self.Send(Command)
-            Power = self.Receive()
+            Send(self.Connexion, Command)
+            Power = Receive(self.Connexion)
         
         return float(Power[:-1])
 
@@ -166,20 +133,19 @@ class ErbiumAmplifier():
             Power = SimuEFA_OutPower
         else:
             Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:OTDB?\n"
-            self.Send(Command)
-            Power = self.Receive()
+            Send(self.Connexion, Command)
+            Power = Receive(self.Connexion)
         
         return float(Power[:-1])
     
     
     def SetUnit(self, Unit):
-        from PyApex.Constantes import AP1000_ERROR_ARGUMENT_VALUE
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE
         from PyApex.Errors import ApexError
-        from sys import exit
         
         if not isinstance(Unit, str):
-            raise ApexError(AP1000_ERROR_ARGUMENT_TYPE, "Unit")
-            sys.exit()
+            self.Connexion.close()
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Unit")
         
         if Unit.lower() in self.ValidUnits:
             self.Unit = Unit
