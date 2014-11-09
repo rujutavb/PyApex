@@ -6,7 +6,7 @@ def Send(Connexion, Command):
     
     if not isinstance(Command, str):
         Connexion.close()
-        raise ApexError(AP1000_ERROR_ARGUMENT_TYPE, "Command")
+        raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Command")
         sys.exit()
     try:
         Connexion.send(Command.encode('utf-8'))
