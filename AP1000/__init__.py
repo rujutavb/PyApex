@@ -70,6 +70,8 @@ class AP1000():
         '''
         Return string ID of AP1000 equipment
         '''
+        from PyApex.Constantes import SimuAP1000_ID
+        
         if self.Simulation:
             return SimuAP1000_ID
         else:
@@ -93,6 +95,7 @@ class AP1000():
             - if return False : Slot is not used
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Constantes import SimuAP1000_SlotUsed
         from PyApex.Errors import ApexError
         
         if not isinstance(SlotNumber, int):
@@ -120,6 +123,7 @@ class AP1000():
         Return a string ID of the module selected by 'SlotNumber'
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Constantes import SimuAP1000_SlotID
         from PyApex.Errors import ApexError
         
         if not isinstance(SlotNumber, int):
@@ -151,6 +155,7 @@ class AP1000():
         Return the slot number (integer) of the module in the slot 'SlotNumber'
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE, AP1000_ERROR_SLOT_NOT_DEFINED
+        from PyApex.Constantes import SimuAP1000_SlotID
         from PyApex.Errors import ApexError
         import re
         
@@ -181,7 +186,7 @@ class AP1000():
         Return a string describing the module in the slot 'SlotNumber'
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
-        from PyApex.Constants import AP1000_ERROR_SLOT_NOT_DEFINED, Modules
+        from PyApex.Constants import AP1000_ERROR_SLOT_NOT_DEFINED, SimuAP1000_SlotID, Modules
         from PyApex.Errors import ApexError
         import re
         
@@ -214,7 +219,7 @@ class AP1000():
         Return a PowerMeter class for the module in the slot 'SlotNumber'
         if Force is True, a PowerMeter class is returned even if the module isn't a PowerMeter
         '''
-        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE
+        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE, AP1000_PWM_NAME
         from PyApex.Errors import ApexError
         from PyApex.AP1000.PowerMeter import PowerMeter
         
@@ -232,7 +237,7 @@ class AP1000():
         Return an Attenuator class for the module in the slot 'SlotNumber'
         if Force is True, a PowerMeter class is returned even if the module isn't an Attenuator
         '''
-        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE
+        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE, AP1000_ATT_NAME
         from PyApex.Errors import ApexError
         from PyApex.AP1000.Attenuator import Attenuator
         
@@ -250,7 +255,7 @@ class AP1000():
         Return a Tunable Laser class for the module in the slot 'SlotNumber'
         if Force is True, a PowerMeter class is returned even if the module isn't a Tunable Laser
         '''
-        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE
+        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE, AP1000_TLS_CBAND_NAME, AP1000_TLS_LBAND_NAME
         from PyApex.Errors import ApexError
         from PyApex.AP1000.TunableLaser import TunableLaser
         
@@ -261,7 +266,7 @@ class AP1000():
             return TunableLaser(self, SlotNumber, self.Simulation)
         else:
             self.Connexion.close()
-            raise ApexError(AP1000_ERROO_SLOT_NOT_GOOD_TYPE, SlotNumber)
+            raise ApexError(AP1000_ERROR_SLOT_NOT_GOOD_TYPE, SlotNumber)
 
 
     def ErbiumAmplifier(self, SlotNumber, Force=False):
@@ -270,6 +275,7 @@ class AP1000():
         if Force is True, a PowerMeter class is returned even if the module isn't an Erbium Amplifier
         '''
         from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE
+        from PyApex.Constantes import AP1000_EFA_PREAMP_NAME, AP1000_EFA_BOOST_NAME, AP1000_EFA_INLINE_NAME 
         from PyApex.Errors import ApexError
         from PyApex.AP1000.ErbiumAmplifier import ErbiumAmplifier
         
@@ -281,5 +287,5 @@ class AP1000():
             return ErbiumAmplifier(self, SlotNumber, self.Simulation)
         else:
             self.Connexion.close()
-            raise ApexError(AP1000_ERROO_SLOT_NOT_GOOD_TYPE, SlotNumber)
+            raise ApexError(AP1000_ERROR_SLOT_NOT_GOOD_TYPE, SlotNumber)
 
