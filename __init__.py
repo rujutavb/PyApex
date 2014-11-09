@@ -1,7 +1,5 @@
-import socket
-import os, sys, re
 
-from PyApex.Constantes import *
+
 from PyApex.AP1000 import AP1000
 from PyApex.AP2050 import AP2050
 from PyApex.AP2040 import AP2040
