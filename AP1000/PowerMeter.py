@@ -21,7 +21,7 @@ class PowerMeter():
 
 
     def GetChannels(self):
-        from PyApex.Constantes import AP1000_PWM_CHTYPE
+        from PyApex.Constantes import SimuPWM_SlotID, AP1000_PWM_CHTYPE
         
         if self.Simulation:
             ID = SimuPWM_SlotID
@@ -60,6 +60,8 @@ class PowerMeter():
     
     
     def GetAverageTime(self):
+        from PyApex.Constantes import SimuPWM_AvgTime
+        
         if self.Simulation:
             AvgTime = SimuPWM_AvgTime
         else:
@@ -112,6 +114,7 @@ class PowerMeter():
     
     def GetWavelength(self, ChNumber=1):
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Constantes import SimuPWM_Wavelength
         from PyApex.Errors import ApexError
         
         if not isinstance(ChNumber, int):
@@ -133,6 +136,7 @@ class PowerMeter():
     
     def SetFrequency(self, Frequency, ChNumber=1):
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Constantes import VACCUM_LIGHT_SPEED
         from PyApex.Errors import ApexError
         
         if not isinstance(Frequency, (float, int)):
@@ -154,6 +158,7 @@ class PowerMeter():
             
     def GetFrequency(self, ChNumber=1):
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Constantes import VACCUM_LIGHT_SPEED
         from PyApex.Errors import ApexError
         
         if not isinstance(ChNumber, int):
@@ -170,6 +175,7 @@ class PowerMeter():
     def GetPower(self, ChNumber=1):
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
         from PyApex.Constantes import APXXXX_ERROR_VARIABLE_NOT_DEFINED
+        from PyApex.Constantes import SimuPWM_Power_dBm, SimuPWM_Power_mW
         from PyApex.Errors import ApexError
         
         if not isinstance(ChNumber, int):
