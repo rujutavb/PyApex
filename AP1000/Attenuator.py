@@ -17,7 +17,7 @@ class Attenuator():
    
     
     def ConvertForWriting(self, Attenuation):
-        from PyApex.Constantes import AP1000_ERROR_ARGUMENT_VALUE, AP1000_ERROR_VARIABLE_NOT_DEFINED
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_VALUE, APXXXX_ERROR_VARIABLE_NOT_DEFINED
         from PyApex.Errors import ApexError
         from math import log10 as log
         
@@ -28,16 +28,16 @@ class Attenuator():
                 log(Attenuation)
             except:
                 self.Connexion.close()
-                raise ApexError(AP1000_ERROR_ARGUMENT_VALUE, "Attenuation")
+                raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Attenuation")
             else:
                 return -10 * log(Attenuation/100)
         else:
             self.Connexion.close()
-            raise ApexError(AP1000_ERROR_VARIABLE_NOT_DEFINED, "self.Unit")
+            raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.Unit")
 
 
     def ConvertForReading(self, Attenuation):
-        from PyApex.Constantes import AP1000_ERROR_VARIABLE_NOT_DEFINED
+        from PyApex.Constantes import APXXXX_ERROR_VARIABLE_NOT_DEFINED
         from PyApex.Errors import ApexError
         
         if self.Unit.lower() == "%":
@@ -46,7 +46,7 @@ class Attenuator():
             return Attenuation
         else:
             self.Connexion.close()
-            raise ApexError(AP1000_ERROR_VARIABLE_NOT_DEFINED, "self.Unit")
+            raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.Unit")
     
     
     def SetAttenuation(self, Attenuation, ChNumber=1):
@@ -64,10 +64,10 @@ class Attenuator():
         Attenuation = self.ConvertForWriting(Attenuation)
         if Attenuation < AP1000_ATT_ATTMIN or Attenuation > AP1000_ATT_ATTMAX:
             self.Connexion.close()
-            raise ApexError(AP1000_ERROR_ARGUMENT_VALUE, "Attenuation")
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Attenuation")
         if ChNumber > AP1000_ATT_CHNUMBER or ChNumber < 1:
             self.Connexion.close()
-            raise ApexError(AP1000_ERROR_ARGUMENT_VALUE, "ChNumber")
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "ChNumber")
             
         if self.Simulation:
             self.Attenuation = Attenuation
@@ -79,7 +79,7 @@ class Attenuator():
     
     def GetAttenuation(self, ChNumber=1):
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
-        from PyApex.Constantes import AP1000_ATT_CHNUMBER
+        from PyApex.Constantes import AP1000_ATT_CHNUMBER, SimuATT_Attenuation
         from PyApex.Errors import ApexError
         
         if not isinstance(ChNumber, int):
