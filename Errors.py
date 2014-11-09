@@ -10,13 +10,13 @@ class ApexError(Exception):
     
     def __str__(self):
         ErrorMsg = "\nPyApex Error " +  str(self.ErrorCode) + " : "
-        if self.ErrorCode == AP1000_ERROR_COMMUNICATION:
+        if self.ErrorCode == APXXXX_ERROR_COMMUNICATION:
             ErrorMsg += "Communication with equipment " + str(self.ErrorCause) + " cannot be established"
-        elif self.ErrorCode == AP1000_ERROR_BADCOMMAND:
+        elif self.ErrorCode == APXXXX_ERROR_BADCOMMAND:
             ErrorMsg += "Command '" + str(self.ErrorCause) + "' can't be interpreted by the equipment"
-        elif self.ErrorCode == AP1000_ERROR_ARGUMENT_TYPE:
+        elif self.ErrorCode == APXXXX_ERROR_ARGUMENT_TYPE:
             ErrorMsg += "Wrong argument type for '" + str(self.ErrorCause) + "'"
-        elif self.ErrorCode == AP1000_ERROR_ARGUMENT_VALUE:
+        elif self.ErrorCode == APXXXX_ERROR_ARGUMENT_VALUE:
             ErrorMsg += "Wrong argument value for '" + str(self.ErrorCause) + "'"
         elif self.ErrorCode == AP1000_ERROR_SLOT_NOT_DEFINED:
             ErrorMsg += "Slot n° " + str(self.ErrorCause) + " has not a defined type"
@@ -24,7 +24,7 @@ class ApexError(Exception):
             ErrorMsg += "Slot n° " + str(self.ErrorCause) + " has not the good type"
         elif self.ErrorCode == AP1000_ERROR_SLOT_TYPE_NOT_DEFINED:
             ErrorMsg += "Slot n° " + str(self.ErrorCause) + " has not the good type"
-        elif self.ErrorCode == AP1000_ERROR_VARIABLE_NOT_DEFINED:
+        elif self.ErrorCode == APXXXX_ERROR_VARIABLE_NOT_DEFINED:
             ErrorMsg += "Internal variable '" + str(self.ErrorCause) + "' is not defined"
         else:
             ErrorMsg += "Error code not defined"
