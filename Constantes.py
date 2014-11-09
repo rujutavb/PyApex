@@ -4,6 +4,7 @@
 # ------------------------------------------------------------------------------
 #                                  UNIVERSAL CONSTANTS
 # ------------------------------------------------------------------------------
+
 VACCUM_LIGHT_SPEED = 299792458
 
 
@@ -87,8 +88,11 @@ AP1000_TLS_FRMAX = [VACCUM_LIGHT_SPEED / AP1000_TLS_WLMAX[0], None, VACCUM_LIGHT
 # MAX PUMP LASER CURRENT (mA)
 AP1000_EFA_IPMAX = [600, 1000, 600]
 
-#                               AP2050 CONSTANTS
+
 # ------------------------------------------------------------------------------
+#                                   AP2050 CONSTANTS
+# ------------------------------------------------------------------------------
+
 # MIN AND MAX WAVELENGTH
 AP2050_WLMIN = 1526
 AP2050_WLMAX = 1566
@@ -96,8 +100,11 @@ AP2050_WLMAX = 1566
 AP2050_MINSPAN = 0.01
 AP2050_MAXSPAN = 40
 
-#                               AP2040 CONSTANTS
+
 # ------------------------------------------------------------------------------
+#                                   AP2040 CONSTANTS
+# ------------------------------------------------------------------------------
+
 # MIN AND MAX WAVELENGTH
 AP2040_WLMIN = 1526
 AP2040_WLMAX = 1566
@@ -115,25 +122,24 @@ AP2040_MINNPTS = 2
 AP2040_MAXNPTS = 20000
 
 
-
-#                            ERROR NUMBER CONSTANTS
 # ------------------------------------------------------------------------------
+#                                   ERROR CODE CONSTANTS
+# ------------------------------------------------------------------------------
+
 APXXXX_ERROR_COMMUNICATION = -1
 APXXXX_ERROR_BADCOMMAND = -2
 APXXXX_ERROR_ARGUMENT_TYPE = -11
 APXXXX_ERROR_ARGUMENT_VALUE = -12
 APXXXX_ERROR_VARIABLE_NOT_DEFINED = -301
-AP1000_ERROR_COMMUNICATION = -1
-AP1000_ERROR_BADCOMMAND = -2
-AP1000_ERROR_ARGUMENT_TYPE = -11
-AP1000_ERROR_ARGUMENT_VALUE = -12
 AP1000_ERROR_SLOT_NOT_DEFINED = -151
 AP1000_ERROR_SLOT_NOT_GOOD_TYPE = -152
 AP1000_ERROR_SLOT_TYPE_NOT_DEFINED = -153
-AP1000_ERROR_VARIABLE_NOT_DEFINED = -301
 
-#                          CONSTANTS FOR SIMULATION
+
 # ------------------------------------------------------------------------------
+#                                   SIMULATION CONSTANTS
+# ------------------------------------------------------------------------------
+
 SimuAP1000_ID = "APEX-TECHNOLOGIES/AP1000-8/00001/1.0\n"
 SimuAP1000_SlotID = "APEX-TECHNOLOGIES/3314/13-3314-A-13-000502/1.0\n"
 SimuAP1000_SlotUsed = "1\n"
