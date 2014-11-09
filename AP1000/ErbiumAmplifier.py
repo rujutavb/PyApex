@@ -21,7 +21,7 @@ class ErbiumAmplifier():
 
     def GetType(self):
         from PyApex.Constantes import AP1000_ERROR_SLOT_TYPE_NOT_DEFINED
-        from PyApex.Constantes import AP1000_EFA_PREAMP, AP1000_EFA_BOOST, AP1000_EFA_INLINE
+        from PyApex.Constantes import AP1000_EFA_PREAMP, AP1000_EFA_BOOST, AP1000_EFA_INLINE, SimuEFA_SlotID
         from PyApex.Errors import ApexError
         import re
         
@@ -77,6 +77,8 @@ class ErbiumAmplifier():
 
 
     def GetInVoltage(self):
+        from PyApex.Constantes import SimuEFA_InVoltage
+        
         if self.Simulation:
             InVoltage = SimuEFA_InVoltage
         else:
@@ -88,6 +90,8 @@ class ErbiumAmplifier():
 
 
     def GetOutVoltage(self):
+        from PyApex.Constantes import SimuEFA_OutVoltage
+        
         if self.Simulation:
             InVoltage = SimuEFA_OutVoltage
         else:
@@ -117,7 +121,9 @@ class ErbiumAmplifier():
         self.IPump = IPump
     
     
-    def GetInPower(self):      
+    def GetInPower(self):
+        from PyApex.Constantes import SimuEFA_InPower
+        
         if self.Simulation:
             Power = SimuEFA_InPower
         else:
@@ -128,7 +134,9 @@ class ErbiumAmplifier():
         return float(Power[:-1])
 
 
-    def GetOutPower(self):      
+    def GetOutPower(self):
+        from PyApex.Constantes import SimuEFA_OutPower
+        
         if self.Simulation:
             Power = SimuEFA_OutPower
         else:
