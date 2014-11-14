@@ -13,8 +13,8 @@ class AP1000():
             - AP331X (Power Meter Module)
             - AP336X (Attenuator Module)
             - AP337X (Amplifier Module)
+            - AP3344 (2x2 Optical Switch Module)
         this version cannot yet communicate with :
-            - AP334X (Optical Switch Module)
             - AP339X (DFB Laser Module)
     
     VERSION
@@ -296,3 +296,21 @@ class AP1000():
             self.Connexion.close()
             raise ApexError(AP1000_ERROR_SLOT_NOT_GOOD_TYPE, SlotNumber)
 
+
+    def OpticalSwitch(self, SlotNumber, Force=False):
+        '''
+        Return an OpticalSwitch class for the module in the slot 'SlotNumber'
+        if Force is True, an OpticalSwitch class is returned even if the module isn't an Optical Switch
+        '''
+        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE
+        from PyApex.Constantes import AP1000_OSW_NAME 
+        from PyApex.Errors import ApexError
+        from PyApex.AP1000.OpticalSwitch import OpticalSwitch
+        
+        if Force:
+            return OpticalSwitch(self, SlotNumber, self.Simulation)
+        if self.Simulation or self.SlotType(SlotNumber) == AP1000_OSW_NAME:
+            return OpticalSwitch(self, SlotNumber, self.Simulation)
+        else:
+            self.Connexion.close()
+            raise ApexError(AP1000_ERROR_SLOT_NOT_GOOD_TYPE, SlotNumber)
