@@ -96,6 +96,7 @@ class AP1000():
             - if return False : Slot is not used
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Constantes import AP1000_SLOT_MIN, AP1000_SLOT_MAX
         from PyApex.Constantes import SimuAP1000_SlotUsed
         from PyApex.Errors import ApexError
         
@@ -125,6 +126,7 @@ class AP1000():
         If Force is True, the function return an ID even if slot isn't used
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Constantes import AP1000_SLOT_MIN, AP1000_SLOT_MAX
         from PyApex.Constantes import SimuAP1000_SlotID
         from PyApex.Errors import ApexError
         
@@ -158,6 +160,7 @@ class AP1000():
         If Force is True, the function return a S/N even if slot isn't used 
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE, AP1000_ERROR_SLOT_NOT_DEFINED
+        from PyApex.Constantes import AP1000_SLOT_MIN, AP1000_SLOT_MAX
         from PyApex.Constantes import SimuAP1000_SlotID
         from PyApex.Errors import ApexError
         import re
@@ -189,7 +192,8 @@ class AP1000():
         Return a string describing the module in the slot 'SlotNumber'
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
-        from PyApex.Constants import AP1000_ERROR_SLOT_NOT_DEFINED, SimuAP1000_SlotID, Modules
+        from PyApex.Constantes import AP1000_SLOT_MIN, AP1000_SLOT_MAX
+        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_DEFINED, SimuAP1000_SlotID, Modules
         from PyApex.Errors import ApexError
         import re
         
