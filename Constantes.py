@@ -164,6 +164,8 @@ SimuEFA_OutVoltage = "624\n"
 SimuEFA_InPower = "-10\n"
 SimuEFA_OutPower = "15\n"
 
+SimuOSW_SlotID = "APEX-TECHNOLOGIES/3344/10-3344-A-000501/1.0\n"
+
 SimuAP2050_ID = "APEX Technologies/2050-A/09-2050-A-000000/9.14\n"
 SimuAP2050_StartWavelength = "1526.000\n"
 SimuAP2050_StopWavelength = "1566.000\n"
