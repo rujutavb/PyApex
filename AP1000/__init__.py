@@ -13,17 +13,18 @@ class AP1000():
             - AP331X (Power Meter Module)
             - AP336X (Attenuator Module)
             - AP337X (Amplifier Module)
+        this version cannot yet communicate with :
+            - AP334X (Optical Switch Module)
+            - AP339X (DFB Laser Module)
     
     VERSION
         1.0
-    
-    FUNCTIONS
     '''
 
     def __init__(self, IPaddress, PortNumber=5900, Simulation=False):
         '''
         Constructor of AP1000 equipment.
-        IPaddress is the IP address of the equipment. It's a string data
+        IPaddress is the IP address (string) of the equipment.
         PortNumber is by default 5900. It's an integer
         Simulation is a boolean to indicate to the program if it has to run in simulation mode or not
         '''
@@ -121,6 +122,7 @@ class AP1000():
     def SlotID(self, SlotNumber, Force=False):
         '''
         Return a string ID of the module selected by 'SlotNumber'
+        If Force is True, the function return an ID even if slot isn't used
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
         from PyApex.Constantes import SimuAP1000_SlotID
@@ -152,7 +154,8 @@ class AP1000():
 
     def SlotSN(self, SlotNumber, Force=False):
         '''
-        Return the slot number (integer) of the module in the slot 'SlotNumber'
+        Return the Serial Number (integer) of the module in the slot 'SlotNumber'
+        If Force is True, the function return a S/N even if slot isn't used 
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE, AP1000_ERROR_SLOT_NOT_DEFINED
         from PyApex.Constantes import SimuAP1000_SlotID
@@ -217,7 +220,7 @@ class AP1000():
     def PowerMeter(self, SlotNumber, Force=False):
         '''
         Return a PowerMeter class for the module in the slot 'SlotNumber'
-        if Force is True, a PowerMeter class is returned even if the module isn't a PowerMeter
+        if Force is True, a PowerMeter class is returned even if the module isn't a Power Meter
         '''
         from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE, AP1000_PWM_NAME
         from PyApex.Errors import ApexError
@@ -235,7 +238,7 @@ class AP1000():
     def Attenuator(self, SlotNumber, Force=False):
         '''
         Return an Attenuator class for the module in the slot 'SlotNumber'
-        if Force is True, a PowerMeter class is returned even if the module isn't an Attenuator
+        if Force is True, an Attenuator class is returned even if the module isn't an Attenuator
         '''
         from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE, AP1000_ATT_NAME
         from PyApex.Errors import ApexError
@@ -252,8 +255,8 @@ class AP1000():
 
     def TunableLaser(self, SlotNumber, Force=False):
         '''
-        Return a Tunable Laser class for the module in the slot 'SlotNumber'
-        if Force is True, a PowerMeter class is returned even if the module isn't a Tunable Laser
+        Return a TunableLaser class for the module in the slot 'SlotNumber'
+        if Force is True, a TunableLaser class is returned even if the module isn't a Tunable Laser
         '''
         from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE, AP1000_TLS_CBAND_NAME, AP1000_TLS_LBAND_NAME
         from PyApex.Errors import ApexError
@@ -271,8 +274,8 @@ class AP1000():
 
     def ErbiumAmplifier(self, SlotNumber, Force=False):
         '''
-        Return an Erbium Amplifier class for the module in the slot 'SlotNumber'
-        if Force is True, a PowerMeter class is returned even if the module isn't an Erbium Amplifier
+        Return an ErbiumAmplifier class for the module in the slot 'SlotNumber'
+        if Force is True, an ErbiumAmplifier class is returned even if the module isn't an Erbium Amplifier
         '''
         from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE
         from PyApex.Constantes import AP1000_EFA_PREAMP_NAME, AP1000_EFA_BOOST_NAME, AP1000_EFA_INLINE_NAME 
