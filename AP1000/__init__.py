@@ -288,9 +288,7 @@ class AP1000():
         
         if Force:
             return ErbiumAmplifier(self, SlotNumber, self.Simulation)
-        if self.Simulation or self.SlotType(SlotNumber) == AP1000_EFA_PREAMP_NAME \
-           or self.SlotType(SlotNumber) == AP1000_EFA_BOOST_NAME \
-           or self.SlotType(SlotNumber) == AP1000_EFA_INLINE_NAME:
+        if self.Simulation or self.SlotType(SlotNumber) == AP1000_EFA_NAME:
             return ErbiumAmplifier(self, SlotNumber, self.Simulation)
         else:
             self.Connexion.close()
