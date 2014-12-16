@@ -24,21 +24,15 @@ AP1000_OSW = 3344
 AP1000_OSW_NAME = "Optical Switch"
 AP1000_ATT = 3364
 AP1000_ATT_NAME = "Optical Attenuator"
-AP1000_EFA_PREAMP = 3370
-AP1000_EFA_PREAMP_NAME = "Erbium Doped Fiber Pre-Amplifier"
-AP1000_EFA_BOOST = 3371
-AP1000_EFA_BOOST_NAME = "Erbium Doped Fiber Booster Amplifier"
-AP1000_EFA_INLINE = 3372
-AP1000_EFA_INLINE_NAME = "Erbium Doped Fiber In-Line Amplifier"
+AP1000_EFA = 3370
+AP1000_EFA_NAME = "Erbium Doped Fiber Amplifier"
 
 Modules = {\
     AP1000_TLS_CBAND : AP1000_TLS_CBAND_NAME, \
     AP1000_TLS_LBAND : AP1000_TLS_LBAND_NAME, \
     AP1000_PWM : AP1000_PWM_NAME, \
     AP1000_ATT : AP1000_ATT_NAME, \
-    AP1000_EFA_PREAMP : AP1000_EFA_PREAMP_NAME, \
-    AP1000_EFA_BOOST : AP1000_EFA_BOOST_NAME, \
-    AP1000_EFA_INLINE : AP1000_EFA_INLINE_NAME, \
+    AP1000_EFA : AP1000_EFA_NAME, \
     AP1000_OSW : AP1000_OSW_NAME,\
 }
 
@@ -84,9 +78,9 @@ AP1000_TLS_FRMAX = [VACCUM_LIGHT_SPEED / AP1000_TLS_WLMAX[0], None, VACCUM_LIGHT
 
 #                         ERBIUM AMPLIFIER CONSTANTS
 # ------------------------------------------------------------------------------
-# [3370 : PRE-AMPLIFIER, 3371 : BOOSTER APMLIFIER, 3372 : IN-NINE AMPLIFIER]
+# [3370-A : BOOSTER, 3370-B : IN-LINE, 3370-C : PRE-AMPLI]
 # MAX PUMP LASER CURRENT (mA)
-AP1000_EFA_IPMAX = [600, 1000, 600]
+AP1000_EFA_IPMAX = [1000, 600, 600]
 
 
 # ------------------------------------------------------------------------------
@@ -158,7 +152,7 @@ SimuTLS_SlotID = "APEX-TECHNOLOGIES/3350/10-3350-A-000503/0.0\n"
 SimuTLS_Power = "5\n"
 SimuTLS_Wavelength = "1553.310\n"
 
-SimuEFA_SlotID = "APEX-TECHNOLOGIES/3371/09-3371-A-000500/0.0\n"
+SimuEFA_SlotID = "APEX-TECHNOLOGIES/3370/09-3370-A-000500/0.0\n"
 SimuEFA_InVoltage = "512\n"
 SimuEFA_OutVoltage = "624\n"
 SimuEFA_InPower = "-10\n"
