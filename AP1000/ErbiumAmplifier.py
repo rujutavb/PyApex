@@ -21,7 +21,7 @@ class ErbiumAmplifier():
 
     def GetType(self):
         from PyApex.Constantes import AP1000_ERROR_SLOT_TYPE_NOT_DEFINED
-        from PyApex.Constantes import AP1000_EFA_PREAMP, AP1000_EFA_BOOST, AP1000_EFA_INLINE, SimuEFA_SlotID
+        from PyApex.Constantes import SimuEFA_SlotID
         from PyApex.Errors import ApexError
         import re
         
@@ -32,11 +32,11 @@ class ErbiumAmplifier():
             Send(self.Connexion, Command)
             ID = Receive(self.Connexion)
 
-        if re.findall(str(AP1000_EFA_PREAMP), ID.split("/")[1]) != []:
+        if re.findall("A", ID.split("/")[2].split("-")[2]) != []:
             return 0
-        elif re.findall(str(AP1000_EFA_BOOST), ID.split("/")[1]) != []:
+        elif re.findall("B", ID.split("/")[2].split("-")[2]) != []:
             return 1
-        elif re.findall(str(AP1000_EFA_INLINE), ID.split("/")[1]) != []:
+        elif re.findall("C", ID.split("/")[2].split("-")[2]) != []:
             return 2
         else:
             self.Connexion.close()
