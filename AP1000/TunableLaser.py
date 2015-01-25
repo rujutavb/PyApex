@@ -25,7 +25,7 @@ class TunableLaser():
 
     def __str__(self):
         '''
-        Return the string below when the 'print()' function is used
+        Return the equipement name and the slot number when the 'print()' function is used
         '''
         return "Tunable Laser in slot " + str(self.SlotNumber)
 
@@ -264,11 +264,10 @@ class TunableLaser():
     def SetFrequency(self, Frequency):
         '''
         Set frequency of the TLS equipment
-        Wavelength is expressed in GHz
+        Frequency is expressed in GHz
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
-        from PyApex.Constantes import VACCUM_LIGHT_SPEED
-        from PyApex.Constantes import AP1000_TLS_WLMAX
+        from PyApex.Constantes import VACCUM_LIGHT_SPEED, AP1000_TLS_WLMAX
         from PyApex.Errors import ApexError
         
         try:
@@ -289,7 +288,7 @@ class TunableLaser():
     def GetFrequency(self):
         '''
         Get frequency of the TLS equipment
-        The return wavelength is expressed in GHz
+        The return frequency is expressed in GHz
         '''
         from PyApex.Constantes import VACCUM_LIGHT_SPEED
             
