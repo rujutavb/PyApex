@@ -130,7 +130,7 @@ class PowerMeter():
 
     def SetWavelength(self, Wavelength, ChNumber=1):
         '''
-        Set wavelength of the PWM equipment
+        Set wavelength of the channel ChNumber of the PWM equipment
         Wavelength is expressed in nm
         ChNumber is the channel number : 1 (default) or 2
         '''
@@ -173,7 +173,7 @@ class PowerMeter():
 
     def GetWavelength(self, ChNumber=1):
         '''
-        Get wavelength of the PWM equipment
+        Get wavelength of the channel ChNumber of the PWM equipment
         The return wavelength is expressed in nm
         ChNumber is the channel number : 1 (default) or 2
         '''
@@ -204,7 +204,7 @@ class PowerMeter():
 
     def SetFrequency(self, Frequency, ChNumber=1):
         '''
-        Set frequency of the PWM equipment
+        Set frequency of the channel ChNumber of the PWM equipment
         Frequency is expressed in GHz
         ChNumber is the channel number : 1 (default) or 2
         '''
@@ -238,7 +238,7 @@ class PowerMeter():
 
     def GetFrequency(self, ChNumber=1):
         '''
-        Set frequency of the PWM equipment
+        Set frequency of the channel ChNumber of the PWM equipment
         Frequency is expressed in GHz
         ChNumber is the channel number : 1 (default) or 2
         '''
@@ -262,7 +262,7 @@ class PowerMeter():
 
     def GetPower(self, ChNumber=1):
         '''
-        Set frequency of the PWM equipment
+        Set frequency of the channel ChNumber of the PWM equipment
         The return power is expressed in the unit defined by the GetUnit() method
         ChNumber is the channel number : 1 (default) or 2
         '''
