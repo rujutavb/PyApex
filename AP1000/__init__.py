@@ -282,7 +282,7 @@ class AP1000():
         if Force is True, an ErbiumAmplifier class is returned even if the module isn't an Erbium Amplifier
         '''
         from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE
-        from PyApex.Constantes import AP1000_EFA_PREAMP_NAME, AP1000_EFA_BOOST_NAME, AP1000_EFA_INLINE_NAME 
+        from PyApex.Constantes import AP1000_EFA_NAME
         from PyApex.Errors import ApexError
         from PyApex.AP1000.ErbiumAmplifier import ErbiumAmplifier
         
