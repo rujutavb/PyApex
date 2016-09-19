@@ -28,12 +28,21 @@ class ErbiumAmplifier():
         return "Erbium Amplifier in slot " + str(self.SlotNumber)
 
 
-    def GetType(self):
+    def GetType(self, type="d"):
         '''
         Return the type of the EFA
-        return 0 for Booster
-        return 1 for In-Line
-        return 2 for Pre-Ampli
+        if type = 'd' (default), return a digit :
+            - 0 for Booster
+            - 1 for In-Line
+            - 2 for Pre-Ampli
+        if type = 'c', return the option character :
+            - 'A' for Booster
+            - 'B' for In-Line
+            - 'C' for Pre-Ampli
+        if type = 's', return a string :
+            - "Booster" for Booster
+            - "In-Line" for In-Line
+            - "Pre-Amplifier" for Pre-Ampli
         '''
         from PyApex.Constantes import AP1000_ERROR_SLOT_TYPE_NOT_DEFINED
         from PyApex.Constantes import SimuEFA_SlotID
@@ -48,11 +57,26 @@ class ErbiumAmplifier():
             ID = Receive(self.Connexion)
         
         if re.findall("A", ID.split("/")[2].split("-")[2]) != []:
-            return 0
+            if type.lower() == "c":
+                return "A"
+            elif type.lower() == "s":
+                return "Booster"
+            else:
+                return 0
         elif re.findall("B", ID.split("/")[2].split("-")[2]) != []:
-            return 1
+            if type.lower() == "c":
+                return "B"
+            elif type.lower() == "s":
+                return "In-Line"
+            else:
+                return 1
         elif re.findall("C", ID.split("/")[2].split("-")[2]) != []:
-            return 2
+            if type.lower() == "c":
+                return "C"
+            elif type.lower() == "s":
+                return "Pre-Amplifier"
+            else:
+                return 2
         else:
             self.Connexion.close()
             raise ApexError(AP1000_ERROR_SLOT_TYPE_NOT_DEFINED, self.SlotNumber)

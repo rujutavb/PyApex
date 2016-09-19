@@ -2,6 +2,12 @@
 # -*- coding: utf-8 -*-
 
 # ------------------------------------------------------------------------------
+#                                       IMPORTS
+# ------------------------------------------------------------------------------
+
+from serial import EIGHTBITS, PARITY_NONE, STOPBITS_ONE
+
+# ------------------------------------------------------------------------------
 #                                  UNIVERSAL CONSTANTS
 # ------------------------------------------------------------------------------
 
@@ -65,7 +71,7 @@ AP1000_ATT_WLMAX = 1700
 
 #                           TUNABLE LASER CONSTANTS
 # ------------------------------------------------------------------------------
-# [3350 : C-BAND TYPE, NOT USED, 3352 : L-BAND TYPE]
+# [3350 : C-BAND TYPE, 3351 : NOT USED, 3352 : L-BAND TYPE]
 # MIN AND MAX POWER
 AP1000_TLS_POWMIN = [-30, None, -30]
 AP1000_TLS_POWMAX = [13, None, 13]
@@ -80,7 +86,7 @@ AP1000_TLS_FRMAX = [VACCUM_LIGHT_SPEED / AP1000_TLS_WLMAX[0], None, VACCUM_LIGHT
 # ------------------------------------------------------------------------------
 # [3370-A : BOOSTER, 3370-B : IN-LINE, 3370-C : PRE-AMPLI]
 # MAX PUMP LASER CURRENT (mA)
-AP1000_EFA_IPMAX = [1000, 600, 600]
+AP1000_EFA_IPMAX = [1000, 1000, 600]
 
 
 # ------------------------------------------------------------------------------
@@ -115,6 +121,40 @@ AP2040_MAXYRES = 100
 AP2040_MINNPTS = 2
 AP2040_MAXNPTS = 20000
 
+# ------------------------------------------------------------------------------
+#                                   AB3510 CONSTANTS
+# ------------------------------------------------------------------------------
+
+# VID AND PID
+AB3510_VID = 0x5553
+AB3510_PID = 0x3512
+# VENDOR REQUESTS
+AB3510_VR_RESET_ALL = 0xB0
+AB3510_VR_SET_EEPROM_PARAMETERS = 0xB1
+AB3510_VR_GET_EEPROM_PARAMETERS = 0xB2
+AB3510_VR_SIMULATION_MODE = 0xB4
+AB3510_VR_GET_SAMPLE = 0xB5
+AB3510_VR_START_ACQ = 0xB6
+AB3510_VR_STOP_ACQ = 0xB7
+AB3510_VR_SET_FREQ = 0xB9
+AB3510_VR_GET_FREQ = 0xBA
+AB3510_VR_GET_TEMPERATURE = 0xBB
+AB3510_VR_BULK_TEST = 0xBC
+AB3510_VR_RESET_FIFO = 0xBF
+AB3510_VR_WRITE_EEPROM = 0xC1
+AB3510_VR_READ_EEPROM = 0xC2
+
+# ------------------------------------------------------------------------------
+#                               ETUVE CONSTANTS
+# ------------------------------------------------------------------------------
+
+ETUVE_BAUDRATE = 9600
+ETUVE_NBITS = EIGHTBITS
+ETUVE_PARITY = PARITY_NONE
+ETUVE_STOPBIT = STOPBITS_ONE
+ETUVE_FLOWCONTROL = False
+
+
 
 # ------------------------------------------------------------------------------
 #                                   ERROR CODE CONSTANTS
@@ -128,6 +168,28 @@ APXXXX_ERROR_VARIABLE_NOT_DEFINED = -301
 AP1000_ERROR_SLOT_NOT_DEFINED = -151
 AP1000_ERROR_SLOT_NOT_GOOD_TYPE = -152
 AP1000_ERROR_SLOT_TYPE_NOT_DEFINED = -153
+
+ABXXXX_NO_EQUIPMENT_FOUND = -301
+ABXXXX_ERROR_BAD_HANDLE = -311
+ABXXXX_EP0_WRITE_ERROR = -331
+ABXXXX_EP0_READ_ERROR = -332
+ABXXXX_EP1_WRITE_ERROR = -333
+ABXXXX_EP1_READ_ERROR = -334
+ABXXXX_EP2_WRITE_ERROR = -335
+ABXXXX_EP2_READ_ERROR = -336
+ABXXXX_EP3_WRITE_ERROR = -337
+ABXXXX_EP3_READ_ERROR = -338
+ABXXXX_EP4_WRITE_ERROR = -339
+ABXXXX_EP4_READ_ERROR = -340
+ABXXXX_EP5_WRITE_ERROR = -341
+ABXXXX_EP5_READ_ERROR = -342
+ABXXXX_EP6_WRITE_ERROR = -343
+ABXXXX_EP6_READ_ERROR = -344
+
+ETUVE_ERROR_COMMUNICATION = -1
+ETUVE_ERROR_BADCOMMAND = -2
+ETUVE_ERROR_ARGUMENT_TYPE = -11
+ETUVE_ERROR_ARGUMENT_VALUE = -12
 
 
 # ------------------------------------------------------------------------------
@@ -170,4 +232,8 @@ SimuAP2050_YResolution = "2.000\n"
 SimuAP2050_NPoints = "10000\n"
 
 SimuAP2040_ID = "APEX Technologies/2041-B/14-2041-B-000601/9.27\n"
+
+SIMU_AB3510_VID = 0x5553
+SIMU_AB3510_PID = 0x3510
+SIMU_AB3510_TEMPERATURE = 23.6
      
