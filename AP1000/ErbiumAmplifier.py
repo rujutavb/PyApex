@@ -148,13 +148,13 @@ class ErbiumAmplifier():
         from PyApex.Constantes import SimuEFA_OutVoltage
         
         if self.Simulation:
-            InVoltage = SimuEFA_OutVoltage
+            OutVoltage = SimuEFA_OutVoltage
         else:
             Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:POWEROUTVALUE\n"
             Send(self.Connexion, Command)
-            InVoltage = Receive(self.Connexion)
+            OutVoltage = Receive(self.Connexion)
         
-        return int(InVoltage[:-1])
+        return int(OutVoltage[:-1])
 
 
     def SetIPump(self, IPump):

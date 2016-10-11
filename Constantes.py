@@ -12,6 +12,7 @@ from serial import EIGHTBITS, PARITY_NONE, STOPBITS_ONE
 # ------------------------------------------------------------------------------
 
 VACCUM_LIGHT_SPEED = 299792458
+Celerity = VACCUM_LIGHT_SPEED
 
 
 # ------------------------------------------------------------------------------
@@ -32,6 +33,8 @@ AP1000_ATT = 3364
 AP1000_ATT_NAME = "Optical Attenuator"
 AP1000_EFA = 3370
 AP1000_EFA_NAME = "Erbium Doped Fiber Amplifier"
+AP1000_FIL = 3380
+AP1000_FIL_NAME = "Optical Filter"
 
 Modules = {\
     AP1000_TLS_CBAND : AP1000_TLS_CBAND_NAME, \
@@ -40,6 +43,7 @@ Modules = {\
     AP1000_ATT : AP1000_ATT_NAME, \
     AP1000_EFA : AP1000_EFA_NAME, \
     AP1000_OSW : AP1000_OSW_NAME,\
+    AP1000_FIL : AP1000_FIL_NAME,\
 }
 
 #                           SLOTS NUMBER MIN AND MAX
@@ -64,7 +68,7 @@ AP1000_PWM_AVGMAX = 10000
 AP1000_ATT_CHNUMBER = 2
 # MIN AND MAX ATTENUATION
 AP1000_ATT_ATTMIN = 0
-AP1000_ATT_ATTMAX = 31
+AP1000_ATT_ATTMAX = 35
 # MIN AND MAX WAVELENGTH
 AP1000_ATT_WLMIN = 1300
 AP1000_ATT_WLMAX = 1700
@@ -88,38 +92,35 @@ AP1000_TLS_FRMAX = [VACCUM_LIGHT_SPEED / AP1000_TLS_WLMAX[0], None, VACCUM_LIGHT
 # MAX PUMP LASER CURRENT (mA)
 AP1000_EFA_IPMAX = [1000, 1000, 600]
 
+#                               FILTER CONSTANTS
+# ------------------------------------------------------------------------------
+# MIN AND MAX WAVELENGTH
+AP1000_FIL_WLMIN = 1525.0
+AP1000_FIL_WLMAX = 1565.0
+# MIN AND MAX FREQUENCY
+AP1000_FIL_FRMIN = VACCUM_LIGHT_SPEED / AP1000_FIL_WLMAX
+AP1000_FIL_FRMAX = VACCUM_LIGHT_SPEED / AP1000_FIL_WLMIN
+
 
 # ------------------------------------------------------------------------------
-#                                   AP2050 CONSTANTS
+#                                   AP2XXX CONSTANTS
 # ------------------------------------------------------------------------------
 
 # MIN AND MAX WAVELENGTH
-AP2050_WLMIN = 1526
-AP2050_WLMAX = 1566
-# MIN AND MAX SPAN IN WAVELENGTH
-AP2050_MINSPAN = 0.01
-AP2050_MAXSPAN = 40
-
-
-# ------------------------------------------------------------------------------
-#                                   AP2040 CONSTANTS
-# ------------------------------------------------------------------------------
-
-# MIN AND MAX WAVELENGTH
-AP2040_WLMIN = 1526
-AP2040_WLMAX = 1566
+AP2XXX_WLMIN = 1526
+AP2XXX_WLMAX = 1566
 # MIN AND MAX WAVELENGTH SPAN
-AP2040_MINSPAN = 0.01
-AP2040_MAXSPAN = 40
+AP2XXX_MINSPAN = 0.01
+AP2XXX_MAXSPAN = 40
 # MIN AND MAX CENTER WAVELENGTH
-AP2040_MAXCENTER = AP2040_WLMAX - AP2040_MINSPAN / 2
-AP2040_MINCENTER = AP2040_WLMIN + AP2040_MINSPAN / 2
+AP2XXX_MAXCENTER = AP2XXX_WLMAX - AP2XXX_MINSPAN / 2
+AP2XXX_MINCENTER = AP2XXX_WLMIN + AP2XXX_MINSPAN / 2
 # MIN AND MAX Y RESOLUTION
-AP2040_MINYRES = 0.001
-AP2040_MAXYRES = 100
+AP2XXX_MINYRES = 0.001
+AP2XXX_MAXYRES = 100
 # MIN AND MAX POINTS NUMBER
-AP2040_MINNPTS = 2
-AP2040_MAXNPTS = 20000
+AP2XXX_MINNPTS = 2
+AP2XXX_MAXNPTS = 100000
 
 # ------------------------------------------------------------------------------
 #                                   AB3510 CONSTANTS
@@ -222,16 +223,14 @@ SimuEFA_OutPower = "15\n"
 
 SimuOSW_SlotID = "APEX-TECHNOLOGIES/3344/10-3344-A-000501/1.0\n"
 
-SimuAP2050_ID = "APEX Technologies/2050-A/09-2050-A-000000/9.14\n"
-SimuAP2050_StartWavelength = "1526.000\n"
-SimuAP2050_StopWavelength = "1566.000\n"
-SimuAP2050_Span = "20\n"
-SimuAP2050_Center = "1551.234\n"
-SimuAP2050_XResolution = "0.100\n"
-SimuAP2050_YResolution = "2.000\n"
-SimuAP2050_NPoints = "10000\n"
-
-SimuAP2040_ID = "APEX Technologies/2041-B/14-2041-B-000601/9.27\n"
+SimuAP2XXX_ID = "APEX Technologies/2050-A/09-2050-A-000000/9.14\n"
+SimuAP2XXX_StartWavelength = "1526.000\n"
+SimuAP2XXX_StopWavelength = "1566.000\n"
+SimuAP2XXX_Span = "20\n"
+SimuAP2XXX_Center = "1551.234\n"
+SimuAP2XXX_XResolution = "0.100\n"
+SimuAP2XXX_YResolution = "2.000\n"
+SimuAP2XXX_NPoints = "10000\n"
 
 SIMU_AB3510_VID = 0x5553
 SIMU_AB3510_PID = 0x3510

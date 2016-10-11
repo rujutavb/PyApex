@@ -71,7 +71,7 @@ class AB3510():
 
     def Open(self, Handle=0):
         '''
-        Open connexion with an AB3510 equipment.
+        Opens a connexion with an AB3510 equipment.
         This method is called by the constructor of AB3510 class if only 1 board is present
         '''
         from PyApex.Constantes import ABXXXX_ERROR_BAD_HANDLE
@@ -83,7 +83,10 @@ class AB3510():
         else:
             try:
                 Devices = self.Find()
-                if len(Devices) <= Handle:
+                if len(Devices) == 0:
+                    raise ApexError(ABXXXX_NO_EQUIPMENT_FOUND, "AB3510")
+                    exit()
+                elif len(Devices) <= Handle:
                     raise ApexError(ABXXXX_ERROR_BAD_HANDLE, Handle)
                     exit()
                 

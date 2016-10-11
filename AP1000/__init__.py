@@ -281,8 +281,7 @@ class AP1000():
         Return an ErbiumAmplifier class for the module in the slot 'SlotNumber'
         if Force is True, an ErbiumAmplifier class is returned even if the module isn't an Erbium Amplifier
         '''
-        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE
-        from PyApex.Constantes import AP1000_EFA_PREAMP_NAME, AP1000_EFA_BOOST_NAME, AP1000_EFA_INLINE_NAME 
+        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE, AP1000_EFA_NAME 
         from PyApex.Errors import ApexError
         from PyApex.AP1000.ErbiumAmplifier import ErbiumAmplifier
         
@@ -300,8 +299,7 @@ class AP1000():
         Return an OpticalSwitch class for the module in the slot 'SlotNumber'
         if Force is True, an OpticalSwitch class is returned even if the module isn't an Optical Switch
         '''
-        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE
-        from PyApex.Constantes import AP1000_OSW_NAME 
+        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE, AP1000_OSW_NAME  
         from PyApex.Errors import ApexError
         from PyApex.AP1000.OpticalSwitch import OpticalSwitch
         
@@ -309,6 +307,24 @@ class AP1000():
             return OpticalSwitch(self, SlotNumber, self.Simulation)
         if self.Simulation or self.SlotType(SlotNumber) == AP1000_OSW_NAME:
             return OpticalSwitch(self, SlotNumber, self.Simulation)
+        else:
+            self.Connexion.close()
+            raise ApexError(AP1000_ERROR_SLOT_NOT_GOOD_TYPE, SlotNumber)
+    
+    
+    def OpticalFilter(self, SlotNumber, Force=False):
+        '''
+        Return an OpticalFilter class for the module in the slot 'SlotNumber'
+        if Force is True, an OpticalFilter class is returned even if the module isn't an Optical Filter
+        '''
+        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE, AP1000_FIL_NAME
+        from PyApex.Errors import ApexError
+        from PyApex.AP1000.Filter import Filter
+        
+        if Force:
+            return Filter(self, SlotNumber, self.Simulation)
+        if self.Simulation or self.SlotType(SlotNumber) == AP1000_FIL_NAME:
+            return Filter(self, SlotNumber, self.Simulation)
         else:
             self.Connexion.close()
             raise ApexError(AP1000_ERROR_SLOT_NOT_GOOD_TYPE, SlotNumber)
