@@ -136,7 +136,7 @@ class ErbiumAmplifier():
             Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:POWERINVALUE\n"
             Send(self.Connexion, Command)
             InVoltage = Receive(self.Connexion)
-        
+
         return int(InVoltage[:-1])
 
 

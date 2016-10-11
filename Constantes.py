@@ -156,7 +156,6 @@ ETUVE_STOPBIT = STOPBITS_ONE
 ETUVE_FLOWCONTROL = False
 
 
-
 # ------------------------------------------------------------------------------
 #                                   ERROR CODE CONSTANTS
 # ------------------------------------------------------------------------------
@@ -235,4 +234,3 @@ SimuAP2XXX_NPoints = "10000\n"
 SIMU_AB3510_VID = 0x5553
 SIMU_AB3510_PID = 0x3510
 SIMU_AB3510_TEMPERATURE = 23.6
-     

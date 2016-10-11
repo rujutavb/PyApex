@@ -2,6 +2,7 @@ PyApex
 ======
 
 Python3 Library for controlling Apex equipments
+<<<<<<< HEAD
 =======
 Python3 Library for controlling Apex Technologies equipments
 
@@ -33,3 +34,5 @@ where 1 is the slot number of the module
 5. To close the connection to the equipment, use the Close function. For exemple
 	RemoteEquipment.Close()
 
+=======
+>>>>>>> github/master
