@@ -9,16 +9,17 @@ class AP1000():
     DESCRIPTION
         Elementary functions to communicate with Apex AP1000 equipment
         this version can communicate with :
-            - AP335X (Tunable Laser Module)
             - AP331X (Power Meter Module)
+            - AP3344 (2x2 Optical Switch Module)
+            - AP335X (Tunable Laser Module)
             - AP336X (Attenuator Module)
             - AP337X (Amplifier Module)
-            - AP3344 (2x2 Optical Switch Module)
+            - AP338X (Optical Filter Module)
         this version cannot yet communicate with :
             - AP339X (DFB Laser Module)
     
     VERSION
-        1.0
+        1.1
     '''
 
     def __init__(self, IPaddress, PortNumber=5900, Simulation=False):
