@@ -19,15 +19,17 @@ class AP2XXX():
         PortNumber is by default 5900. It's an integer
         Simulation is a boolean to indicate to the program if it has to run in simulation mode or not
         '''
+        from PyApex.Constantes import AP2XXX_WLMIN, AP2XXX_WLMAX 
+        
         self.IPAddress = IPaddress
         self.PortNumber = PortNumber
         self.Simulation = Simulation
         
         # Variables and constants of the equipment
-        self.StartWavelength = AP2040_WLMIN
-        self.StopWavelength = AP2040_WLMAX
-        self.Span = AP2040_WLMAX - AP2040_WLMIN
-        self.Center = AP2040_WLMIN + (self.Span / 2)
+        self.StartWavelength = AP2XXX_WLMIN
+        self.StopWavelength = AP2XXX_WLMAX
+        self.Span = AP2XXX_WLMAX - AP2XXX_WLMIN
+        self.Center = AP2XXX_WLMIN + (self.Span / 2)
         self.SweepResolution = 1.12 
         self.ValidSweepResolutions = [0 , 1 , 2]
         self.NoiseMaskValue = -70
@@ -231,7 +233,7 @@ class AP2XXX():
         if not isinstance(Center, (float, int)):
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Center")
             sys.exit()
-        if Span < AP2XXX_MINCENTER or Span > AP2XXX_MAXCENTER:
+        if Center < AP2XXX_MINCENTER or Center > AP2XXX_MAXCENTER:
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Center")
             sys.exit()
 
@@ -432,16 +434,31 @@ class AP2XXX():
         
         NPoints = self.GetNPoints()
         if not self.Simulation:
+            YData = []
+            XData = []
+            
             if Scale.lower() == "lin":
                 Command = "SPDATAL" + str(int(TraceNumber)) + "\n"
             else:
                 Command = "SPDATAD" + str(int(TraceNumber)) + "\n"
             Send(self.Connexion, Command)
-            YData = Receive(self.Connexion, NPoints)
-
+            YStr = Receive(self.Connexion, 12 * NPoints)[:-1]
+            YStr = YStr.split(" ")
+            for s in YStr:
+                try:
+                    YData.append(float(s))
+                except:
+                    YData.append(0.0)
+                
             Command = "SPDATAWL" + str(TraceNumber) + "\n"
             Send(self.Connexion, Command)
-            XData = Receive(self.Connexion, NPoints)
+            XStr = Receive(self.Connexion, 12 * NPoints)[:-1]
+            XStr = XStr.split(" ")
+            for s in XStr:
+                try:
+                    XData.append(float(s))
+                except:
+                    XData.append(0.0)
         else:
             YData = []
             XData = []
