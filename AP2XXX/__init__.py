@@ -724,3 +724,83 @@ class AP2XXX():
             sleep(3)
         if int(NbAverage) > 1:
             self.DesactivateAverageMode()
+    
+    
+    def AddMarker(self, Position, TraceNumber=1):
+        '''
+        Add a marker
+        TraceNumber is an integer between 1 (default) and 6
+        Position is the X-axis position of the marker expressed in the value of 'ScaleXUnit'
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE 
+        from PyApex.Errors import ApexError
+        
+        if not isinstance(TraceNumber, int):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TraceNumber")
+            sys.exit()
+            
+        if not isinstance(Position, (int, float)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Position")
+            sys.exit()
+        
+        if not TraceNumber in self.Validtracenumbers:
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "TraceNumber")
+            sys.exit()
+        
+        if not self.Simulation:
+            Command = "SPMKRAD" + str(TraceNumber) + "_" + str(Position) + "\n"
+            Send(self.Connexion, Command)
+    
+    
+    def GetMarkers(self, TraceNumber=1):
+        '''
+        Gets the Y-axis markers of a selected trace
+        TraceNumber is an integer between 1 (default) and 6
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE 
+        from PyApex.Errors import ApexError
+        
+        if not isinstance(TraceNumber, int):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TraceNumber")
+            sys.exit()
+        
+        if not TraceNumber in self.Validtracenumbers:
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "TraceNumber")
+            sys.exit()
+        
+        Markers = []
+        if not self.Simulation:
+            Command = "SPDATAMKRY" + str(TraceNumber) + "\n"
+            Send(self.Connexion, Command)
+            YStr = Receive(self.Connexion, 64)[:-1]
+            YStr = YStr.split(" ")
+            YStr = YStr[1:]
+            
+            for y in YStr:
+                if y.lower() not in ["dbm", "mw"]:
+                    Markers.append(float(y))
+        
+        return Markers
+    
+    
+    def DelAllMarkers(self, TraceNumber=1):
+        '''
+        Deletes all markers of a selected trace
+        TraceNumber is an integer between 1 (default) and 6
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE 
+        from PyApex.Errors import ApexError
+        
+        if not isinstance(TraceNumber, int):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TraceNumber")
+            sys.exit()
+        
+        if not TraceNumber in self.Validtracenumbers:
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "TraceNumber")
+            sys.exit()
+        
+        Markers = []
+        if not self.Simulation:
+            Command = "SPMKRDELAL" + str(TraceNumber) + "\n"
+            Send(self.Connexion, Command)
+        
