@@ -470,7 +470,7 @@ class AP2XXX():
                     YData.append(10 * log10(random()))
                 XData.append(SimuAP2XXX_StartWavelength + i * DeltaX)
                 
-        return [YData, XData]
+        return [YData[1:], XData[1:]]
 
 
     def SetNoiseMask(self, NoiseMaskValue):
