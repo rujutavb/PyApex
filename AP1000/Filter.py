@@ -188,3 +188,51 @@ class Filter():
         Unit is a string which could be "nm" for wavelength or "GHz" for frequency
         '''
         return self.Unit
+    
+    
+    def SetVoltage(self, Voltage):
+        '''
+        Calibration use only
+        Set Voltage of the FIL equipment (DAC binary value)
+        Voltage is expressed in binary value (between 0 and 65535)
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Errors import ApexError
+        
+        if not isinstance(Voltage, (int, float)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Voltage")
+            sys.exit()
+        
+        if(Voltage < 0 or Voltage > 65535):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Voltage")
+            sys.exit()
+            
+        if not self.Simulation:
+            Command = "FIL[" + str(self.SlotNumber).zfill(2) + "]:SETV" + \
+                      str(Voltage) + "\n"
+            Send(self.Connexion, Command)
+        
+        
+        self.Wavelength = self.Convert(Frequency)
+    
+    
+    def SetSwitch(self, Value):
+        '''
+        Calibration use only
+        Set connection of the switch in the FIL equipment
+        Value is a binary value (True or False)
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Errors import ApexError
+        
+        if not isinstance(Voltage, bool):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Value")
+            sys.exit()
+            
+        if not self.Simulation:
+            Command = "FIL[" + str(self.SlotNumber).zfill(2) + "]:SWITCH" + \
+                      str(int(Value)) + "\n"
+            Send(self.Connexion, Command)
+        
+        
+        self.Wavelength = self.Convert(Frequency)
