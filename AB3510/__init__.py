@@ -122,6 +122,7 @@ class AB3510():
         '''
         from PyApex.Constantes import AB3510_VR_RESET_ALL, ABXXXX_EP0_WRITE_ERROR
         from PyApex.Errors import ApexError
+        from sys import exit
         
         if not self.Simulation:
             try:
@@ -138,6 +139,7 @@ class AB3510():
         from PyApex.Constantes import AB3510_VR_GET_TEMPERATURE, ABXXXX_EP0_READ_ERROR, SIMU_AB3510_TEMPERATURE
         from PyApex.Errors import ApexError
         from random import randint
+        from sys import exit
 
         if self.Simulation:
             return SIMU_AB3510_TEMPERATURE
@@ -157,6 +159,7 @@ class AB3510():
         '''
         from PyApex.Constantes import AB3510_VR_GET_SAMPLE, ABXXXX_EP0_READ_ERROR
         from PyApex.Errors import ApexError
+        from sys import exit
 
         Samples = []
         if self.Simulation:
@@ -170,7 +173,7 @@ class AB3510():
                 exit()
             else:
                 for i in range(0, 8, 2):
-                    Samples.append(int((SampleWord[i] * 256 + SampleWord[i + 1]) / 4))
+                    Samples.append(int((SampleWord[i] + (SampleWord[i + 1] * 256)) / 4))
         return Samples    
 
 
@@ -181,6 +184,7 @@ class AB3510():
         from PyApex.Constantes import AB3510_VR_SET_EEPROM_PARAMETERS, ABXXXX_EP0_WRITE_ERROR,\
              APXXXX_ERROR_ARGUMENT_TYPE
         from PyApex.Errors import ApexError
+        from sys import exit
 
         if not isinstance(Data, bytes):
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Data")
@@ -206,6 +210,7 @@ class AB3510():
         from PyApex.Constantes import AB3510_VR_GET_EEPROM_PARAMETERS, ABXXXX_EP0_READ_ERROR,\
              APXXXX_ERROR_ARGUMENT_TYPE
         from PyApex.Errors import ApexError
+        from sys import exit
 
         if not isinstance(BytesNumber, int):
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "BytesNumber")

@@ -190,11 +190,12 @@ class Filter():
         return self.Unit
     
     
-    def SetVoltage(self, Voltage):
+    def SetVoltage(self, Voltage, Filter=1):
         '''
         Calibration use only
         Set Voltage of the FIL equipment (DAC binary value)
         Voltage is expressed in binary value (between 0 and 65535)
+        Filter is the number of the filter 1 (default) or 2
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
         from PyApex.Errors import ApexError
@@ -203,36 +204,48 @@ class Filter():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Voltage")
             sys.exit()
         
+        if not isinstance(Filter, (int)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Filter")
+            sys.exit()
+        
         if(Voltage < 0 or Voltage > 65535):
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Voltage")
+            sys.exit()
+        
+        if(Filter not in [1, 2]):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Filter")
             sys.exit()
             
         if not self.Simulation:
             Command = "FIL[" + str(self.SlotNumber).zfill(2) + "]:SETV" + \
-                      str(Voltage) + "\n"
+                      str(Filter) + str(Voltage) + "\n"
             Send(self.Connexion, Command)
-        
-        
-        self.Wavelength = self.Convert(Frequency)
     
     
-    def SetSwitch(self, Value):
+    def SetSwitch(self, Value, Filter=1):
         '''
         Calibration use only
         Set connection of the switch in the FIL equipment
         Value is a binary value (True or False)
+        Filter is the number of the filter 1 (default) or 2
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
         from PyApex.Errors import ApexError
         
-        if not isinstance(Voltage, bool):
+        if not isinstance(Value, bool):
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Value")
+            sys.exit()
+        
+        if not isinstance(Filter, (int)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Filter")
+            sys.exit()
+        
+        if(Filter not in [1, 2]):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Filter")
             sys.exit()
             
         if not self.Simulation:
             Command = "FIL[" + str(self.SlotNumber).zfill(2) + "]:SWITCH" + \
-                      str(int(Value)) + "\n"
+                      str(Filter) + str(int(Value)) + "\n"
             Send(self.Connexion, Command)
         
-        
-        self.Wavelength = self.Convert(Frequency)

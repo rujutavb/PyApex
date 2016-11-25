@@ -395,7 +395,7 @@ class AP2XXX():
             except:
                 status = 0
         else:
-            status = 0
+            status = 1
             
         return status
 
@@ -631,11 +631,16 @@ class AP2XXX():
             Send(self.Connexion, Command)
 
 
-    def FindPeak(self, TraceNumber=1, ThresholdValue=20.0):
+    def FindPeak(self, TraceNumber=1, ThresholdValue=20.0, Find="max"):
         '''
         Find the peaks in the selected trace
         TraceNumber is an integer between 1 (default) and 6
         ThresholdValue is a float expressed in dB
+        Find is a string between the following values:
+            - Find = "MAX" : only the max peak is returned (default)
+            - Find = "MIN" : only the min peak is returned
+            - Find = "ALL" : all peaks are returned in a list
+            - Find = "MEAN" : a mean value of all peaks is returned
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE 
         from PyApex.Errors import ApexError
@@ -648,15 +653,52 @@ class AP2XXX():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "TraceNumber")
             sys.exit()
         
+        if not isinstance(ThresholdValue, (int, float)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "ThresholdValue")
+            sys.exit()
+        
         if not self.Simulation:
             Command = "SPPKFIND" + str(TraceNumber) + "_" + str(ThresholdValue) + "\n"
             Send(self.Connexion, Command)
-            #Peak1 = Receive(self.Connexion)
-            Command2 = "SPDATAMKRX" + str(TraceNumber) + "\n"
-            Send(self.Connexion, Command2)
-            Peak = Receive(self.Connexion)
+            Peaks = self.GetMarkers(TraceNumber, Axis='X')
+        
+        else:
+            Peaks = [1545.000, 1550.000, 1555.000]
+            
+        if str(Find).lower() == "all":
+            return Peaks
+        
+        elif str(Find).lower() == "mean":
+            if len(Peaks) > 0:
+                Sum = 0
+                for p in Peaks:
+                    Sum += p
+                return Sum / len(Peaks)
+            else:
+                return 0.0
+        
+        elif str(Find).lower() == "min":
+            if len(Peaks) > 0:
+                Min = Peaks[0]
+                for p in Peaks:
+                    if Min > p:
+                        Min = p
+                return Min
+            else:
+                return 0.0
+        
+        else:
+            if len(Peaks) > 0:
+                Max = Peaks[0]
+                for p in Peaks:
+                    if Max < p:
+                        Max = p
+                return Max
+            else:
+                return 0.0
+        
         self.tracenumber = TraceNumber
-        return Peak.split(" ")[1]
+        return Peak
 
 
     def ActivateAverageMode(self):
@@ -679,14 +721,14 @@ class AP2XXX():
 
     def AutoMeasure(self, TraceNumber=1, NbAverage=1):
         '''
-        Auto measurement which performs a peak search
-        and selects the spectral range and modify the span
+        Auto measurement which performs a single and looks for the maximum peak
+        If a peak is detected, this method selects the spectral range and modify the span
         TraceNumber is an integer between 1 (default) and 6
         NbAverage is the number of average to perform after the span selection (no average by default)
         '''
-        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE 
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Constantes import AP2XXX_WLMIN, AP2XXX_WLMAX
         from PyApex.Errors import ApexError
-        from time import sleep
         
         if not isinstance(TraceNumber, int):
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TraceNumber")
@@ -704,26 +746,28 @@ class AP2XXX():
             sys.exit()
             
         self.DeleteAll()
-        self.SetStartWavelength(AP2040_WLMIN)
-        self.SetStopWavelength(AP2040_WLMAX)
-        self.Run(Type="single")
-        sleep(8)
+        self.SetStartWavelength(AP2XXX_WLMIN)
+        self.SetStopWavelength(AP2XXX_WLMAX)
+        self.Run()
         
-        WavelengthPeak = self.FindPeak(TraceNumber, ThresholdValue=20.0)
-        if self.ScaleXUnit == 0:
-            self.SetSpan(125.0)
-        else:
-            self.SetSpan(1.0)
-        self.SetCenter(float(WavelengthPeak))
+        PeakValue = self.FindPeak(TraceNumber, ThresholdValue=20.0, Find="Max")
         
-        self.DeleteAll()
-        if int(NbAverage) > 1:
-            self.ActivateAverageMode()
-        for i in range(0, NbAverage):
-            self.Run(Type="single")
-            sleep(3)
-        if int(NbAverage) > 1:
-            self.DesactivateAverageMode()
+        if PeakValue != 0.0:
+            if self.ScaleXUnit == 0:
+                self.SetSpan(125.0)
+            else:
+                self.SetSpan(1.0)
+            self.SetCenter(PeakValue)
+            
+            self.DeleteAll()
+            self.DelAllMarkers(TraceNumber)
+            
+            if int(NbAverage) > 1:
+                self.ActivateAverageMode()
+            for i in range(NbAverage):
+                self.Run()
+            if int(NbAverage) > 1:
+                self.DesactivateAverageMode()
     
     
     def AddMarker(self, Position, TraceNumber=1):
@@ -752,13 +796,24 @@ class AP2XXX():
             Send(self.Connexion, Command)
     
     
-    def GetMarkers(self, TraceNumber=1):
+    def GetMarkers(self, TraceNumber=1, Axis='y'):
         '''
-        Gets the Y-axis markers of a selected trace
+        Gets the X-axis or Y-axis markers of a selected trace
         TraceNumber is an integer between 1 (default) and 6
+        Axis is a string or an integer for selecting the axis:
+            Axis = 0 or 'X' : get the X-axis values of the markers
+            Axis = 1 or 'Y' : get the Y-axis values of the markers (default)
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE 
         from PyApex.Errors import ApexError
+        
+        if not isinstance(Axis, (int, str)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Axis")
+            sys.exit()
+        
+        if not Axis in [0, 1] and not str(Axis).lower() in ['x', 'y'] :
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Axis")
+            sys.exit()
         
         if not isinstance(TraceNumber, int):
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TraceNumber")
@@ -768,18 +823,28 @@ class AP2XXX():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "TraceNumber")
             sys.exit()
         
+        if str(Axis).lower() == 'x':
+            Axis = 0
+        elif str(Axis).lower() == 'y':
+            Axis = 1
+        
         Markers = []
         if not self.Simulation:
-            Command = "SPDATAMKRY" + str(TraceNumber) + "\n"
+            if Axis:
+                Command = "SPDATAMKRY" + str(TraceNumber) + "\n"
+            else:
+                Command = "SPDATAMKRX" + str(TraceNumber) + "\n"
             Send(self.Connexion, Command)
-            YStr = Receive(self.Connexion, 64)[:-1]
-            YStr = YStr.split(" ")
-            YStr = YStr[1:]
+            Str = Receive(self.Connexion, 64)[:-1]
+            Str = Str.split(" ")
+            Str = Str[1:]
             
-            for y in YStr:
-                if y.lower() not in ["dbm", "mw"]:
-                    Markers.append(float(y))
-        
+            for v in Str:
+                if v.lower() not in ["dbm", "mw", "nm", "ghz"]:
+                    try:
+                        Markers.append(float(v))
+                    except:
+                        pass
         return Markers
     
     
