@@ -36,16 +36,30 @@ class AB3510():
         Constructor of AB3510 equipment.
         Simulation is a boolean to indicate to the program if it has to run in simulation mode or not
         '''
-        from PyApex.Constantes import ABXXXX_NO_EQUIPMENT_FOUND
+        from PyApex.Constantes import ABXXXX_NO_EQUIPMENT_FOUND, AB3510_PTS_NB
         from PyApex.Errors import ApexError
         from sys import exit
         
         self.Simulation = Simulation
         self.Handle = 0
         self.Device = None
+        
+        self.InternalData = {}
+        self.InternalData["sn"] = "XX-AB3510-XXXXXX"
+        self.InternalData["firmware"] = "1.0"
+        self.InternalData["hardware"] = "1.0"
+        self.InternalData["ch0"] = {}
+        self.InternalData["ch1"] = {}
+        self.InternalData["ch2"] = {}
+        self.InternalData["ch3"] = {}
+        self.EEPromOK = False
+        
         self.Channels = []
         for i in range(0, 4):
+            EEPromCalib = []
             PowerCalib = []
+            for k in range(AB3510_PTS_NB):
+                EEPromCalib.append([0.0, 0])
             for k in range(0, 2**14):
                 PowerCalib.append(0.0)
             self.Channels.append([PowerCalib, [1.0, 0.0], [1.0, 0.0]])
@@ -177,23 +191,39 @@ class AB3510():
         return Samples    
 
 
-    def SetEEPROMParameters(self, Data):
+    def SetEEPromData(self, Data):
         '''
-        Set Parameters into the EEPROM of AB3510
+        Set Data into the EEPROM of AB3510
+        Data is a bytes object to write into the EEProm
         '''
         from PyApex.Constantes import AB3510_VR_SET_EEPROM_PARAMETERS, ABXXXX_EP0_WRITE_ERROR,\
              APXXXX_ERROR_ARGUMENT_TYPE
         from PyApex.Errors import ApexError
         from sys import exit
 
-        if not isinstance(Data, bytes):
+        if not isinstance(Data, (bytes, bytearray)):
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Data")
             exit()
         
         if self.Simulation:
             return True
         else:
-            self.Device.ctrl_transfer(0x40, AB3510_VR_SET_EEPROM_PARAMETERS, len(Data), 0, Data)
+            if len(Data) <= 64:
+                self.Device.ctrl_transfer(0x40, AB3510_VR_SET_EEPROM_PARAMETERS, len(Data), 0, Data)
+            else:
+                Length = len(Data)
+                print("Send the first 64 bytes")
+                self.Device.ctrl_transfer(0x40, AB3510_VR_SET_EEPROM_PARAMETERS, Length, 0, Data[0:64])
+                Index = 64
+                Length -= 64
+                for i in range(int(Length / 64)):
+                    print("Send the " + str(i) + "ieme 64 bytes")
+                    self.Device.ctrl_transfer(0x40, 0, 0, 0, Data[Index:Index + 64])
+                    Index += 64
+                    Length -= 64
+                if Length > 0:
+                    print("Send the last " + str(Length) + " bytes")
+                    self.Device.ctrl_transfer(0x40, 0, 0, 0, Data[Index:Index + Length + 1])
             try:
                 len(Data)
             except:
@@ -203,9 +233,11 @@ class AB3510():
                 return True
 
 
-    def GetEEPROMParameters(self, BytesNumber):
+    def GetEEPromData(self, BytesNumber):
         '''
-        Get Parameters from the EEPROM of AB3510
+        Get Data from the EEPROM of AB3510
+        BytesNumber is the number of bytes to read from the EEProm
+        Returns an array of the data bytes
         '''
         from PyApex.Constantes import AB3510_VR_GET_EEPROM_PARAMETERS, ABXXXX_EP0_READ_ERROR,\
              APXXXX_ERROR_ARGUMENT_TYPE
@@ -228,5 +260,132 @@ class AB3510():
             else:
                 return Data
 
-
+    
+    def EEPromData2Parameters(self):
+        '''
+        Reads the data from the EEProm and converts these data into python variables
+        '''
+        from PyApex.Constantes import AB3510_PTS_NB
+        from struct import unpack, calcsize
+        
+        Data = self.GetEEPromData(3500)
+        
+        if Data == -1:
+            return False
+        
+        self.InternalData["sn"] = ""
+        for c in Data[:20]:
+            if c != 0:
+                self.InternalData["sn"] += chr(c)
+        I0 = 20
+        
+        self.InternalData["firmware"] = ""
+        for c in Data[I0:I0 + 7]:
+            if c != 0:
+                self.InternalData["firmware"] += chr(c)
+        I0 += 7
+        
+        self.InternalData["hardware"] = ""
+        for c in Data[I0:I0 + 7]:
+            if c != 0:
+                self.InternalData["hardware"] += chr(c)
+        I0 += 7
+        
+        self.EEPromOK = "3510" in self.InternalData["sn"] and self.InternalData["firmware"] == "1.0"
+        
+        for n in range(4):
+            ChKey = "ch" + str(n)
+            
+            self.InternalData[ChKey]["powers"] = []
+            for i in range(AB3510_PTS_NB):
+                Istart = I0 + i * calcsize('f')
+                Istop = Istart + calcsize('f')
+                self.InternalData[ChKey]["powers"].append(unpack('f', Data[Istart:Istop])[0])
+            I0 = Istop
+            
+            self.InternalData[ChKey]["values"] = []
+            for i in range(AB3510_PTS_NB):
+                Istart = I0 + i * calcsize('h')
+                Istop = Istart + calcsize('h')
+                self.InternalData[ChKey]["values"].append(unpack('h', Data[Istart:Istop])[0])
+            I0 = Istop
+            
+            self.InternalData[ChKey]["tempcoeff"] = []
+            self.InternalData[ChKey]["tempcoeff"].append(unpack('f', Data[I0:I0 + calcsize('f')])[0])
+            I0 += calcsize('f')
+            self.InternalData[ChKey]["tempcoeff"].append(unpack('f', Data[I0:I0 + calcsize('f')])[0])
+            I0 += calcsize('f')
+            self.InternalData[ChKey]["wavecoeff"] = []
+            self.InternalData[ChKey]["wavecoeff"].append(unpack('f', Data[I0:I0 + calcsize('f')])[0])
+            I0 += calcsize('f')
+            self.InternalData[ChKey]["wavecoeff"].append(unpack('f', Data[I0:I0 + calcsize('f')])[0])
+            I0 += calcsize('f')
+        
+        return True
+    
+    
+    def Parameters2EEPromData(self):
+        '''
+        Converts the python variables into binary data and writes these data to the EEProm
+        '''
+        from PyApex.Constantes import AB3510_PTS_NB
+        from struct import pack, calcsize
+        
+        format = ""
+        for i in range(20 + 6 + 6):
+            format += 'c'
+        for i in range(4):
+            for k in range(AB3510_PTS_NB):
+                format += 'fh'
+            format += 'ffff'
+        
+        Data = bytearray(bytes(calcsize(format)))
+        
+        for i in range(20):
+            try:
+                Data[i] = (ord(self.InternalData["sn"][i]))
+            except:
+                pass
+        I0 = 20
+        
+        for i in range(6):
+            try:
+                Data[I0 + i] = (ord(self.InternalData["firmware"][i]))
+            except:
+                pass
+        I0 += 6
+        
+        for i in range(6):
+            try:
+                Data[I0 + i] = (ord(self.InternalData["hardware"][i]))
+            except:
+                pass
+        I0 += 6
+        
+        for n in range(4):
+            ChKey = "ch" + str(n)
+            
+            for i in range(AB3510_PTS_NB):
+                Temp = pack('f', self.InternalData[ChKey]["powers"][i])
+                for k in range(calcsize('f')):
+                    Data[I0 + k] = Temp[k]
+                I0 += calcsize('f')
+            
+            for i in range(AB3510_PTS_NB):
+                Temp = pack('h', self.InternalData[ChKey]["values"][i])
+                for k in range(calcsize('h')):
+                    Data[I0 + k] = Temp[k]
+                I0 += calcsize('h')
+            
+            Temp = pack('ff', self.InternalData[ChKey]["tempcoeff"][0], self.InternalData[ChKey]["tempcoeff"][1])
+            for i in range(calcsize('ff')):
+                Data[I0 + i] = Temp[i]    
+            I0 += calcsize('ff')
+            
+            Temp = pack('ff', self.InternalData[ChKey]["wavecoeff"][0], self.InternalData[ChKey]["wavecoeff"][1])
+            for i in range(calcsize('ff')):
+                Data[I0 + i] = Temp[i]    
+            I0 += calcsize('ff')
+        
+        return self.SetEEPromData(Data)
 

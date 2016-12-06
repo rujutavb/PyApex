@@ -631,11 +631,14 @@ class AP2XXX():
             Send(self.Connexion, Command)
 
 
-    def FindPeak(self, TraceNumber=1, ThresholdValue=20.0, Find="max"):
+    def FindPeak(self, TraceNumber=1, ThresholdValue=20.0, Axis='X', Find="max"):
         '''
         Find the peaks in the selected trace
         TraceNumber is an integer between 1 (default) and 6
         ThresholdValue is a float expressed in dB
+        Axis is a string or an integer for selecting the axis:
+            Axis = 0 or 'X' : get the X-axis values of the markers (default)
+            Axis = 1 or 'Y' : get the Y-axis values of the markers
         Find is a string between the following values:
             - Find = "MAX" : only the max peak is returned (default)
             - Find = "MIN" : only the min peak is returned
@@ -647,6 +650,10 @@ class AP2XXX():
         
         if not isinstance(TraceNumber, int):
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TraceNumber")
+            sys.exit()
+            
+        if not Axis in [0, 1] and not str(Axis).lower() in ['x', 'y'] :
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Axis")
             sys.exit()
 
         if not TraceNumber in self.Validtracenumbers:
@@ -660,7 +667,7 @@ class AP2XXX():
         if not self.Simulation:
             Command = "SPPKFIND" + str(TraceNumber) + "_" + str(ThresholdValue) + "\n"
             Send(self.Connexion, Command)
-            Peaks = self.GetMarkers(TraceNumber, Axis='X')
+            Peaks = self.GetMarkers(TraceNumber, Axis=Axis)
         
         else:
             Peaks = [1545.000, 1550.000, 1555.000]
@@ -825,7 +832,7 @@ class AP2XXX():
         
         if str(Axis).lower() == 'x':
             Axis = 0
-        elif str(Axis).lower() == 'y':
+        else:
             Axis = 1
         
         Markers = []
@@ -869,3 +876,57 @@ class AP2XXX():
             Command = "SPMKRDELAL" + str(TraceNumber) + "\n"
             Send(self.Connexion, Command)
         
+
+    def LineWidth(self, TraceNumber=1, Get="width"):
+        '''
+        Gets the 3-db line width of the selected trace
+        TraceNumber is an integer between 1 (default) and 6
+        ThresholdValue is a float expressed in dB
+        Get is a string between the following values:
+            - Get = "WIDTH" : only the line width is returned (default)
+            - Get = "CENTER" : only the line width center is returned
+            - Get = "LEVEL" : only the line width peak level is returned
+            - Get = "ALL" : all line width values are returned in a list
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE 
+        from PyApex.Errors import ApexError
+        
+        if not isinstance(TraceNumber, int):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TraceNumber")
+            sys.exit()
+
+        if not TraceNumber in self.Validtracenumbers:
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "TraceNumber")
+            sys.exit()
+        
+        if not self.Simulation:
+            Command = "SPLWTH" + str(TraceNumber) + "_3.0\n"
+            Send(self.Connexion, Command)
+            Str = Receive(self.Connexion, 64)[:-1]
+            Values = []
+            Str = Str.split("_")
+            
+            for s in Str:
+                for v in s.split(" "): 
+                    if v.lower() not in ["dbm", "mw", "nm", "ghz"]:
+                        try:
+                            Values.append(float(v))
+                        except:
+                            pass
+            while len(Values) < 3:
+                Values.append(0.0)
+        
+        else:
+            Values = [0.100, 1550.000, 2.25]
+            
+        if str(Get).lower() == "all":
+            return Values
+        
+        elif str(Get).lower() == "center":
+            return Values[1]
+        
+        elif str(Get).lower() == "level":
+            return Values[2]
+        
+        else:
+            return Values[0]

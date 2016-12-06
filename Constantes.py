@@ -107,8 +107,8 @@ AP1000_FIL_FRMAX = VACCUM_LIGHT_SPEED / AP1000_FIL_WLMIN
 # ------------------------------------------------------------------------------
 
 # MIN AND MAX WAVELENGTH
-AP2XXX_WLMIN = 1526
-AP2XXX_WLMAX = 1566
+AP2XXX_WLMIN = 1520
+AP2XXX_WLMAX = 1630
 # MIN AND MAX WAVELENGTH SPAN
 AP2XXX_MINSPAN = 0.01
 AP2XXX_MAXSPAN = 100
@@ -144,6 +144,8 @@ AB3510_VR_BULK_TEST = 0xBC
 AB3510_VR_RESET_FIFO = 0xBF
 AB3510_VR_WRITE_EEPROM = 0xC1
 AB3510_VR_READ_EEPROM = 0xC2
+# OTHER CONSTANTS
+AB3510_PTS_NB = 100
 
 # ------------------------------------------------------------------------------
 #                                   AB3380 CONSTANTS

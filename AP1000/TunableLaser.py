@@ -183,7 +183,7 @@ class TunableLaser():
     def On(self):
         '''
         Activate the output power of TLS equipment
-        Waits 5 seconds after switching on
+        Waits 1 second after switching on
         '''
         from time import sleep
         
@@ -191,7 +191,7 @@ class TunableLaser():
             Command = "TLS[" + str(self.SlotNumber).zfill(2) + "]:L1\n"
             Send(self.Connexion, Command)
         self.Status = "ON"
-        sleep(5)
+        sleep(1)
 
 
     def Off(self):
