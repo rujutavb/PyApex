@@ -930,3 +930,42 @@ class AP2XXX():
         
         else:
             return Values[0]
+    
+    
+    def SaveToFile(self, FileName, TraceNumber=1, Type="dat"):
+        '''
+        Save a trace on local hard disk
+        FileName is a string representing the path of the file to save
+        TraceNumber is an integer between 1 (default) and 6
+        Type is the type of the file to save
+        Type is a string between the following values:
+            - Type = "DAT" : data are saved in a binary format (default)
+            - Type = "TXT" : data are saved in a text format
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE, APXXXX_ERROR_BAD_FILENAME
+        from PyApex.Errors import ApexError
+        from os.path import isdir, dirname
+        
+        if not isinstance(TraceNumber, int):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TraceNumber")
+            sys.exit()
+
+        if not TraceNumber in self.Validtracenumbers:
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "TraceNumber")
+            sys.exit()
+        
+        if not isdir(dirname(FileName)):
+            raise ApexError(APXXXX_ERROR_BAD_FILENAME, str(FileName))
+            sys.exit()
+        
+        if str(Type).lower() == "txt":
+            Type = 1
+        else:
+            Type = 0
+        
+        if not self.Simulation:
+            if Type:
+                Command = "SPSAVEB" + str(TraceNumber) + "_" + str(FileName) + "\n"
+            else:
+                Command = "SPSAVEA" + str(TraceNumber) + "_" + str(FileName) + "\n"
+            Send(self.Connexion, Command)
