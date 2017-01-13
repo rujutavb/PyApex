@@ -10,7 +10,7 @@ class AP1000():
         Elementary functions to communicate with Apex AP1000 equipment
         this version can communicate with :
             - AP331X (Power Meter Module)
-            - AP3344 (2x2 Optical Switch Module)
+            - AP3344 (Optical Switch Module)
             - AP335X (Tunable Laser Module)
             - AP336X (Attenuator Module)
             - AP337X (Amplifier Module)
