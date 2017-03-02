@@ -22,12 +22,17 @@ Python 3 package for controlling Apex Technologies equipments
 
 from PyApex.AP1000 import AP1000
 from PyApex.AP2XXX import AP2XXX
-from PyApex.AB3510 import AB3510
-from PyApex.AB3380 import AB3380
-from PyApex.Etuve import Etuve
+try:
+    from PyApex.AB3510 import AB3510
+    from PyApex.AB3380 import AB3380
+except ImportError:
+    print("No module usb\nAB3510 and AB3380 classes cannot be used")
+try:
+    from PyApex.Etuve import Etuve
+except ImportError:
+    print("No module serial\nEtuve class cannot be used")
 
 from PyApex.Constantes import Celerity
-
 
 Version = 1.01
 PythonVersion = 3.4
