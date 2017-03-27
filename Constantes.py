@@ -5,7 +5,10 @@
 #                                       IMPORTS
 # ------------------------------------------------------------------------------
 
-from serial import EIGHTBITS, PARITY_NONE, STOPBITS_ONE
+try:
+    from serial import EIGHTBITS, PARITY_NONE, STOPBITS_ONE
+except:
+    pass
 
 # ------------------------------------------------------------------------------
 #                                  UNIVERSAL CONSTANTS
@@ -172,11 +175,14 @@ AB3380_PTS_NB = 84
 #                               ETUVE CONSTANTS
 # ------------------------------------------------------------------------------
 
-ETUVE_BAUDRATE = 9600
-ETUVE_NBITS = EIGHTBITS
-ETUVE_PARITY = PARITY_NONE
-ETUVE_STOPBIT = STOPBITS_ONE
-ETUVE_FLOWCONTROL = False
+try:
+    ETUVE_BAUDRATE = 9600
+    ETUVE_NBITS = EIGHTBITS
+    ETUVE_PARITY = PARITY_NONE
+    ETUVE_STOPBIT = STOPBITS_ONE
+    ETUVE_FLOWCONTROL = False
+except:
+    pass
 
 
 # ------------------------------------------------------------------------------

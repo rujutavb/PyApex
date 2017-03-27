@@ -162,7 +162,7 @@ class ErbiumAmplifier():
         Set laser pump current of the EFA equipment
         IPump is expressed in mA
         '''
-        from PyApex.Constantes import APXXXX_ERROR__ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
         from PyAPex.Constantes import AP1000_EFA_IPMAX
         from PyApex.Errors import ApexError
         
@@ -170,7 +170,7 @@ class ErbiumAmplifier():
             IPump = float(IPump)
         except:
             self.Connexion.close()
-            raise ApexError(APXXXX_ERROR__ARGUMENT_TYPE, "IPump")
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "IPump")
         else:
             if IPump > AP1000_EFA_IPMAX[self.Type]:
                 IPump = AP1000_EFA_IPMAX[self.Type]
