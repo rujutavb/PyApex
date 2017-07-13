@@ -294,3 +294,71 @@ class TunableLaser():
             
         Wavelength = self.GetWavelength()
         return VACCUM_LIGHT_SPEED / Wavelength
+    
+    
+    def SetSOACurrent(self, Current):
+        '''
+        !!! FOR TLS CALIBRATION ONLY !!!
+        Set the SOA current. 'Current' is a 16-bits binary value 
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Constantes import AP1000_TLS_SOAMIN, AP1000_TLS_SOAMAX
+        from PyApex.Errors import ApexError
+        
+        if not isinstance(Current, (float, int)):
+            self.Off()
+            self.Connexion.close()
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Current")
+            
+        if Current < AP1000_TLS_SOAMIN or Current > AP1000_TLS_SOAMAX:
+            self.Off()
+            self.Connexion.close()
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Current")
+            
+        if not self.Simulation:
+            Command = "TLS[" + str(self.SlotNumber).zfill(2) + "]:SETSOAVALUE" + str(Current) + "\n"
+            Send(self.Connexion, Command)
+            
+        self.SOACurrent = Current
+    
+    
+    def SetDiodeTemp(self, DiodeNumber, Temperature, SweepSpeed, SOAComp):
+        '''
+        !!! FOR TLS CALIBRATION ONLY !!!
+        Select the laser diode 'DiodeNumber' (between 1 and 12)
+        Set the temperature of the diode. 'Temperature' is a 16-bits binary value
+        Set the temperature tuning speed
+        Set the SOA compensation value
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Constantes import AP1000_TLS_TMIN, AP1000_TLS_TMAX
+        from PyApex.Errors import ApexError
+
+        if not isinstance(DiodeNumber, int):
+            self.Off()
+            self.Connexion.close()
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "DiodeNumber")
+        
+        if not isinstance(Temperature, (float, int)):
+            self.Off()
+            self.Connexion.close()
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Temperature")
+        
+        if DiodeNumber < 1 or DiodeNumber > 12:
+            self.Off()
+            self.Connexion.close()
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "DiodeNumber")
+        
+        if Temperature < AP1000_TLS_TMIN or Temperature > AP1000_TLS_TMAX:
+            self.Off()
+            self.Connexion.close()
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Temperature")
+            
+        if not self.Simulation:
+            Command = "TLS[" + str(self.SlotNumber).zfill(2) + "]:SETTARGETPARAM" + str(DiodeNumber) + ";" + str(Temperature) + ";"+ str(SweepSpeed) + ";" + str(SOAComp) + "\n"
+            Send(self.Connexion, Command)
+            
+        self.DiodeNumber = DiodeNumber
+        self.DiodeTemp = Temperature
+        self.SweepSpeed = SweepSpeed
+        self.SOAComp = SOAComp

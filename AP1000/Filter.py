@@ -57,8 +57,8 @@ class Filter():
             sys.exit()
             
         if not self.Simulation:
-            Command = "FIL[" + str(self.SlotNumber).zfill(2) + "]:TWL" + \
-                      ("%.3f" % Wavelength) + "\n"
+            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TWL" + \
+                      ("%.2f" % Wavelength) + "\n"
             Send(self.Connexion, Command)
         
         self.Wavelength = Wavelength
@@ -73,7 +73,7 @@ class Filter():
         if self.Simulation:
             Wavelength = self.Wavelength
         else:
-            Command = "FIL[" + str(self.SlotNumber).zfill(2) + "]:TWL?\n"
+            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TWL?\n"
             Send(self.Connexion, Command)
             Wavelength = Receive(self.Connexion)
         
@@ -98,8 +98,8 @@ class Filter():
             sys.exit()
             
         if not self.Simulation:
-            Command = "FIL[" + str(self.SlotNumber).zfill(2) + "]:TFR" + \
-                      ("%.3f" % Frequency) + "\n"
+            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TFR" + \
+                      ("%.2f" % Frequency) + "\n"
             Send(self.Connexion, Command)
         
         
@@ -115,7 +115,7 @@ class Filter():
         if self.Simulation:
             Wavelength = self.Wavelength
         else:
-            Command = "FIL[" + str(self.SlotNumber).zfill(2) + "]:TFR?\n"
+            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TFR?\n"
             Send(self.Connexion, Command)
             Wavelength = Receive(self.Connexion)
         
@@ -134,10 +134,10 @@ class Filter():
             WavelengthMin = AP1000_FIL_WLMIN
             WavelengthMax = AP1000_FIL_WLMAX
         else:
-            Command = "FIL[" + str(self.SlotNumber).zfill(2) + "]:WLMIN?\n"
+            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:WLMIN?\n"
             Send(self.Connexion, Command)
             WavelengthMin = float(Receive(self.Connexion)[:-1])
-            Command = "FIL[" + str(self.SlotNumber).zfill(2) + "]:WLMAX?\n"
+            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:WLMAX?\n"
             Send(self.Connexion, Command)
             WavelengthMax = float(Receive(self.Connexion)[:-1])
         
@@ -156,16 +156,171 @@ class Filter():
             FrequencyMin = AP1000_FIL_FRMIN
             FrequencyMax = AP1000_FIL_FRMAX
         else:
-            Command = "FIL[" + str(self.SlotNumber).zfill(2) + "]:FRMIN?\n"
+            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:FRMIN?\n"
             Send(self.Connexion, Command)
             FrequencyMin = float(Receive(self.Connexion)[:-1])
-            Command = "FIL[" + str(self.SlotNumber).zfill(2) + "]:FRMAX?\n"
+            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:FRMAX?\n"
             Send(self.Connexion, Command)
             FrequencyMax = float(Receive(self.Connexion)[:-1])
         
         return [FrequencyMin, FrequencyMax]
+        
+        
+    def SetStartWavelength(self, Wavelength):
+        '''
+        Set the start wavelength for a sweep
+        Wavelength is expressed in nm
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Errors import ApexError
+        
+        if not isinstance(Wavelength, (int, float)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
+            sys.exit()
+        
+        [WavelengthMin, WavelengthMax] = self.GetWavelngthLimits()
+        if(Wavelength < WavelengthMin or Wavelength > WavelengthMax):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Wavelength")
+            sys.exit()
+            
+        if not self.Simulation:
+            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TSTAWL" + \
+                      ("%.2f" % Wavelength) + "\n"
+            Send(self.Connexion, Command)
+    
+    
+    def GetStartWavelength(self):
+        '''
+        Get the start wavelength for a sweep
+        Returns the wavelength in nm
+        '''
+        from PyApex.Constantes import AP1000_FIL_WLMIN
+        
+        if self.Simulation:
+            Wavelength = AP1000_FIL_WLMIN
+        else:
+            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TSTAWL?\n"
+            Send(self.Connexion, Command)
+            Wavelength = Receive(self.Connexion)
+        
+        return float(Wavelength[:-1])
+    
+    
+    def SetStopWavelength(self, Wavelength):
+        '''
+        Set the stop wavelength for a sweep
+        Wavelength is expressed in nm
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Errors import ApexError
+        
+        if not isinstance(Wavelength, (int, float)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
+            sys.exit()
+        
+        [WavelengthMin, WavelengthMax] = self.GetWavelngthLimits()
+        if(Wavelength < WavelengthMin or Wavelength > WavelengthMax):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Wavelength")
+            sys.exit()
+            
+        if not self.Simulation:
+            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TSTPWL" + \
+                      ("%.2f" % Wavelength) + "\n"
+            Send(self.Connexion, Command)
 
+    
+    def GetStopWavelength(self):
+        '''
+        Get the stop wavelength for a sweep
+        Returns the wavelength in nm
+        '''
+        from PyApex.Constantes import AP1000_FIL_WLMAX
+        
+        if self.Simulation:
+            Wavelength = AP1000_FIL_WLMAX
+        else:
+            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TSTPWL?\n"
+            Send(self.Connexion, Command)
+            Wavelength = Receive(self.Connexion)
+        
+        return float(Wavelength[:-1])
+    
+    
+    def SetSweepSpeed(self, SweepSpeed):
+        '''
+        Set the speed for a sweep
+        SweepSpeed is expressed in nm/s
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Constantes import AP1000_FIL_SPEEDMIN, AP1000_FIL_SPEEDMAX
+        from PyApex.Errors import ApexError
+        
+        if not isinstance(SweepSpeed, (int, float)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "SweepSpeed")
+            sys.exit()
+        
+        if(SweepSpeed < AP1000_FIL_SPEEDMIN or SweepSpeed > AP1000_FIL_SPEEDMAX):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "SweepSpeed")
+            sys.exit()
+            
+        if not self.Simulation:
+            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TSWES" + \
+                      ("%.2f" % SweepSpeed) + "\n"
+            Send(self.Connexion, Command)
 
+    
+    def GetSweepSpeed(self):
+        '''
+        Get the speed for a sweep
+        Returns the speed in nm/s
+        '''
+        from PyApex.Constantes import AP1000_FIL_SPEEDMIN
+        
+        if self.Simulation:
+            Speed = AP1000_FIL_SPEEDMIN
+        else:
+            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TSWES?\n"
+            Send(self.Connexion, Command)
+            Speed = Receive(self.Connexion)
+        
+        return float(Speed[:-1])
+    
+    
+    def RunSweep(self, Type="single"):
+        '''
+        Run a sweep.
+        If Type is
+            - "single" or 0, a single sweep is running (default)
+            - "repeat" or 1, a repeat sweep is running
+        '''
+        
+        Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:"
+        
+        if not self.Simulation:
+            if isinstance(Type, str):
+                if Type.lower() == "repeat":
+                    Command += "TRET\n"                    
+                else:
+                    Command += "TSGL\n"
+            else:
+                if Type == 1:
+                    Command += "TRET\n"
+                else:
+                    Command += "TSGL\n"
+            
+            Send(self.Connexion, Command)
+    
+    
+    def StopSweep(self):
+        '''
+        Stop a sweep
+        '''
+        
+        if not self.Simulation:
+            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TSTO\n"
+            Send(self.Connexion, Command)
+    
+    
     def SetUnit(self, Unit):
         '''
         Set the unit of the FIL equipment
@@ -217,7 +372,7 @@ class Filter():
             sys.exit()
             
         if not self.Simulation:
-            Command = "FIL[" + str(self.SlotNumber).zfill(2) + "]:SETV" + \
+            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:SETV" + \
                       str(Filter) + str(Voltage) + "\n"
             Send(self.Connexion, Command)
     
@@ -245,7 +400,7 @@ class Filter():
             sys.exit()
             
         if not self.Simulation:
-            Command = "FIL[" + str(self.SlotNumber).zfill(2) + "]:SWITCH" + \
+            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:SWITCH" + \
                       str(Filter) + str(int(Value)) + "\n"
             Send(self.Connexion, Command)
         
