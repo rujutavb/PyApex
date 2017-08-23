@@ -969,3 +969,500 @@ class AP2XXX():
             else:
                 Command = "SPSAVEA" + str(TraceNumber) + "_" + str(FileName) + "\n"
             Send(self.Connexion, Command)
+    
+    
+    def GetPolarimeterIdentity(self):
+        '''
+        Gets the serial number of the polarimeter board
+        !!! FOR CALIBRATION ONLY !!!
+        '''
+        
+        Values = []
+        if not self.Simulation:
+            Command = "POLIDN?\n"
+            Send(self.Connexion, Command)
+            Str = Receive(self.Connexion, 64)[:-1]
+            
+            for value in Str.split(" "):
+                Values.append(value)
+        else:
+            Values = ["XX-AB3510-XSIMUX", "1.0", "1.1"]
+        
+        return Values
+    
+    
+    def GetPolarimeterRawPower(self):
+        '''
+        Gets the power values in binary from the 4 detectors of the polarimeter
+        !!! FOR CALIBRATION ONLY !!!
+        '''
+        from random import randint
+        
+        Values = []
+        if not self.Simulation:
+            Command = "POLRAWPOWER?\n"
+            Send(self.Connexion, Command)
+            Str = Receive(self.Connexion, 64)[:-1]
+            
+            for v in Str.split(" "):
+                try:
+                    Values.append(int(v))
+                except:
+                    pass
+        else:
+            for i in range(4):
+                Values.append(randint(0, 2**14))
+        
+        return Values
+    
+    
+    def GetPolarimeterTemp(self):
+        '''
+        Gets the polarimeter temperature in °C
+        !!! FOR CALIBRATION ONLY !!!
+        '''
+        from random import random
+        
+        if not self.Simulation:
+            Command = "POLTEMP?\n"
+            Send(self.Connexion, Command)
+            Str = Receive(self.Connexion, 64)[:-1]
+            
+            try:
+                Temperature = float(Str)
+            except:
+                Temperature = 0.0
+        else:
+            Temperature = 10.0 * random() + 20.0
+        
+        return Temperature
+        
+    
+    def GetPolarimeterPower(self):
+        '''
+        Gets the power values in dBm from the 4 detectors of the polarimeter
+        !!! FOR CALIBRATION ONLY !!!
+        '''
+        from random import random
+        
+        Values = []
+        if not self.Simulation:
+            Command = "POLPOWER?\n"
+            Send(self.Connexion, Command)
+            Str = Receive(self.Connexion, 64)[:-1]
+            
+            for v in Str.split(" "):
+                try:
+                    Values.append(float(v))
+                except:
+                    pass
+        else:
+            for i in range(4):
+                Values.append(80.0 * random() - 70.0)
+        
+        return Values
+    
+    
+    def SetPolarimeterPath(self, Path="full"):
+        '''
+        Sets the polarimeter path
+        Path can be a string or an integer
+            - Path = "full" or 0 : the polarimeter input is used (no optical filter) (default)
+            - Path = "filtered" or 1 : the OSA input is used (a 170 pm optical filter is used)
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE
+        from PyApex.Errors import ApexError
+        
+        if not self.Simulation:
+            Command = "POLPATH"
+            if isinstance(Path, string):
+                if Path.lower() == "filtered":
+                    Command += "1"
+                else:
+                    Command += "0"
+            elif isinstance(Path, int):
+                if Path == 1:
+                    Command += "1"
+                else:
+                    Command += "0"
+            else:
+                raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Path")
+                sys.exit()
+            
+            Command += "\n"
+            Send(self.Connexion, Command)
+            
+    
+    def GetPolarimeterPath(self):
+        '''
+        Gets the polarimeter path
+        The returned path is a string:
+            - "full" if the polarimeter input is used (no optical filter),
+            - "filtered" if the OSA input is used (a 170 pm optical filter is used)
+            - "error" if it's not a defined path
+        '''
+        
+        PathString = ""
+        if not self.Simulation:
+            Command = "POLPATH?\n"
+            Send(self.Connexion, Command)
+            Str = Receive(self.Connexion, 64)[:-1]
+            
+            try:
+                if int(Str) == 1:
+                    PathString = "filtered"
+                elif int(Str) == 0:
+                    PathString = "full"
+            except:
+                PathString = "error"
+        else:
+            PathString = "full"
+        
+        return PathString
+            
+            
+    def SetPolarimeterWavelength(self, Wavelength):
+        '''
+        Sets the polarimeter wavelength. Wavelength is expressed in nm
+        If the "filtered" path is used, the filter is set to the specified wavelength
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE
+        from PyApex.Errors import ApexError
+        
+        if not isinstance(Path, (int, float)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
+            sys.exit()
+        
+        if not self.Simulation:
+            Command = "POLWL" + str(Wavelength) + "\n"
+            Send(self.Connexion, Command)
+            
+    
+    def GetPolarimeterWavelength(self):
+        '''
+        Gets the polarimeter wavelength
+        The returned wavelength is expressed in nm
+        '''
+        
+        if not self.Simulation:
+            Command = "POLWL?\n"
+            Send(self.Connexion, Command)
+            Str = Receive(self.Connexion, 64)[:-1]
+            
+            try:
+                Wavelength = float(Str)
+            except:
+                Wavelength = 0.0
+        else:
+            Wavelength = 1550.0
+        
+        return Wavelength        
+    
+
+    def GetStateOfPolarization(self):
+        '''
+        Gets the State Of Polarization for the selected path
+        and the selected wavelength
+        '''
+        from random import random
+        from math import sqrt
+        
+        Values = []
+        if not self.Simulation:
+            Command = "POLSOP?\n"
+            Send(self.Connexion, Command)
+            Str = Receive(self.Connexion, 64)[:-1]
+            
+            for v in Str.split(" "):
+                try:
+                    Values.append(float(v))
+                except:
+                    pass
+        else:
+            S = []
+            S.append(1.0)
+            for i in range(3):
+                S.append(2.0 * random() - 1.0)
+            S0 = sqrt(S[0]**2 + S[1]**2 + S[2]**2)
+            for i in range(4):
+                Values.append(S[i] / S[0])
+        
+        return Values
+    
+    
+    def GetFilterIdentity(self):
+        '''
+        Gets the serial number of the filter board
+        !!! FOR CALIBRATION ONLY !!!
+        '''
+        
+        Values = []
+        if not self.Simulation:
+            Command = "FILIDN?\n"
+            Send(self.Connexion, Command)
+            value = Receive(self.Connexion, 64)[:-1]
+        else:
+            value = "XX-3380-A-XSIMUX"
+        
+        return value
+    
+    
+    def SetFilterOutput(self, State = False):
+        '''
+        Sets the state of the internal optical switch
+        State can be a boolean or an integer:
+            - State = 0 or False : the filter output is not enabled (default)
+            - State = 1 or True : the filter output is enabled
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Errors import ApexError
+        
+        if not isinstance(State, (int, bool)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "State")
+            sys.exit()
+        
+        if int(State) not in [0, 1]:
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "State")
+            sys.exit()
+        
+        if not self.Simulation:
+            Command = "FILOUTENABLE" + str(int(State)) + "\n"
+            Send(self.Connexion, Command)
+    
+    
+    def GetFilterOutput(self):
+        '''
+        Gets the state of the internal optical switch
+        the returned state is a boolean:
+            - State = False : the filter output is not enabled
+            - State = True : the filter output is enabled
+        '''
+        
+        if not self.Simulation:
+            Command = "FILOUTENABLE?\n"
+            Send(self.Connexion, Command)
+            State = Receive(self.Connexion, 64)[:-1]
+            try:
+                State = bool(int(State))
+            except:
+                pass
+        else:
+            State = True
+            
+        return State
+    
+    
+    def SetFilterWavelength(self, Wavelength):
+        '''
+        Sets the filter static wavelength
+        Wavelength is expressed in nm
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE
+        from PyApex.Errors import ApexError
+        
+        if not isinstance(Wavelength, (int, float)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
+            sys.exit()
+        
+        if not self.Simulation:
+            Command = "FILWL" + str(Wavelength) + "\n"
+            Send(self.Connexion, Command)
+            
+        
+    def GetFilterWavelength(self):
+        '''
+        Gets the static wavelength of the optical filter
+        the returned wavelength is expressed in nm
+        '''
+        from random import random
+        
+        if not self.Simulation:
+            Command = "FILWL?\n"
+            Send(self.Connexion, Command)
+            Wavelength = Receive(self.Connexion, 64)[:-1]
+            try:
+                Wavelength = float(Wavelength)
+            except:
+                pass
+        else:
+            Wavelength = 30.0 * random() + 1530.0
+            
+        return Wavelength
+
+
+    def SetFilterMode(self, Mode = "single"):
+        '''
+        Sets the filter mode
+        Mode can be an integer or a string:
+            Mode = 1 or "single" : Only 1 filter is used (default)
+            Mode = 2 or "dual" : 2 cascaded filters are used
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE
+        from PyApex.Errors import ApexError
+        
+        if not isinstance(Mode, (int, str)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Mode")
+            sys.exit()
+        
+        if isinstance(Mode, string):
+            if Mode.lower() == "dual":
+                Mode = 2
+            else:
+                Mode = 1
+        elif isinstance(Mode, int):
+            if Mode == 2:
+                Mode = 2
+            else:
+                Mode = 1
+        else:
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Mode")
+            sys.exit()
+        
+        if not self.Simulation:
+            Command = "FILMODE" + str(Mode) + "\n"
+            Send(self.Connexion, Command)
+            
+        
+    def GetFilterMode(self):
+        '''
+        Gets the Mode of the optical filter
+        the returned Mode is an integer
+        '''
+        
+        if not self.Simulation:
+            Command = "FILMODE?\n"
+            Send(self.Connexion, Command)
+            Mode = Receive(self.Connexion, 64)[:-1]
+            try:
+                Mode = int(Mode)
+            except:
+                pass
+        else:
+            Mode = 1
+            
+        return Mode
+        
+        
+    def SetFilterStartWavelength(self, Wavelength):
+        '''
+        Sets the filter start wavelength for sweep
+        Wavelength is expressed in nm
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE
+        from PyApex.Errors import ApexError
+        
+        if not isinstance(Wavelength, (int, float)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
+            sys.exit()
+        
+        if not self.Simulation:
+            Command = "FILSTARTWL" + str(Wavelength) + "\n"
+            Send(self.Connexion, Command)
+            
+        
+    def GetFilterStartWavelength(self):
+        '''
+        Gets the start wavelength of the optical filter sweep
+        the returned wavelength is expressed in nm
+        '''
+        from random import random
+        
+        if not self.Simulation:
+            Command = "FILSTARTWL?\n"
+            Send(self.Connexion, Command)
+            Wavelength = Receive(self.Connexion, 64)[:-1]
+            try:
+                Wavelength = float(Wavelength)
+            except:
+                pass
+        else:
+            Wavelength = 15.0 * random() + 1530.0
+            
+        return Wavelength    
+        
+    
+    def SetFilterStopWavelength(self, Wavelength):
+        '''
+        Sets the filter start wavelength for sweep
+        Wavelength is expressed in nm
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE
+        from PyApex.Errors import ApexError
+        
+        if not isinstance(Wavelength, (int, float)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
+            sys.exit()
+        
+        if not self.Simulation:
+            Command = "FILSTOPWL" + str(Wavelength) + "\n"
+            Send(self.Connexion, Command)
+            
+        
+    def GetFilterStopWavelength(self):
+        '''
+        Gets the start wavelength of the optical filter sweep
+        the returned wavelength is expressed in nm
+        '''
+        from random import random
+        
+        if not self.Simulation:
+            Command = "FILSTOPWL?\n"
+            Send(self.Connexion, Command)
+            Wavelength = Receive(self.Connexion, 64)[:-1]
+            try:
+                Wavelength = float(Wavelength)
+            except:
+                pass
+        else:
+            Wavelength = 15.0 * random() + 1545.0
+            
+        return Wavelength
+
+    
+    def FilterRun(self, Type = "single"):
+        '''
+        Run a sweep with the optical filter
+        If Type is
+            - "single" or 1, a single measurement is running (default)
+            - "repeat" or 2, a repeat measurement is running
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE
+        from PyApex.Errors import ApexError
+        
+        if not isinstance(Type, (int, str)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Type")
+            sys.exit()
+        
+        if isinstance(Type, string):
+            if Type.lower() == "repeat":
+                Type = 2
+            else:
+                Type = 1
+        elif isinstance(Type, int):
+            if Type == 2:
+                Type = 2
+            else:
+                Type = 1
+        else:
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Type")
+            sys.exit()
+        
+        if not self.Simulation:
+            Command = "FILRUN" + str(Type) + "\n"
+            Send(self.Connexion, Command)
+    
+    
+    def FilterStop(self):
+        '''
+        Stop a sweep with the optical filter
+        If the filter is not running or is running in 'single' mode,
+        this command has no effect
+        '''
+        
+        if not self.Simulation:
+            Command = "FILSTOP\n"
+            Send(self.Connexion, Command)
+        
+        
+        
+        
