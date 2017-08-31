@@ -8,18 +8,22 @@ class AP1000():
     '''
     DESCRIPTION
         Elementary functions to communicate with Apex AP1000 equipment
-        this version can communicate with :
+        this version can control :
             - AP331X (Power Meter Module)
             - AP3344 (Optical Switch Module)
             - AP335X (Tunable Laser Module)
             - AP336X (Attenuator Module)
             - AP337X (Amplifier Module)
             - AP338X (Optical Filter Module)
-        this version cannot yet communicate with :
+        this version cannot yet control :
             - AP339X (DFB Laser Module)
     
     VERSION
         1.1
+    
+    CONTRIBUTORS
+        Maxime FONTAINE
+        Khalil KECHAOU
     '''
 
     def __init__(self, IPaddress, PortNumber=5900, Simulation=False):
@@ -196,6 +200,7 @@ class AP1000():
         from PyApex.Constantes import AP1000_SLOT_MIN, AP1000_SLOT_MAX
         from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_DEFINED, SimuAP1000_SlotID, Modules
         from PyApex.Errors import ApexError
+        from random import sample
         import re
         
         if not isinstance(SlotNumber, int):
@@ -206,7 +211,8 @@ class AP1000():
             sys.exit()
         
         if self.Simulation:
-            ID = SimuAP1000_SlotID
+            ID = sample(list(Modules), 1)
+            return Modules[ID[0]]
         else:
             if self.SlotUsed(SlotNumber):
                 ID = self.SlotID(SlotNumber)

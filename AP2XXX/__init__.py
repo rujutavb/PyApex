@@ -7,9 +7,21 @@ class AP2XXX():
     '''
     DESCRIPTION
         Elementary functions to communicate with Apex AP2XXX equipment (OSA and OCSA)
-    
+        This class can control :
+            - The heterodyne OSA
+            - The polarimeter
+            - The optical filter
+        This class cannot yet control :
+            - The filters OSA (AP207X)
+            - The powermeter
+            - The tunable laser
+        
     VERSION
         1.0
+    
+    CONTRIBUTORS
+        Maxime FONTAINE
+        Khalil KECHAOU
     '''
 
     def __init__(self, IPaddress, PortNumber=5900, Simulation=False):
@@ -1129,7 +1141,7 @@ class AP2XXX():
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE
         from PyApex.Errors import ApexError
         
-        if not isinstance(Path, (int, float)):
+        if not isinstance(Wavelength, (int, float)):
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
             sys.exit()
         

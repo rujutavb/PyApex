@@ -4,7 +4,7 @@ Python 3 package for controlling Apex Technologies equipments
     PyApex.AP1000 allows to control an AP1000 mainframe via Ethernet protocol
     "help(PyApex.AP1000)" for more details
 
-    PyApex.AP2XXX allows to control an AP2XXX OSA and OCSA via Ethernet protocol
+    PyApex.AP2XXX allows to control an AP2XXX OSA or OCSA via Ethernet protocol
     "help(PyApex.AP2XXX)" for more details
 
     PyApex.AB3510 allows to control a board AB3510 quad photodetectors via USB 2.0 protocol
