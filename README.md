@@ -36,51 +36,55 @@ The AP2XXX class allows you to control (via Ethernet) any OSA and OCSA equipment
 1. In your Python 3.x script, import the PyApex module. For exemple, if you want to remote control an AP2040 equipment, import the AP2XXX sub-module of PyApex as below<br>
 `import PyApex.AP2XXX as AP2040`<br><br>
 2. Connect to the equipment:<br>
-`MyOSA = AP2040("192.168.0.10", Simulation=False)`<br>
+`MyAP2040 = AP2040("192.168.0.10", Simulation=False)`<br>
 where `192.168.0.10` is the IP address of the equipment<br>
 and `Simulation` argument is a boolean to simulate the equipment<br><br>
 3. To see the methods and attributs of the AP2XXX class, do:<br>
-`help(MyOSA)`<br><br>
-4. To close the connection to the equipment, use the Close function:<br>
-`MyOSA.Close()`<br><br>
+`help(MyAP2040)`<br>
+All functions of your AP2XXX are accsible as sub-class :<br>
+`MyOSA = MyAP2040.OSA()`
+`MyPowerMeter = MyAP2040.Powermeter()`
+And, to see the methods and attributs of these sub-classes :<br>
+`help(MyOSA)`<br>
+`help(MyPowerMeter)`<br>
+4. Finally, to close the connection to the equipment, use the Close function:<br>
+`MyAP2040.Close()`<br><br>
 
 Here is a very simple example for controlling your OSA:<br>
 
-```python
-# Import the AP2XXX class from the Apex Driver
-from PyApex import AP2XXX
-# Import pyplot for displaying the data
-from matplotlib import pyplot as plt
+    # Import the AP2XXX class from the Apex Driver
+    from PyApex import AP2XXX
+    # Import pyplot for displaying the data
+    from matplotlib import pyplot as plt
 
-# Connection to your OSA *** SET THE GOOD IP ADDRESS ***
-MyAP2XXX = AP2XXX("192.168.0.119")
-MyOSA = MyAP2XXX.OSA()
+    # Connection to your OSA *** SET THE GOOD IP ADDRESS ***
+    MyAP2XXX = AP2XXX("192.168.0.119")
+    MyOSA = MyAP2XXX.OSA()
 
-# Set the parameters of your OSA
-# Here, we use wavelength X-Axis and set the span from 1532 to 1563 nm
-# We also set the number of points to 2000
-MyOSA.SetScaleXUnit("nm")
-MyOSA.SetStartWavelength(1532.0)
-MyOSA.SetStopWavelength(1563.0)
-MyOSA.DeactivateAutoNPoints()
-MyOSA.SetNPoints(2000)
+    # Set the parameters of your OSA
+    # Here, we use wavelength X-Axis and set the span from 1532 to 1563 nm
+    # We also set the number of points to 2000
+    MyOSA.SetScaleXUnit("nm")
+    MyOSA.SetStartWavelength(1532.0)
+    MyOSA.SetStopWavelength(1563.0)
+    MyOSA.DeactivateAutoNPoints()
+    MyOSA.SetNPoints(2000)
 
-# We run a single
-Status = MyOSA.Run()
-# If the single is good (Status = 1), we get the data in a list Data = [[Power Data], [Wavelength Data]]
-if Status:
-    Data = MyOSA.GetData()
+    # We run a single
+    Status = MyOSA.Run()
+    # If the single is good (Status = 1), we get the data in a list Data = [[Power Data], [Wavelength Data]]
+    if Status:
+        Data = MyOSA.GetData()
 
-# The connection with the OSA is closed
-MyOSA.Close()
+    # The connection with the OSA is closed
+    MyOSA.Close()
 
-# The spectrum is displayed
-if Status:
-    plt.grid(True)
-    plt.plot(Data[1], Data[0])
-    plt.xlabel("Wavelength (nm)")
-    plt.ylabel("Power (dBm)")
-    plt.show()
-else:
-    print("No spectrum acquired")
-'''
+    # The spectrum is displayed
+    if Status:
+        plt.grid(True)
+        plt.plot(Data[1], Data[0])
+        plt.xlabel("Wavelength (nm)")
+        plt.ylabel("Power (dBm)")
+        plt.show()
+    else:
+        print("No spectrum acquired")
