@@ -43,7 +43,7 @@ and `Simulation` argument is a boolean to simulate the equipment<br><br>
 `help(MyAP2040)`<br>
 All functions of your AP2XXX are in sub-classes :<br>
 `MyOSA = MyAP2040.OSA()` for the Heterodyne OSA<br>
-`MyPowerMeter = MyAP2040.Powermeter()` for the powermeter,...<br>
+`MyPowerMeter = MyAP2040.Powermeter()` for the powermeter, ...<br>
 And, to see the methods and attributs of these sub-classes :<br>
 `help(MyOSA)`<br>
 `help(MyPowerMeter)`<br>
@@ -51,7 +51,7 @@ And, to see the methods and attributs of these sub-classes :<br>
 `MyAP2040.Close()`<br><br>
 
 Here is a very simple example for controlling your OSA:<br>
-
+```python
     # Import the AP2XXX class from the Apex Driver
     from PyApex import AP2XXX
     # Import pyplot for displaying the data
