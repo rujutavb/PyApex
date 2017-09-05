@@ -41,5 +41,43 @@ where `192.168.0.10` is the IP address of the equipment<br>
 and `Simulation` argument is a boolean to simulate the equipment<br><br>
 3. To see the methods and attributs of the AP2XXX class, do:<br>
 `help(MyOSA)`<br><br>
+4. Here is a very simple example for controlling your OSA:<br>
+`# Import the AP2XXX class from the Apex Driver`<br>
+`from PyApex import AP2XXX`<br>
+`# Import pyplot for displaying the data`<br>
+`from matplotlib import pyplot as plt`<br>
+``<br>
+`# Connection to your OSA *** SET THE GOOD IP ADDRESS ***`<br>
+`MyAP2XXX = AP2XXX("192.168.0.119")`<br>
+`MyOSA = MyAP2XXX.OSA()`<br>
+``<br>
+`# Set the parameters of your OSA`<br>
+`# Here, we use wavelength X-Axis and set the span from 1532 to 1563 nm`<br>
+`# We also set the number of points to 2000`<br>
+`MyOSA.SetScaleXUnit("nm")`<br>
+`MyOSA.SetStartWavelength(1532.0)`<br>
+`MyOSA.SetStopWavelength(1563.0)`<br>
+`MyOSA.DeactivateAutoNPoints()`<br>
+`MyOSA.SetNPoints(2000)`<br>
+``<br>
+`# We run a single`<br>
+`Status = MyOSA.Run()`<br>
+`# If the single is good (Status = 1), we get the data in a list Data = [[Power Data], [Wavelength Data]]`<br>
+`if Status:`<br>
+`    Data = MyOSA.GetData()`<br>
+``<br>
+`# The connection with the OSA is closed`<br>
+`MyOSA.Close()`<br>
+``<br>
+`# The spectrum is displayed`<br>
+`if Status:`<br>
+`    plt.grid(True)`<br>
+`    plt.plot(Data[1], Data[0])`<br>
+`    plt.xlabel("Wavelength (nm)")`<br>
+`    plt.ylabel("Power (dBm)")`<br>
+`    plt.show()`<br>
+`else:`<br>
+`    print("No spectrum acquired")`<br>
+
 4. To close the connection to the equipment, use the Close function:<br>
 `MyOSA.Close()`<br><br>
