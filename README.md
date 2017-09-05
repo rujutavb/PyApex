@@ -41,9 +41,9 @@ where `192.168.0.10` is the IP address of the equipment<br>
 and `Simulation` argument is a boolean to simulate the equipment<br><br>
 3. To see the methods and attributs of the AP2XXX class, do:<br>
 `help(MyAP2040)`<br>
-All functions of your AP2XXX are accsible as sub-class :<br>
-`MyOSA = MyAP2040.OSA()`
-`MyPowerMeter = MyAP2040.Powermeter()`
+All functions of your AP2XXX are in sub-classes :<br>
+`MyOSA = MyAP2040.OSA()` for the Heterodyne OSA<br>
+`MyPowerMeter = MyAP2040.Powermeter()` for the powermeter,...<br>
 And, to see the methods and attributs of these sub-classes :<br>
 `help(MyOSA)`<br>
 `help(MyPowerMeter)`<br>
