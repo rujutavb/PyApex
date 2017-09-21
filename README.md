@@ -77,7 +77,7 @@ Here is a very simple example for controlling your OSA:<br>
         Data = MyOSA.GetData()
 
     # The connection with the OSA is closed
-    MyOSA.Close()
+    MyAP2XXX.Close()
 
     # The spectrum is displayed
     if Status:
