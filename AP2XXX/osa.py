@@ -11,6 +11,8 @@ class OSA():
         Equipment is the AP2XXX class of the equipment
         Simulation is a boolean to indicate to the program if it has to run in simulation mode or not
         '''
+        from PyApex.Constantes import AP2XXX_WLMIN, AP2XXX_WLMAX   
+        
         self.Connexion = Equipment.Connexion
         self.Simulation = Simulation
         self.ID = Equipment.GetID()
@@ -401,7 +403,7 @@ class OSA():
             else:
                 Command = "SPDATAD" + str(int(TraceNumber)) + "\n"
             Send(self.Connexion, Command)
-            YStr = Receive(self.Connexion, 12 * NPoints)[:-1]
+            YStr = Receive(self.Connexion, 20 * NPoints)[:-1]
             YStr = YStr.split(" ")
             for s in YStr:
                 try:
@@ -411,7 +413,7 @@ class OSA():
                 
             Command = "SPDATAWL" + str(TraceNumber) + "\n"
             Send(self.Connexion, Command)
-            XStr = Receive(self.Connexion, 12 * NPoints)[:-1]
+            XStr = Receive(self.Connexion, 20 * NPoints)[:-1]
             XStr = XStr.split(" ")
             for s in XStr:
                 try:
@@ -419,15 +421,15 @@ class OSA():
                 except:
                     XData.append(0.0)
         else:
-            YData = []
-            XData = []
-            DeltaX = (SimuAP2XXX_StopWavelength - SimuAP2XXX_StartWavelength) / NPoints
+            YData = [NPoints]
+            XData = [NPoints]       
+            DeltaX = (self.StopWavelength - self.StartWavelength) / NPoints
             for i in range(0, NPoints):
                 if Scale.lower() == "lin":
                     YData.append(random())
                 else:
-                    YData.append(10 * log10(random()))
-                XData.append(SimuAP2XXX_StartWavelength + i * DeltaX)
+                    YData.append(80.0 * random() - 70.0)
+                XData.append(self.StartWavelength + i * DeltaX)
                 
         return [YData[1:], XData[1:]]
 

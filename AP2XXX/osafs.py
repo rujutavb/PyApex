@@ -14,7 +14,6 @@ class OsaFs():
         self.Connexion = Equipment.Connexion
         self.Simulation = Simulation
         self.ID = Equipment.GetID()
-        self.Type = self.GetType()
         
         # Variables and constants of the equipment
         self.StartWavelength = 1530.0
@@ -242,20 +241,23 @@ class OsaFs():
         '''
         from PyApex.Errors import ApexError
         
-        if not self.Simulation:
-            if isinstance(Type, str):                  
-                elif Type.lower() == "repeat":
-                    Command = "OSAFSRUN2\n"
-                else:
-                    Command = "OSAFSRUN1\n"
-            elif isinstance(Type, (int, float)): 
-                elif Type == 2:
-                    Command = "OSAFSRUN2\n"
-                else:
-                    Command = "OSAFSRUN1\n"
+        
+        if isinstance(Type, str):                  
+            if Type.lower() == "repeat":
+                Command = "OSAFSRUN2\n"
             else:
-                raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Type")
-                sys.exit()
+                Command = "OSAFSRUN1\n"
+        elif isinstance(Type, (int, float)): 
+            if Type == 2:
+                Command = "OSAFSRUN2\n"
+            else:
+                Command = "OSAFSRUN1\n"
+        else:
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Type")
+            sys.exit()
+        
+        if not self.Simulation:
+            Send(self.Connexion, Command)
     
     
     def Stop(self):
@@ -289,7 +291,10 @@ class OsaFs():
         else:
             Command = "OSAFSPOINTS" + str(int(TraceNumber)) + "\n"
             Send(self.Connexion, Command)
-            NPoints = int(Receive(self.Connexion)[:-1])
+            try:
+                NPoints = int(Receive(self.Connexion)[:-1])
+            except:
+                NPoints = 0
 
         return NPoints
     
@@ -329,8 +334,10 @@ class OsaFs():
             else:
                 Command = "OSAFSDATAD" + str(int(TraceNumber)) + "\n"
             Send(self.Connexion, Command)
-            YStr = Receive(self.Connexion, 12 * NPoints)[:-1]
+            YStr = Receive(self.Connexion, 20 * NPoints)[:-1]
+            print(YStr)
             YStr = YStr.split(" ")
+            print(YStr)
             for s in YStr:
                 try:
                     YData.append(float(s))
@@ -339,8 +346,10 @@ class OsaFs():
                 
             Command = "OSAFSDATAWL" + str(int(TraceNumber)) + "\n"
             Send(self.Connexion, Command)
-            XStr = Receive(self.Connexion, 12 * NPoints)[:-1]
+            XStr = Receive(self.Connexion, 20 * NPoints)[:-1]
+            print(XStr)
             XStr = XStr.split(" ")
+            print(XStr)
             for s in XStr:
                 try:
                     XData.append(float(s))

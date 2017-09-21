@@ -31,7 +31,6 @@ class AP2XXX():
         PortNumber is by default 5900. It's an integer
         Simulation is a boolean to indicate to the program if it has to run in simulation mode or not
         '''
-        from PyApex.Constantes import AP2XXX_WLMIN, AP2XXX_WLMAX 
         
         self.IPAddress = IPaddress
         self.PortNumber = PortNumber
