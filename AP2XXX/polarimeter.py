@@ -127,7 +127,7 @@ class Polarimeter():
         
         if not self.Simulation:
             Command = "POLPATH"
-            if isinstance(Path, string):
+            if isinstance(Path, str):
                 if Path.lower() == "filtered":
                     Command += "1"
                 else:

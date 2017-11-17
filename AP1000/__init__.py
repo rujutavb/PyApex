@@ -15,7 +15,6 @@ class AP1000():
             - AP336X (Attenuator Module)
             - AP337X (Amplifier Module)
             - AP338X (Optical Filter Module)
-        this version cannot yet control :
             - AP339X (DFB Laser Module)
     
     VERSION
@@ -242,8 +241,8 @@ class AP1000():
         if self.Simulation or self.SlotType(SlotNumber) == AP1000_PWM_NAME:
             return PowerMeter(self, SlotNumber, self.Simulation)
         else:
-            self.Connexion.close()
-            raise ApexError(AP1000_ERROR_SLOT_NOT_GOOD_TYPE, SlotNumber)
+            print("PyApex Warning. Wrong module")
+            return None
 
 
     def Attenuator(self, SlotNumber, Force=False):
@@ -260,8 +259,8 @@ class AP1000():
         if self.Simulation or self.SlotType(SlotNumber) == AP1000_ATT_NAME:
             return Attenuator(self, SlotNumber, self.Simulation)
         else:
-            self.Connexion.close()
-            raise ApexError(AP1000_ERROR_SLOT_NOT_GOOD_TYPE, SlotNumber)
+            print("PyApex Warning. Wrong module")
+            return None
 
 
     def TunableLaser(self, SlotNumber, Force=False):
@@ -279,8 +278,8 @@ class AP1000():
            or self.SlotType(SlotNumber) == AP1000_TLS_LBAND_NAME:
             return TunableLaser(self, SlotNumber, self.Simulation)
         else:
-            self.Connexion.close()
-            raise ApexError(AP1000_ERROR_SLOT_NOT_GOOD_TYPE, SlotNumber)
+            print("PyApex Warning. Wrong module")
+            return None
 
 
     def ErbiumAmplifier(self, SlotNumber, Force=False):
@@ -297,8 +296,8 @@ class AP1000():
         if self.Simulation or self.SlotType(SlotNumber) == AP1000_EFA_NAME:
             return ErbiumAmplifier(self, SlotNumber, self.Simulation)
         else:
-            self.Connexion.close()
-            raise ApexError(AP1000_ERROR_SLOT_NOT_GOOD_TYPE, SlotNumber)
+            print("PyApex Warning. Wrong module")
+            return None
 
 
     def OpticalSwitch(self, SlotNumber, Force=False):
@@ -315,8 +314,8 @@ class AP1000():
         if self.Simulation or self.SlotType(SlotNumber) == AP1000_OSW_NAME:
             return OpticalSwitch(self, SlotNumber, self.Simulation)
         else:
-            self.Connexion.close()
-            raise ApexError(AP1000_ERROR_SLOT_NOT_GOOD_TYPE, SlotNumber)
+            print("PyApex Warning. Wrong module")
+            return None
     
     
     def OpticalFilter(self, SlotNumber, Force=False):
@@ -333,5 +332,25 @@ class AP1000():
         if self.Simulation or self.SlotType(SlotNumber) == AP1000_FIL_NAME:
             return Filter(self, SlotNumber, self.Simulation)
         else:
-            self.Connexion.close()
-            raise ApexError(AP1000_ERROR_SLOT_NOT_GOOD_TYPE, SlotNumber)
+            print("PyApex Warning. Wrong module")
+            return None
+    
+    
+    def DfbLaser(self, SlotNumber, Force=False):
+        '''
+        Return a DfbLaser class for the module in the slot 'SlotNumber'
+        if Force is True, a DfbLaser class is returned even if the module isn't a DFB Laser
+        '''
+        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE, AP1000_DFB_CBAND_NAME, AP1000_DFB_LBAND_NAME, AP1000_DFB_OBAND_NAME
+        from PyApex.Errors import ApexError
+        from PyApex.AP1000.DfbLaser import DfbLaser
+        
+        if Force:
+            return DfbLaser(self, SlotNumber, self.Simulation)
+        if self.Simulation or self.SlotType(SlotNumber) == AP1000_DFB_CBAND_NAME \
+           or self.SlotType(SlotNumber) == AP1000_DFB_LBAND_NAME or \
+           self.SlotType(SlotNumber) == AP1000_DFB_OBAND_NAME:
+            return DfbLaser(self, SlotNumber, self.Simulation)
+        else:
+            print("PyApex Warning. Wrong module")
+            return None

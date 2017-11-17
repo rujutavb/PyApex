@@ -125,11 +125,6 @@ class Attenuator():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "ChNumber")
         else:
             
-            Attenuation = self.ConvertForWriting(Attenuation)
-            if Attenuation < AP1000_ATT_ATTMIN:
-                Attenuation = AP1000_ATT_ATTMIN
-            if Attenuation > AP1000_ATT_ATTMAX:
-                Attenuation = AP1000_ATT_ATTMAX
             if ChNumber > AP1000_ATT_CHNUMBER:
                 ChNumber = AP1000_ATT_CHNUMBER
             if ChNumber < 1:
