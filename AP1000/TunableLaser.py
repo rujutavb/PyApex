@@ -50,7 +50,7 @@ class TunableLaser():
 
         if re.findall(str(AP1000_TLS_CBAND), ID.split("/")[1]) != []:
             return 0
-        elif re.findall(str(AP1000_TLS_CLBAND), ID.split("/")[1]) != []:
+        elif re.findall(str(AP1000_TLS_LBAND), ID.split("/")[1]) != []:
             return 2
         else:
             self.Off()
