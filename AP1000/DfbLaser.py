@@ -12,22 +12,22 @@ class DfbLaser():
         SlotNumber is the number of the slot used by the TLS
         Simulation is a boolean to indicate to the program if it has to run in simulation mode or not
         '''
-        self.Connexion = Equipment.Connexion
-        self.SlotNumber = SlotNumber
-        self.Simulation = Simulation
-        self.Type = self.GetType()
-        self.Unit = "dBm"
-        self.Wavelength = 1550
-        self.Power = 0
-        self.Status = "OFF"
-        self.ValidUnits = ["dbm", "mw"]
+        self.__Connexion = Equipment.Connexion
+        self.__SlotNumber = SlotNumber
+        self.__Simulation = Simulation
+        self.__Type = self.GetType()
+        self.__Unit = "dBm"
+        self.__Wavelength = 1550
+        self.__Power = 0
+        self.__Status = "OFF"
+        self.__ValidUnits = ["dbm", "mw"]
 
 
     def __str__(self):
         '''
         Return the equipement name and the slot number when the 'print()' function is used
         '''
-        return "Tunable Laser in slot " + str(self.SlotNumber)
+        return "Tunable Laser in slot " + str(self.__SlotNumber)
 
 
     def GetType(self):
@@ -42,12 +42,12 @@ class DfbLaser():
         from PyApex.Errors import ApexError
         import re
         
-        if self.Simulation:
+        if self.__Simulation:
             ID = SimuDFB_SlotID
         else:
-            Command = "SLT[" + str(self.SlotNumber).zfill(2) + "]:IDN?\n"
-            Send(self.Connexion, Command)
-            ID = Receive(self.Connexion)
+            Command = "SLT[" + str(self.__SlotNumber).zfill(2) + "]:IDN?\n"
+            Send(self.__Connexion, Command)
+            ID = Receive(self.__Connexion)
 
         if re.findall(str(AP1000_DFB_CBAND), ID.split("/")[1]) != []:
             return 0
@@ -57,11 +57,11 @@ class DfbLaser():
             return 5
         else:
             self.Off()
-            self.Connexion.close()
-            raise ApexError(AP1000_ERROR_SLOT_TYPE_NOT_DEFINED, self.SlotNumber)
+            self.__Connexion.close()
+            raise ApexError(AP1000_ERROR_SLOT_TYPE_NOT_DEFINED, self.__SlotNumber)
             
     
-    def ConvertForWriting(self, Power):
+    def __ConvertForWriting(self, Power):
         '''
         Internal use only
         Convert a dBm power in mW or a mW power in dBm
@@ -70,24 +70,24 @@ class DfbLaser():
         from PyApex.Errors import ApexError
         from math import log10 as log
         
-        if self.Unit.lower() == "dbm":
+        if self.__Unit.lower() == "dbm":
             return Power
-        elif self.Unit.lower() == "mw":
+        elif self.__Unit.lower() == "mw":
             try:
                 log(Power)
             except:
                 self.Off()
-                self.Connexion.close()
+                self.__Connexion.close()
                 raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Power")
             else:
                 return -10 * log(Power/100)
         else:
             self.Off()
-            self.Connexion.close()
-            raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.Unit")
+            self.__Connexion.close()
+            raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.__Unit")
 
 
-    def ConvertForReading(self, Power):
+    def __ConvertForReading(self, Power):
         '''
         Internal use only
         Convert a dBm power in mW or a mW power in dBm
@@ -95,13 +95,13 @@ class DfbLaser():
         from PyApex.Constantes import APXXXX_ERROR_VARIABLE_NOT_DEFINED
         from PyApex.Errors import ApexError
         
-        if self.Unit.lower() == "mw":
+        if self.__Unit.lower() == "mw":
             return 10**(Power / 10)
-        elif self.Unit.lower() == "dbm":
+        elif self.__Unit.lower() == "dbm":
             return Power
         else:
-            self.Connexion.close()
-            raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.Unit")
+            self.__Connexion.close()
+            raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.__Unit")
 
 
     def SetPower(self, Power):
@@ -117,26 +117,25 @@ class DfbLaser():
             Power = float(Power)
         except:
             self.Off()
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Power")
         else:
-            Power = self.ConvertForWriting(Power)
-            if Power < AP1000_DFB_POWMIN[self.Type]:
+            Power = self.__ConvertForWriting(Power)
+            if Power < AP1000_DFB_POWMIN[self.__Type]:
                 print("PyApex Warning. DFB Power is set to its minimum value: " + \
-                      str(AP1000_DFB_POWMIN[self.Type]) + " dBm !")
-                Power = AP1000_DFB_POWMIN[self.Type]
-            elif Power > AP1000_DFB_POWMAX[self.Type]:
+                      str(AP1000_DFB_POWMIN[self.__Type]) + " dBm !")
+                Power = AP1000_DFB_POWMIN[self.__Type]
+            elif Power > AP1000_DFB_POWMAX[self.__Type]:
                 print("PyApex Warning. DFB Power is set to its maximum value: " + \
-                      str(AP1000_DFB_POWMAX[self.Type]) + " dBm !")
-                Power = AP1000_DFB_POWMAX[self.Type]
+                      str(AP1000_DFB_POWMAX[self.__Type]) + " dBm !")
+                Power = AP1000_DFB_POWMAX[self.__Type]
                 
-            if self.Simulation:
-                self.Power = Power
-            else:
-                Command = "DFB[" + str(self.SlotNumber).zfill(2) + "]:TPDB" + \
+            if not self.__Simulation:
+                Command = "DFB[" + str(self.__SlotNumber).zfill(2) + "]:TPDB" + \
                           ("%.1f" % Power) + "\n"
-                Send(self.Connexion, Command)
-                self.Power = Power
+                Send(self.__Connexion, Command)
+                
+            self.__Power = Power
 
 
     def GetPower(self):
@@ -144,18 +143,14 @@ class DfbLaser():
         Get output power of the DFB equipment
         The return power is expressed in the unit defined by the GetUnit() method
         '''
-        from PyApex.Constantes import AP1000_DFB_POWMIN, AP1000_DFB_POWMAX
-        from random import random
         
-        if self.Simulation:
-            self.Power = random() * (AP1000_DFB_POWMAX[self.Type] - AP1000_DFB_POWMIN[self.Type]) + AP1000_DFB_POWMIN[self.Type]
-        else:
-            Command = "DFB[" + str(self.SlotNumber).zfill(2) + "]:TPDB?\n"
-            Send(self.Connexion, Command)
-            Power = Receive(self.Connexion)
-            self.Power = float(Power[:-1])
+        if not self.__Simulation:
+            Command = "DFB[" + str(self.__SlotNumber).zfill(2) + "]:TPDB?\n"
+            Send(self.__Connexion, Command)
+            Power = Receive(self.__Connexion)
+            self.__Power = self.__ConvertForReading(float(Power[:-1]))
         
-        return self.ConvertForReading(self.Power)
+        return self.__Power
 
 
     def SetUnit(self, Unit):
@@ -170,11 +165,11 @@ class DfbLaser():
             Unit = str(Unit)
         except:
             self.Off()
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Unit")
         else:
-            if Unit.lower() in self.ValidUnits:
-                self.Unit = Unit
+            if Unit.lower() in self.__ValidUnits:
+                self.__Unit = Unit
 
 
     def GetUnit(self):
@@ -182,7 +177,7 @@ class DfbLaser():
         Get power unit of the DFB equipment
         The return unit is a string
         '''
-        return self.Unit
+        return self.__Unit
 
 
     def On(self):
@@ -192,10 +187,10 @@ class DfbLaser():
         '''
         from time import sleep
         
-        if not self.Simulation:
-            Command = "DFB[" + str(self.SlotNumber).zfill(2) + "]:L1\n"
-            Send(self.Connexion, Command)
-        self.Status = "ON"
+        if not self.__Simulation:
+            Command = "DFB[" + str(self.__SlotNumber).zfill(2) + "]:L1\n"
+            Send(self.__Connexion, Command)
+        self.__Status = "ON"
         sleep(0.2)
 
 
@@ -203,10 +198,10 @@ class DfbLaser():
         '''
         Shut down the output power of the DFB equipment
         '''
-        if not self.Simulation:
-            Command = "DFB[" + str(self.SlotNumber).zfill(2) + "]:L0\n"
-            Send(self.Connexion, Command)
-        self.Status = "OFF"
+        if not self.__Simulation:
+            Command = "DFB[" + str(self.__SlotNumber).zfill(2) + "]:L0\n"
+            Send(self.__Connexion, Command)
+        self.__Status = "OFF"
 
 
     def GetStatus(self):
@@ -214,17 +209,17 @@ class DfbLaser():
         Return the status ("ON" or "OFF") of the DFB equipment
         '''
         
-        if not self.Simulation:
-            Command = "DFB[" + str(self.SlotNumber).zfill(2) + "]:L?\n"
-            Send(self.Connexion, Command)
-            StrStatus = Receive(self.Connexion)[:-1]
+        if not self.__Simulation:
+            Command = "DFB[" + str(self.__SlotNumber).zfill(2) + "]:L?\n"
+            Send(self.__Connexion, Command)
+            StrStatus = Receive(self.__Connexion)[:-1]
         
             if StrStatus == "1":
-                self.Status = "ON"
+                self.__Status = "ON"
             else:
-                self.Status = "OFF"
+                self.__Status = "OFF"
                 
-        return self.Status
+        return self.__Status
 
 
     def SetWavelength(self, Wavelength):
@@ -240,24 +235,24 @@ class DfbLaser():
             Wavelength = float(Wavelength)
         except:
             self.Off()
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
         else:
-            if Wavelength < AP1000_DFB_WLMIN[self.Type]:
+            if Wavelength < AP1000_DFB_WLMIN[self.__Type]:
                 print("PyApex Warning. DFB Wavelength is set to its minimum value: " + \
-                      str(AP1000_DFB_WLMIN[self.Type]) + " nm !")
-                Wavelength = AP1000_DFB_WLMIN[self.Type]
-            if Wavelength > AP1000_DFB_WLMAX[self.Type]:
+                      str(AP1000_DFB_WLMIN[self.__Type]) + " nm !")
+                Wavelength = AP1000_DFB_WLMIN[self.__Type]
+            if Wavelength > AP1000_DFB_WLMAX[self.__Type]:
                 print("PyApex Warning. DFB Wavelength is set to its maximum value: " + \
-                      str(AP1000_DFB_WLMAX[self.Type]) + " nm !")
-                Wavelength = AP1000_DFB_WLMAX[self.Type]
+                      str(AP1000_DFB_WLMAX[self.__Type]) + " nm !")
+                Wavelength = AP1000_DFB_WLMAX[self.__Type]
             
-            if not self.Simulation:
-                Command = "DFB[" + str(self.SlotNumber).zfill(2) + "]:TWL" + \
+            if not self.__Simulation:
+                Command = "DFB[" + str(self.__SlotNumber).zfill(2) + "]:TWL" + \
                           ("%4.3f" % Wavelength).zfill(8) + "\n"
-                Send(self.Connexion, Command)
+                Send(self.__Connexion, Command)
             
-            self.Wavelength = Wavelength
+            self.__Wavelength = Wavelength
 
 
     def GetWavelength(self):
@@ -268,19 +263,12 @@ class DfbLaser():
         from PyApex.Constantes import AP1000_DFB_WLMIN, AP1000_DFB_WLMAX
         from random import random
         
-        if self.Simulation:
-            Wavelength = random() * (AP1000_DFB_WLMAX[self.Type] - AP1000_DFB_WLMIN[self.Type]) + AP1000_DFB_WLMIN[self.Type]
-        else:
-            Command = "DFB[" + str(self.SlotNumber).zfill(2) + "]:TWL?\n"
-            Send(self.Connexion, Command)
-            Wavelength = Receive(self.Connexion)
-        
-        try:
-            self.Wavelength = float(Wavelength[:-1])
-        except:
-            pass
+        if not self.__Simulation:
+            Command = "DFB[" + str(self.__SlotNumber).zfill(2) + "]:TWL?\n"
+            Send(self.__Connexion, Command)
+            self.__Wavelength = float(Receive(self.__Connexion)[:-1])
             
-        return self.Wavelength
+        return self.__Wavelength
 
 
     def SetFrequency(self, Frequency):
@@ -296,17 +284,17 @@ class DfbLaser():
             Frequency = float(Frequency)
         except:
             self.Off()
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Frequency")
         else:
-            if Frequency < AP1000_DFB_FRMIN[self.Type]:
+            if Frequency < AP1000_DFB_FRMIN[self.__Type]:
                 print("PyApex Warning. DFB Frequency is set to its minimum value: " + \
-                      str(AP1000_DFB_FRMIN[self.Type]) + " nm !")
-                Frequency = AP1000_DFB_FRMIN[self.Type]
-            if Frequency > AP1000_DFB_FRMAX[self.Type]:
+                      str(AP1000_DFB_FRMIN[self.__Type]) + " nm !")
+                Frequency = AP1000_DFB_FRMIN[self.__Type]
+            if Frequency > AP1000_DFB_FRMAX[self.__Type]:
                 print("PyApex Warning. DFB Frequency is set to its maximum value: " + \
-                      str(AP1000_DFB_FRMAX[self.Type]) + " nm !")
-                Frequency = AP1000_DFB_FRMAX[self.Type]
+                      str(AP1000_DFB_FRMAX[self.__Type]) + " nm !")
+                Frequency = AP1000_DFB_FRMAX[self.__Type]
             
             self.SetWavelength(VACCUM_LIGHT_SPEED / Frequency)
 

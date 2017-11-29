@@ -11,20 +11,20 @@ class Powermeter():
         Equipment is the AP2XXX class of the equipment
         Simulation is a boolean to indicate to the program if it has to run in simulation mode or not
         '''
-        self.Connexion = Equipment.Connexion
-        self.Simulation = Simulation
-        self.ID = Equipment.GetID()
+        self.__Connexion = Equipment.Connexion
+        self.__Simulation = Simulation
+        self.__ID = Equipment.GetID()
         
         # Variables and constants of the equipment
-        self.Unit = "dBm"
-        self.ValidUnits = ["dbm", "mw"]
+        self.__Unit = "dBm"
+        self.__ValidUnits = ["dbm", "mw"]
 
 
     def __str__(self):
         '''
         Return the equipment type and the AP2XXX ID
         '''
-        return "Powermeter of " + str(self.ID)
+        return "Powermeter of " + str(self.__ID)
     
     
     def SetUnit(self, Unit):
@@ -38,11 +38,11 @@ class Powermeter():
         try:
             Unit = str(Unit)
         except:
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Unit")
         else:
-            if Unit.lower() in self.ValidUnits:
-                self.Unit = Unit
+            if Unit.lower() in self.__ValidUnits:
+                self.__Unit = Unit
 
 
     def GetUnit(self):
@@ -50,7 +50,7 @@ class Powermeter():
         Get power unit of the Powermeter equipment
         The return unit is a string
         '''
-        return self.Unit
+        return self.__Unit
     
     
     def GetPower(self, Polar=0):
@@ -68,29 +68,22 @@ class Powermeter():
         from random import random
         
         if not isinstance(Polar, (int)):
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Polar")
 
-        if self.Simulation:
-            if self.Unit.lower() == "dbm":
+        if self.__Simulation:
+            if self.__Unit.lower() == "dbm":
                 Power = 60.0 * random() - 50.0
-            elif self.Unit.lower() == "mw":
+            elif self.__Unit.lower() == "mw":
                 Power = 10.0 * random()
             else:
-                self.Connexion.close()
-                raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.Unit")
+                self.__Connexion.close()
+                raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.__Unit")
         else:
             Command = "SPMEASDETECTORDBM1\n"               
-            Send(self.Connexion, Command)
-            Power = Receive(self.Connexion)
+            Send(self.__Connexion, Command)
+            Power = Receive(self.__Connexion)
         
         return float(Power[:-1])
-    
-    
-    
-    
-    
-    
-    
     
     

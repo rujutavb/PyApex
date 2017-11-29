@@ -12,21 +12,21 @@ class PowerMeter():
         SlotNumber is the number of the slot used by the PWM
         Simulation is a boolean to indicate to the program if it has to run in simulation mode or not
         '''
-        self.Connexion = Equipment.Connexion
-        self.Simulation = Simulation
-        self.SlotNumber = SlotNumber
-        self.Unit = "dBm"
-        self.Wavelength = 1550
-        self.AvgTime = 100
-        self.Channels = self.GetChannels()
-        self.ValidUnits = ["dbm", "mw"]
+        self.__Connexion = Equipment.Connexion
+        self.__Simulation = Simulation
+        self.__SlotNumber = SlotNumber
+        self.__Unit = "dBm"
+        self.__Wavelength = 1550
+        self.__AvgTime = 100
+        self.__Channels = self.GetChannels()
+        self.__ValidUnits = ["dbm", "mw"]
 
 
     def __str__(self):
         '''
         Return the equipement name and the slot number when the 'print()' function is used
         '''
-        return "Optical Power Meter in slot " + str(self.SlotNumber)
+        return "Optical Power Meter in slot " + str(self.__SlotNumber)
 
 
     def GetChannels(self):
@@ -37,12 +37,12 @@ class PowerMeter():
         '''
         from PyApex.Constantes import SimuPWM_SlotID, AP1000_PWM_CHTYPE
         
-        if self.Simulation:
+        if self.__Simulation:
             ID = SimuPWM_SlotID
         else:
-            Command = "SLT[" + str(self.SlotNumber).zfill(2) + "]:IDN?\n"
-            Send(self.Connexion, Command)
-            ID = Receive(self.Connexion)
+            Command = "SLT[" + str(self.__SlotNumber).zfill(2) + "]:IDN?\n"
+            Send(self.__Connexion, Command)
+            ID = Receive(self.__Connexion)
         
         Channels = []
         for c in ID.split("/")[2].split("-")[3]:
@@ -65,7 +65,7 @@ class PowerMeter():
         try:
             AvgTime = float(AvgTime)
         except:
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "AvgTime")
         else:
             if AvgTime < AP1000_PWM_AVGMIN:
@@ -77,12 +77,12 @@ class PowerMeter():
                       str(AP1000_PWM_AVGMAX) + " ms !")
                 AvgTime = AP1000_PWM_AVGMAX
             
-            if not self.Simulation:
-                Command = "POW[" + str(self.SlotNumber).zfill(2) + "]:SETAVERAGE" + \
+            if not self.__Simulation:
+                Command = "POW[" + str(self.__SlotNumber).zfill(2) + "]:SETAVERAGE" + \
                           str(AvgTime) + "\n"
-                Send(self.Connexion, Command)
+                Send(self.__Connexion, Command)
             
-            self.AvgTime = AvgTime
+            self.__AvgTime = AvgTime
 
 
     def GetAverageTime(self):
@@ -90,16 +90,13 @@ class PowerMeter():
         Get the average time of the PWM equipment
         AvgTime is expressed in ms
         '''
-        from PyApex.Constantes import SimuPWM_AvgTime
         
-        if self.Simulation:
-            AvgTime = SimuPWM_AvgTime
-        else:
-            Command = "POW[" + str(self.SlotNumber).zfill(2) + "]:SETAVERAGE?\n"
-            Send(self.Connexion, Command)
-            AvgTime = Receive(self.Connexion)
+        if not self.__Simulation:
+            Command = "POW[" + str(self.__SlotNumber).zfill(2) + "]:SETAVERAGE?\n"
+            Send(self.__Connexion, Command)
+            self.__AvgTime = float(Receive(self.__Connexion)[:-1])
             
-        return float(AvgTime[:-1])
+        return self.__AvgTime
 
 
     def SetUnit(self, Unit):
@@ -113,11 +110,11 @@ class PowerMeter():
         try:
             Unit = str(Unit)
         except:
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Unit")
         else:
-            if Unit.lower() in self.ValidUnits:
-                self.Unit = Unit
+            if Unit.lower() in self.__ValidUnits:
+                self.__Unit = Unit
 
 
     def GetUnit(self):
@@ -125,7 +122,7 @@ class PowerMeter():
         Get power unit of the PWM equipment
         The return unit is a string
         '''
-        return self.Unit
+        return self.__Unit
 
 
     def SetWavelength(self, Wavelength, ChNumber=1):
@@ -141,13 +138,13 @@ class PowerMeter():
         try:
             Wavelength = float(Wavelength)
         except:
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
         else:
             try:
                 ChNumber = int(ChNumber)
             except:
-                self.Connexion.close()
+                self.__Connexion.close()
                 raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "ChNumber")
             else:
                 if Wavelength < AP1000_PWM_WLMIN:
@@ -158,17 +155,17 @@ class PowerMeter():
                     print("PyApex Warning. PWM Wavelength is set to its maximum value: " + \
                           str(AP1000_PWM_WLMAX) + " nm !")
                     Wavelength = AP1000_PWM_WLMAX
-                if ChNumber > len(self.Channels):
+                if ChNumber > len(self.__Channels):
                     print("PyApex Warning. PWM Channel is set to 1 !")
                     ChNumber = 1
                 
-                if not self.Simulation:
-                    Command = "POW[" + str(self.SlotNumber).zfill(2) + \
+                if not self.__Simulation:
+                    Command = "POW[" + str(self.__SlotNumber).zfill(2) + \
                               "]:SETWAVELENGTH[" + str(ChNumber) + "]" + \
                               ("%4.3f" % Wavelength).zfill(8) + "\n"
-                    Send(self.Connexion, Command)
+                    Send(self.__Connexion, Command)
                 
-                self.Wavelength = Wavelength
+                self.__Wavelength = Wavelength
 
 
     def GetWavelength(self, ChNumber=1):
@@ -178,28 +175,25 @@ class PowerMeter():
         ChNumber is the channel number : 1 (default) or 2
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
-        from PyApex.Constantes import SimuPWM_Wavelength
         from PyApex.Errors import ApexError
         
         try:
             ChNumber = int(ChNumber)
         except:
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "ChNumber")
         else:
-            if ChNumber > len(self.Channels):
+            if ChNumber > len(self.__Channels):
                 print("PyApex Warning. PWM Channel is set to 1 !")
                 ChNumber = 1
             
-            if self.Simulation:
-                Wavelength = SimuPWM_Wavelength
-            else:
-                Command = "POW[" + str(slef.SlotNumber).zfill(2) + "]:WAV[" + \
+            if not self.__Simulation:
+                Command = "POW[" + str(slef.__SlotNumber).zfill(2) + "]:WAV[" + \
                           str(ChNumber) + "]?\n"
-                Send(self.Connexion, Command)
-                Wavelength = Receive(self.Connexion)
+                Send(self.__Connexion, Command)
+                self.__Wavelength = float(Receive(self.__Connexion)[:-1])
             
-            return float(Wavelength[:-1])
+            return self.__Wavelength
 
 
     def SetFrequency(self, Frequency, ChNumber=1):
@@ -215,16 +209,16 @@ class PowerMeter():
         try:
             Frequency = float(Frequency)
         except:
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Frequency")
         else:
             try:
                 ChNumber = int(ChNumber)
             except:
-                self.Connexion.close()
+                self.__Connexion.close()
                 raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "ChNumber")
             else:
-                if ChNumber > len(self.Channels):
+                if ChNumber > len(self.__Channels):
                     print("PyApex Warning. PWM Channel is set to 1 !")
                     ChNumber = 1
                     
@@ -249,10 +243,10 @@ class PowerMeter():
         try:
             ChNumber = int(ChNumber)
         except:
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "ChNumber")
         else:
-            if ChNumber > len(self.Channels):
+            if ChNumber > len(self.__Channels):
                 print("PyApex Warning. PWM Channel is set to 1 !")
                 ChNumber = 1
             
@@ -274,33 +268,33 @@ class PowerMeter():
         try:
             ChNumber = int(ChNumber)
         except:
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "ChNumber")
         else:
-            if ChNumber > len(self.Channels):
+            if ChNumber > len(self.__Channels):
                 print("PyApex Warning. PWM Channel is set to 1 !")
                 ChNumber = 1
             
-            if self.Simulation:
-                if self.Unit.lower() == "dbm":
+            if self.__Simulation:
+                if self.__Unit.lower() == "dbm":
                     Power = SimuPWM_Power_dBm
-                elif self.Unit.lower() == "mw":
+                elif self.__Unit.lower() == "mw":
                     Power = SimuPWM_Power_mW
                 else:
-                    self.Connexion.close()
-                    raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.Unit")
+                    self.__Connexion.close()
+                    raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.__Unit")
             else:
-                if self.Unit.lower() == "dbm":
-                    Command = "POW[" + str(self.SlotNumber).zfill(2) + "]:DBM[" + \
+                if self.__Unit.lower() == "dbm":
+                    Command = "POW[" + str(self.__SlotNumber).zfill(2) + "]:DBM[" + \
                               str(ChNumber) + "]?\n"
-                elif self.Unit.lower() == "mw":
-                    Command = "POW[" + str(self.SlotNumber).zfill(2) + "]:MW[" + \
+                elif self.__Unit.lower() == "mw":
+                    Command = "POW[" + str(self.__SlotNumber).zfill(2) + "]:MW[" + \
                               str(ChNumber) + "]?\n"
                 else:
-                    self.Connexion.close()
-                    raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.Unit")
+                    self.__Connexion.close()
+                    raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.__Unit")
                 
-                Send(self.Connexion, Command)
-                Power = Receive(self.Connexion)
+                Send(self.__Connexion, Command)
+                Power = Receive(self.__Connexion)
             
             return float(Power[:-1])

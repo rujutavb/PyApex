@@ -32,9 +32,9 @@ class AP1000():
         PortNumber is by default 5900. It's an integer
         Simulation is a boolean to indicate to the program if it has to run in simulation mode or not
         '''
-        self.IPAddress = IPaddress
-        self.PortNumber = PortNumber
-        self.Simulation = Simulation
+        self.__IPAddress = IPaddress
+        self.__PortNumber = PortNumber
+        self.__Simulation = Simulation
         self.Open()
         
 
@@ -47,11 +47,11 @@ class AP1000():
         self.Connexion.settimeout(10)
         self.Connexion.setblocking(True)
         
-        if self.Simulation:
+        if self.__Simulation:
             print("Connected successfully to the equipment")
         else:
             try:
-                self.Connexion.connect((self.IPAddress, self.PortNumber))
+                self.Connexion.connect((self.__IPAddress, self.__PortNumber))
                 print("Connected successfully to the equipment")
             except:
                 print("Cannot connect to the equipment")
@@ -64,7 +64,7 @@ class AP1000():
         from PyApex.Constantes import APXXXX_ERROR_COMMUNICATION
         from PyApex.Errors import ApexError
         
-        if not self.Simulation:
+        if not self.__Simulation:
             try:
                 self.Connexion.close()
             except:
@@ -77,7 +77,7 @@ class AP1000():
         '''
         from PyApex.Constantes import SimuAP1000_ID
         
-        if self.Simulation:
+        if self.__Simulation:
             return SimuAP1000_ID
         else:
             Send(self.Connexion, "*IDN?\n")
@@ -89,7 +89,7 @@ class AP1000():
         '''
         Reset AP1000 equipment
         '''
-        if not self.Simulation:
+        if not self.__Simulation:
             Send(self.Connexion, "*RST\n")
 
 
@@ -111,7 +111,7 @@ class AP1000():
             self.Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "SlotNumber")
         
-        if self.Simulation:
+        if self.__Simulation:
             ID = SimuAP1000_SlotUsed
         else:
             Command = "SLT[" + str(SlotNumber).zfill(2) + "]:EMPTY?\n"
@@ -141,7 +141,7 @@ class AP1000():
             self.Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "SlotNumber")
         
-        if self.Simulation:
+        if self.__Simulation:
             ID = SimuAP1000_SlotID
         else:
             if Force:
@@ -176,7 +176,7 @@ class AP1000():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "SlotNumber")
             sys.exit()
 
-        if self.Simulation:
+        if self.__Simulation:
             SN = SimuAP1000_SlotID
         else:
             SN = self.SlotID(SlotNumber, Force=Force)
@@ -209,7 +209,7 @@ class AP1000():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "SlotNumber")
             sys.exit()
         
-        if self.Simulation:
+        if self.__Simulation:
             ID = sample(list(Modules), 1)
             return Modules[ID[0]]
         else:
@@ -237,9 +237,9 @@ class AP1000():
         from PyApex.AP1000.PowerMeter import PowerMeter
         
         if Force:
-            return PowerMeter(self, SlotNumber, self.Simulation)
-        if self.Simulation or self.SlotType(SlotNumber) == AP1000_PWM_NAME:
-            return PowerMeter(self, SlotNumber, self.Simulation)
+            return PowerMeter(self, SlotNumber, self.__Simulation)
+        if self.__Simulation or self.SlotType(SlotNumber) == AP1000_PWM_NAME:
+            return PowerMeter(self, SlotNumber, self.__Simulation)
         else:
             print("PyApex Warning. Wrong module")
             return None
@@ -255,9 +255,9 @@ class AP1000():
         from PyApex.AP1000.Attenuator import Attenuator
         
         if Force:
-            return Attenuator(self, SlotNumber, self.Simulation)
-        if self.Simulation or self.SlotType(SlotNumber) == AP1000_ATT_NAME:
-            return Attenuator(self, SlotNumber, self.Simulation)
+            return Attenuator(self, SlotNumber, self.__Simulation)
+        if self.__Simulation or self.SlotType(SlotNumber) == AP1000_ATT_NAME:
+            return Attenuator(self, SlotNumber, self.__Simulation)
         else:
             print("PyApex Warning. Wrong module")
             return None
@@ -273,10 +273,10 @@ class AP1000():
         from PyApex.AP1000.TunableLaser import TunableLaser
         
         if Force:
-            return TunableLaser(self, SlotNumber, self.Simulation)
-        if self.Simulation or self.SlotType(SlotNumber) == AP1000_TLS_CBAND_NAME \
+            return TunableLaser(self, SlotNumber, self.__Simulation)
+        if self.__Simulation or self.SlotType(SlotNumber) == AP1000_TLS_CBAND_NAME \
            or self.SlotType(SlotNumber) == AP1000_TLS_LBAND_NAME:
-            return TunableLaser(self, SlotNumber, self.Simulation)
+            return TunableLaser(self, SlotNumber, self.__Simulation)
         else:
             print("PyApex Warning. Wrong module")
             return None
@@ -292,9 +292,9 @@ class AP1000():
         from PyApex.AP1000.ErbiumAmplifier import ErbiumAmplifier
         
         if Force:
-            return ErbiumAmplifier(self, SlotNumber, self.Simulation)
-        if self.Simulation or self.SlotType(SlotNumber) == AP1000_EFA_NAME:
-            return ErbiumAmplifier(self, SlotNumber, self.Simulation)
+            return ErbiumAmplifier(self, SlotNumber, self.__Simulation)
+        if self.__Simulation or self.SlotType(SlotNumber) == AP1000_EFA_NAME:
+            return ErbiumAmplifier(self, SlotNumber, self.__Simulation)
         else:
             print("PyApex Warning. Wrong module")
             return None
@@ -310,9 +310,9 @@ class AP1000():
         from PyApex.AP1000.OpticalSwitch import OpticalSwitch
         
         if Force:
-            return OpticalSwitch(self, SlotNumber, self.Simulation)
-        if self.Simulation or self.SlotType(SlotNumber) == AP1000_OSW_NAME:
-            return OpticalSwitch(self, SlotNumber, self.Simulation)
+            return OpticalSwitch(self, SlotNumber, self.__Simulation)
+        if self.__Simulation or self.SlotType(SlotNumber) == AP1000_OSW_NAME:
+            return OpticalSwitch(self, SlotNumber, self.__Simulation)
         else:
             print("PyApex Warning. Wrong module")
             return None
@@ -328,9 +328,9 @@ class AP1000():
         from PyApex.AP1000.Filter import Filter
         
         if Force:
-            return Filter(self, SlotNumber, self.Simulation)
-        if self.Simulation or self.SlotType(SlotNumber) == AP1000_FIL_NAME:
-            return Filter(self, SlotNumber, self.Simulation)
+            return Filter(self, SlotNumber, self.__Simulation)
+        if self.__Simulation or self.SlotType(SlotNumber) == AP1000_FIL_NAME:
+            return Filter(self, SlotNumber, self.__Simulation)
         else:
             print("PyApex Warning. Wrong module")
             return None
@@ -346,11 +346,11 @@ class AP1000():
         from PyApex.AP1000.DfbLaser import DfbLaser
         
         if Force:
-            return DfbLaser(self, SlotNumber, self.Simulation)
-        if self.Simulation or self.SlotType(SlotNumber) == AP1000_DFB_CBAND_NAME \
+            return DfbLaser(self, SlotNumber, self.__Simulation)
+        if self.__Simulation or self.SlotType(SlotNumber) == AP1000_DFB_CBAND_NAME \
            or self.SlotType(SlotNumber) == AP1000_DFB_LBAND_NAME or \
            self.SlotType(SlotNumber) == AP1000_DFB_OBAND_NAME:
-            return DfbLaser(self, SlotNumber, self.Simulation)
+            return DfbLaser(self, SlotNumber, self.__Simulation)
         else:
             print("PyApex Warning. Wrong module")
             return None

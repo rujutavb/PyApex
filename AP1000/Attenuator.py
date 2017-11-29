@@ -10,22 +10,22 @@ class Attenuator():
         SlotNumber is the number of the slot used by the ATT
         Simulation is a boolean to indicate to the program if it has to run in simulation mode or not
         '''
-        self.Connexion = Equipment.Connexion
-        self.Simulation = Simulation
-        self.SlotNumber = SlotNumber
-        self.Unit = "dB"
-        self.Attenuation = 0
-        self.ValidUnits = ["db", "%"]
+        self.__Connexion = Equipment.Connexion
+        self.__Simulation = Simulation
+        self.__SlotNumber = SlotNumber
+        self.__Unit = "dB"
+        self.__Attenuation = 0
+        self.__ValidUnits = ["db", "%"]
 
 
     def __str__(self):
         '''
         Return the equipement name and the slot number when the 'print()' function is used
         '''
-        return "Optical Attenuator in slot " + str(self.SlotNumber)
+        return "Optical Attenuator in slot " + str(self.__SlotNumber)
 
 
-    def ConvertForWriting(self, Attenuation):
+    def __ConvertForWriting(self, Attenuation):
         '''
         Internal use only
         Convert a dB attenuation in % or a % attenuation in dB
@@ -34,22 +34,22 @@ class Attenuator():
         from PyApex.Errors import ApexError
         from math import log10 as log
         
-        if self.Unit.lower() == "db":
+        if self.__Unit.lower() == "db":
             return Attenuation
-        elif self.Unit.lower() == "%":
+        elif self.__Unit.lower() == "%":
             try:
                 log(Attenuation)
             except:
-                self.Connexion.close()
+                self.__Connexion.close()
                 raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Attenuation")
             else:
                 return -10 * log(Attenuation/100)
         else:
-            self.Connexion.close()
-            raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.Unit")
+            self.__Connexion.close()
+            raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.__Unit")
 
 
-    def ConvertForReading(self, Attenuation):
+    def __ConvertForReading(self, Attenuation):
         '''
         Internal use only
         Convert a dB attenuation in % or a % attenuation in dB
@@ -57,13 +57,13 @@ class Attenuator():
         from PyApex.Constantes import APXXXX_ERROR_VARIABLE_NOT_DEFINED
         from PyApex.Errors import ApexError
         
-        if self.Unit.lower() == "%":
+        if self.__Unit.lower() == "%":
             return 10**(- Attenuation / 10)
-        elif self.Unit.lower() == "db":
+        elif self.__Unit.lower() == "db":
             return Attenuation
         else:
-            self.Connexion.close()
-            raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.Unit")
+            self.__Connexion.close()
+            raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.__Unit")
 
 
     def SetAttenuation(self, Attenuation, ChNumber=1):
@@ -79,17 +79,17 @@ class Attenuator():
         try:
             Attenuation = float(Attenuation)
         except:
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Attenuation")
         else:
             try:
                 ChNumber = int(ChNumber)
             except:
-                self.Connexion.close()
+                self.__Connexion.close()
                 raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "ChNumber")
             else:
                 
-                Attenuation = self.ConvertForWriting(Attenuation)
+                Attenuation = self.__ConvertForWriting(Attenuation)
                 if Attenuation < AP1000_ATT_ATTMIN:
                     Attenuation = AP1000_ATT_ATTMIN
                 if Attenuation > AP1000_ATT_ATTMAX:
@@ -99,13 +99,12 @@ class Attenuator():
                 if ChNumber < 1:
                     ChNumber = 1
                 
-                if self.Simulation:
-                    self.Attenuation = Attenuation
-                else:
-                    Command = "ATT[" + str(self.SlotNumber).zfill(2) + "]:DB[" + \
+                if not self.__Simulation:
+                    Command = "ATT[" + str(self.__SlotNumber).zfill(2) + "]:DB[" + \
                               str(ChNumber-1) +"]" + ("%.1f" % Attenuation) + "\n"
-                    Send(self.Connexion, Command)
-            self.Attenuation = Attenuation
+                    Send(self.__Connexion, Command)
+                
+                self.__Attenuation = Attenuation
 
 
     def GetAttenuation(self, ChNumber=1):
@@ -121,7 +120,7 @@ class Attenuator():
         try:
             ChNumber = int(ChNumber)
         except:
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "ChNumber")
         else:
             
@@ -130,15 +129,13 @@ class Attenuator():
             if ChNumber < 1:
                 ChNumber = 1
             
-            if self.Simulation:
-                Attenuation = SimuATT_Attenuation
-            else:
-                Command = "ATT[" + str(self.SlotNumber).zfill(2) + "]:DB[" + \
+            if not self.__Simulation:
+                Command = "ATT[" + str(self.__SlotNumber).zfill(2) + "]:DB[" + \
                           str(ChNumber-1) + "]?\n"
-                Send(self.Connexion, Command)
-                Attenuation = Receive(self.Connexion)
+                Send(self.__Connexion, Command)
+                self.__Attenuation = self.__ConvertForReading(float(Receive(self.__Connexion)[:-1]))
             
-            return self.ConvertForReading(float(Attenuation[:-1]))
+            return self.__Attenuation
 
 
     def SetUnit(self, Unit):
@@ -152,11 +149,11 @@ class Attenuator():
         try:
             Unit = str(Unit)
         except:
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Unit")
         else:
-            if Unit.lower() in self.ValidUnits:
-                self.Unit = Unit
+            if Unit.lower() in self.__ValidUnits:
+                self.__Unit = Unit
 
 
     def GetUnit(self):
@@ -164,4 +161,4 @@ class Attenuator():
         Get the attenuation unit of the ATT equipment
         Unit is a string which could be "dB" for logaritmic or "%" for linear power
         '''
-        return self.Unit
+        return self.__Unit

@@ -11,16 +11,16 @@ class Polarimeter():
         Equipment is the AP2XXX class of the equipment
         Simulation is a boolean to indicate to the program if it has to run in simulation mode or not
         '''
-        self.Connexion = Equipment.Connexion
-        self.Simulation = Simulation
-        self.ID = Equipment.GetID()
+        self.__Connexion = Equipment.Connexion
+        self.__Simulation = Simulation
+        self.__ID = Equipment.GetID()
 
 
     def __str__(self):
         '''
         Return the equipment type and the AP2XXX ID
         '''
-        return "Polarimeter of " + str(self.ID)
+        return "Polarimeter of " + str(self.__ID)
     
     
     def GetPolarimeterIdentity(self):
@@ -30,10 +30,10 @@ class Polarimeter():
         '''
         
         Values = []
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "POLIDN?\n"
-            Send(self.Connexion, Command)
-            Str = Receive(self.Connexion, 64)[:-1]
+            Send(self.__Connexion, Command)
+            Str = Receive(self.__Connexion, 64)[:-1]
             
             for value in Str.split(" "):
                 Values.append(value)
@@ -51,10 +51,10 @@ class Polarimeter():
         from random import randint
         
         Values = []
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "POLRAWPOWER?\n"
-            Send(self.Connexion, Command)
-            Str = Receive(self.Connexion, 64)[:-1]
+            Send(self.__Connexion, Command)
+            Str = Receive(self.__Connexion, 64)[:-1]
             
             for v in Str.split(" "):
                 try:
@@ -75,10 +75,10 @@ class Polarimeter():
         '''
         from random import random
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "POLTEMP?\n"
-            Send(self.Connexion, Command)
-            Str = Receive(self.Connexion, 64)[:-1]
+            Send(self.__Connexion, Command)
+            Str = Receive(self.__Connexion, 64)[:-1]
             
             try:
                 Temperature = float(Str)
@@ -98,10 +98,10 @@ class Polarimeter():
         from random import random
         
         Values = []
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "POLPOWER?\n"
-            Send(self.Connexion, Command)
-            Str = Receive(self.Connexion, 64)[:-1]
+            Send(self.__Connexion, Command)
+            Str = Receive(self.__Connexion, 64)[:-1]
             
             for v in Str.split(" "):
                 try:
@@ -125,7 +125,7 @@ class Polarimeter():
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE
         from PyApex.Errors import ApexError
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "POLPATH"
             if isinstance(Path, str):
                 if Path.lower() == "filtered":
@@ -142,7 +142,7 @@ class Polarimeter():
                 sys.exit()
             
             Command += "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
             
     
     def GetPolarimeterPath(self):
@@ -155,10 +155,10 @@ class Polarimeter():
         '''
         
         PathString = ""
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "POLPATH?\n"
-            Send(self.Connexion, Command)
-            Str = Receive(self.Connexion, 64)[:-1]
+            Send(self.__Connexion, Command)
+            Str = Receive(self.__Connexion, 64)[:-1]
             
             try:
                 if int(Str) == 1:
@@ -185,9 +185,9 @@ class Polarimeter():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
             sys.exit()
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "POLWL" + str(Wavelength) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
             
     
     def GetPolarimeterWavelength(self):
@@ -196,10 +196,10 @@ class Polarimeter():
         The returned wavelength is expressed in nm
         '''
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "POLWL?\n"
-            Send(self.Connexion, Command)
-            Str = Receive(self.Connexion, 64)[:-1]
+            Send(self.__Connexion, Command)
+            Str = Receive(self.__Connexion, 64)[:-1]
             
             try:
                 Wavelength = float(Str)
@@ -220,10 +220,10 @@ class Polarimeter():
         from math import sqrt
         
         Values = []
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "POLSOP?\n"
-            Send(self.Connexion, Command)
-            Str = Receive(self.Connexion, 64)[:-1]
+            Send(self.__Connexion, Command)
+            Str = Receive(self.__Connexion, 64)[:-1]
             
             for v in Str.split(" "):
                 try:
@@ -240,3 +240,5 @@ class Polarimeter():
                 Values.append(S[i] / S[0])
         
         return Values
+        
+    

@@ -10,27 +10,27 @@ class ErbiumAmplifier():
         SlotNumber is the number of the slot used by the EFA
         Simulation is a boolean to indicate to the program if it has to run in simulation mode or not
         '''
-        self.Connexion = Equipment.Connexion
-        self.Simulation = Simulation
-        self.SlotNumber = SlotNumber
-        self.Status = "OFF"
-        self.Type = self.GetType()
-        self.Unit = "dBm"
-        self.GainUnit = "dB"
-        self.Wavelength = 1550
-        self.Amplification = 0
-        self.IPump = 0
-        self.ValidUnits = ["dbm", "mw"]
-        self.ValidGainUnits = ["db", "%"]
-        self.Mode = 0
-        self.Setpoint = [0.0, 0.0]
+        self.__Connexion = Equipment.Connexion
+        self.__Simulation = Simulation
+        self.__SlotNumber = SlotNumber
+        self.__Status = "OFF"
+        self.__Type = self.GetType()
+        self.__Unit = "dBm"
+        self.__GainUnit = "dB"
+        self.__Wavelength = 1550
+        self.__Amplification = 0
+        self.__IPump = 0
+        self.__ValidUnits = ["dbm", "mw"]
+        self.__ValidGainUnits = ["db", "%"]
+        self.__Mode = 0
+        self.__Setpoint = [0.0, 0.0]
 
 
     def __str__(self):
         '''
         Return the equipement name and the slot number when the 'print()' function is used
         '''
-        return "Erbium Amplifier in slot " + str(self.SlotNumber)
+        return "Erbium Amplifier in slot " + str(self.__SlotNumber)
 
 
     def GetType(self, type="d"):
@@ -54,12 +54,12 @@ class ErbiumAmplifier():
         from PyApex.Errors import ApexError
         import re
         
-        if self.Simulation:
+        if self.__Simulation:
             ID = SimuEFA_SlotID
         else:
-            Command = "SLT[" + str(self.SlotNumber).zfill(2) + "]:IDN?\n"
-            Send(self.Connexion, Command)
-            ID = Receive(self.Connexion)
+            Command = "SLT[" + str(self.__SlotNumber).zfill(2) + "]:IDN?\n"
+            Send(self.__Connexion, Command)
+            ID = Receive(self.__Connexion)
         
         if re.findall("A", ID.split("/")[2].split("-")[2]) != []:
             if type.lower() == "c":
@@ -83,11 +83,11 @@ class ErbiumAmplifier():
             else:
                 return 2
         else:
-            self.Connexion.close()
-            raise ApexError(AP1000_ERROR_SLOT_TYPE_NOT_DEFINED, self.SlotNumber)
+            self.__Connexion.close()
+            raise ApexError(AP1000_ERROR_SLOT_TYPE_NOT_DEFINED, self.__SlotNumber)
 
 
-    def ConvertForWriting(self, Value, Type = "power"):
+    def __ConvertForWriting(self, Value, Type = "power"):
         '''
         Internal use only
         Type is the type of value to convert:
@@ -106,13 +106,13 @@ class ErbiumAmplifier():
         else:
             Type = 1
             
-        if (self.Unit.lower() == "dbm" and Type == 1) or (self.GainUnit.lower() == "db" and Type == 2):
+        if (self.__Unit.lower() == "dbm" and Type == 1) or (self.__GainUnit.lower() == "db" and Type == 2):
             return Value
         else:
             try:
                 log(Value)
             except:
-                self.Connexion.close()
+                self.__Connexion.close()
                 raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Value")
             else:
                 if Type == 2:
@@ -120,7 +120,7 @@ class ErbiumAmplifier():
                 return 10.0 * log(Value/10.0)
 
 
-    def ConvertForReading(self, Value, Type = "power"):
+    def __ConvertForReading(self, Value, Type = "power"):
         '''
         Internal use only
         Type is the type of value to convert:
@@ -138,7 +138,7 @@ class ErbiumAmplifier():
         else:
             Type = 1
         
-        if (self.Unit.lower() == "mw" and Type == 1) or (self.GainUnit.lower() == "%" and Type == 2):
+        if (self.__Unit.lower() == "mw" and Type == 1) or (self.__GainUnit.lower() == "%" and Type == 2):
             Value = 10.0**(Value / 10.0)
             if Type == 2:
                 Value *= 100.0
@@ -151,15 +151,16 @@ class ErbiumAmplifier():
         '''
         Get input binary voltage of the EFA equipment
         The return voltage is expressed in binary unit (V = 2.048 / 4096)
+        !!! FOR CALIBRATION ONLY !!!
         '''
         from PyApex.Constantes import SimuEFA_InVoltage
         
-        if self.Simulation:
+        if self.__Simulation:
             InVoltage = SimuEFA_InVoltage
         else:
-            Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:POWERINVALUE\n"
-            Send(self.Connexion, Command)
-            InVoltage = Receive(self.Connexion)
+            Command = "AMP[" + str(self.__SlotNumber).zfill(2) + "]:POWERINVALUE\n"
+            Send(self.__Connexion, Command)
+            InVoltage = Receive(self.__Connexion)
 
         return int(InVoltage[:-1])
 
@@ -168,15 +169,16 @@ class ErbiumAmplifier():
         '''
         Get output binary voltage of the EFA equipment
         The return voltage is expressed in binary unit (V = 2.048 / 4096)
+        !!! FOR CALIBRATION ONLY !!!
         '''
         from PyApex.Constantes import SimuEFA_OutVoltage
         
-        if self.Simulation:
+        if self.__Simulation:
             OutVoltage = SimuEFA_OutVoltage
         else:
-            Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:POWEROUTVALUE\n"
-            Send(self.Connexion, Command)
-            OutVoltage = Receive(self.Connexion)
+            Command = "AMP[" + str(self.__SlotNumber).zfill(2) + "]:POWEROUTVALUE\n"
+            Send(self.__Connexion, Command)
+            OutVoltage = Receive(self.__Connexion)
         
         return int(OutVoltage[:-1])
     
@@ -188,10 +190,10 @@ class ErbiumAmplifier():
         '''
         from time import sleep
         
-        if not self.Simulation:
-            Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:L1\n"
-            Send(self.Connexion, Command)
-        self.Status = "ON"
+        if not self.__Simulation:
+            Command = "AMP[" + str(self.__SlotNumber).zfill(2) + "]:L1\n"
+            Send(self.__Connexion, Command)
+        self.__Status = "ON"
         sleep(0.2)
 
     
@@ -199,17 +201,17 @@ class ErbiumAmplifier():
         '''
         Switch off the pump laser of the EFA equipment
         '''
-        if not self.Simulation:
-            Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:L0\n"
-            Send(self.Connexion, Command)
-        self.Status = "OFF"
+        if not self.__Simulation:
+            Command = "AMP[" + str(self.__SlotNumber).zfill(2) + "]:L0\n"
+            Send(self.__Connexion, Command)
+        self.__Status = "OFF"
         
         
     def GetStatus(self):
         '''
         Returns the status ("ON" or "OFF") of the TLS equipment
         '''
-        return self.Status
+        return self.__Status
         
 
     def SetIPump(self, IPump):
@@ -224,20 +226,20 @@ class ErbiumAmplifier():
         try:
             IPump = float(IPump)
         except:
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "IPump")
         else:
-            if IPump > AP1000_EFA_IPMAX[self.Type]:
-                IPump = AP1000_EFA_IPMAX[self.Type]
+            if IPump > AP1000_EFA_IPMAX[self.__Type]:
+                IPump = AP1000_EFA_IPMAX[self.__Type]
             if IPump < 0:
                 IPump = 0
             
-            if not self.Simulation:
-                Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:PUMP" + \
+            if not self.__Simulation:
+                Command = "AMP[" + str(self.__SlotNumber).zfill(2) + "]:PUMP" + \
                           ("%.1f" % IPump) + "\n"
-                Send(self.Connexion, Command)
+                Send(self.__Connexion, Command)
             
-            self.IPump = IPump
+            self.__IPump = IPump
 
 
     def GetInPower(self):
@@ -247,12 +249,12 @@ class ErbiumAmplifier():
         '''
         from PyApex.Constantes import SimuEFA_InPower
         
-        if self.Simulation:
+        if self.__Simulation:
             Power = SimuEFA_InPower
         else:
-            Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:INDB?\n"
-            Send(self.Connexion, Command)
-            Power = Receive(self.Connexion)
+            Command = "AMP[" + str(self.__SlotNumber).zfill(2) + "]:INDB?\n"
+            Send(self.__Connexion, Command)
+            Power = Receive(self.__Connexion)
         
         return float(Power[:-1])
 
@@ -264,12 +266,12 @@ class ErbiumAmplifier():
         '''
         from PyApex.Constantes import SimuEFA_OutPower
         
-        if self.Simulation:
+        if self.__Simulation:
             Power = SimuEFA_OutPower
         else:
-            Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:OTDB?\n"
-            Send(self.Connexion, Command)
-            Power = Receive(self.Connexion)
+            Command = "AMP[" + str(self.__SlotNumber).zfill(2) + "]:OTDB?\n"
+            Send(self.__Connexion, Command)
+            Power = Receive(self.__Connexion)
         
         return float(Power[:-1])
 
@@ -285,11 +287,11 @@ class ErbiumAmplifier():
         try:
             Unit = str(Unit)
         except:
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Unit")
         else:
-            if Unit.lower() in self.ValidUnits:
-                self.Unit = Unit
+            if Unit.lower() in self.__ValidUnits:
+                self.__Unit = Unit
                 
                 
     def GetUnit(self):
@@ -297,7 +299,7 @@ class ErbiumAmplifier():
         Gets power unit of the EFA equipment
         The return unit is a string
         '''
-        return self.Unit
+        return self.__Unit
         
         
     def SetUnitGain(self, Unit):
@@ -311,11 +313,11 @@ class ErbiumAmplifier():
         try:
             Unit = str(Unit)
         except:
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Unit")
         else:
-            if Unit.lower() in self.ValidGainUnits:
-                self.GainUnit = Unit
+            if Unit.lower() in self.__ValidGainUnits:
+                self.__GainUnit = Unit
 
                 
     def GetGainUnit(self):
@@ -323,7 +325,7 @@ class ErbiumAmplifier():
         Gets gain unit of the EFA equipment
         The return unit is a string
         '''
-        return self.GainUnit
+        return self.__GainUnit
    
 
     def SetMode(self, Mode = 0, SetPoint = None):
@@ -344,41 +346,41 @@ class ErbiumAmplifier():
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE
         from PyApex.Errors import ApexError
         
-        Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:"
+        Command = "AMP[" + str(self.__SlotNumber).zfill(2) + "]:"
         if isinstance(Mode, str):
             if Mode.lower() == "power":
                 Command += "AUTOPOWER"
-                self.Mode = 1
+                self.__Mode = 1
             elif Mode.lower() == "gain":
                 Command += "AUTOGAIN"
-                self.Mode = 2
+                self.__Mode = 2
             else:
                 Command += "MANUAL"
-                self.Mode = 0
+                self.__Mode = 0
         else:
             if Mode == 1:
                 Command += "AUTOPOWER"
-                self.Mode = 1
+                self.__Mode = 1
             elif Mode == 2:
                 Command += "AUTOGAIN"
-                self.Mode = 2
+                self.__Mode = 2
             else:
                 Command += "MANUAL"
-                self.Mode = 0
+                self.__Mode = 0
                 
-        if SetPoint != None and self.Mode != 0:
+        if SetPoint != None and self.__Mode != 0:
             if not isinstance(SetPoint, (int, float)):
-                self.Connexion.close()
+                self.__Connexion.close()
                 raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "SetPoint")
             else:
-                self.Setpoint[self.Mode - 1] = self.ConvertForWriting(SetPoint, self.Mode)
+                self.__Setpoint[self.__Mode - 1] = self.__ConvertForWriting(SetPoint, self.__Mode)
         
-        if self.Mode == 1 or self.Mode == 2:
-            Command += ("%.1f" % self.Setpoint[self.Mode - 1])
+        if self.__Mode == 1 or self.__Mode == 2:
+            Command += ("%.1f" % self.__Setpoint[self.__Mode - 1])
         Command += "\n"
             
-        if not self.Simulation:
-            Send(self.Connexion, Command)
+        if not self.__Simulation:
+            Send(self.__Connexion, Command)
     
     
     def GetMode(self):
@@ -386,25 +388,25 @@ class ErbiumAmplifier():
         Gets the working mode of the EFA equipment
         '''
         
-        Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:MODE?\n"
+        Command = "AMP[" + str(self.__SlotNumber).zfill(2) + "]:MODE?\n"
             
-        if not self.Simulation:
-            Send(self.Connexion, Command)
-            Mode = Receive(self.Connexion)
+        if not self.__Simulation:
+            Send(self.__Connexion, Command)
+            Mode = Receive(self.__Connexion)
         
         try:
             Mode = int(Mode)
-            self.Mode = Mode
+            self.__Mode = Mode
         except:
             pass
         
-        if self.Mode == -1:
+        if self.__Mode == -1:
             return "off"
-        elif self.Mode == 0:
+        elif self.__Mode == 0:
             return "manual"
-        elif self.Mode == 1:
+        elif self.__Mode == 1:
             return "constant power"
-        elif self.Mode == 2:
+        elif self.__Mode == 2:
             return "constant gain"
         else:
             return "unknown mode"
@@ -422,17 +424,17 @@ class ErbiumAmplifier():
         try:
             Power = float(Power)
         except:
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Power")
         else:
-            self.Setpoint[0] = self.ConvertForWriting(Power, "power")
+            self.__Setpoint[0] = self.__ConvertForWriting(Power, "power")
             
             
-            Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:"
-            Command += "AUTOPOWER" + ("%.1f" % self.Setpoint[0]) + "\n"
+            Command = "AMP[" + str(self.__SlotNumber).zfill(2) + "]:"
+            Command += "AUTOPOWER" + ("%.1f" % self.__Setpoint[0]) + "\n"
             
-            if not self.Simulation:
-                Send(self.Connexion, Command)
+            if not self.__Simulation:
+                Send(self.__Connexion, Command)
     
     
     def GetPower(self):
@@ -441,22 +443,22 @@ class ErbiumAmplifier():
         The value is expressed in the unit defined by the GetUnit() method
         
         '''
-        Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:AUTOPOWER?\n"
+        Command = "AMP[" + str(self.__SlotNumber).zfill(2) + "]:AUTOPOWER?\n"
             
-        if not self.Simulation:
-            Send(self.Connexion, Command)
-            Power = Receive(self.Connexion)
+        if not self.__Simulation:
+            Send(self.__Connexion, Command)
+            Power = Receive(self.__Connexion)
             
             if "no set point" in str(Power).lower():
                 return "no set point"
         
         try:
             Power = float(Power)
-            self.Setpoint[0] = Power
+            self.__Setpoint[0] = Power
         except:
             pass
         
-        return self.ConvertForReading(self.Setpoint[0], "power")
+        return self.__ConvertForReading(self.__Setpoint[0], "power")
     
     
     def SetGain(self, Gain):
@@ -471,17 +473,17 @@ class ErbiumAmplifier():
         try:
             Gain = float(Gain)
         except:
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Gain")
         else:
-            self.Setpoint[1] = self.ConvertForWriting(Gain, "gain")
+            self.__Setpoint[1] = self.__ConvertForWriting(Gain, "gain")
             
             
-            Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:"
-            Command += "AUTOGAIN" + ("%.1f" % self.Setpoint[1]) + "\n"
+            Command = "AMP[" + str(self.__SlotNumber).zfill(2) + "]:"
+            Command += "AUTOGAIN" + ("%.1f" % self.__Setpoint[1]) + "\n"
             
-            if not self.Simulation:
-                Send(self.Connexion, Command)
+            if not self.__Simulation:
+                Send(self.__Connexion, Command)
     
     
     def GetGain(self):
@@ -490,20 +492,20 @@ class ErbiumAmplifier():
         The value is expressed in the unit defined by the GetGainUnit() method
         
         '''
-        Command = "AMP[" + str(self.SlotNumber).zfill(2) + "]:AUTOGAIN?\n"
+        Command = "AMP[" + str(self.__SlotNumber).zfill(2) + "]:AUTOGAIN?\n"
             
-        if not self.Simulation:
-            Send(self.Connexion, Command)
-            Gain = Receive(self.Connexion)
+        if not self.__Simulation:
+            Send(self.__Connexion, Command)
+            Gain = Receive(self.__Connexion)
             
             if "no set point" in str(Gain).lower():
                 return "no set point"
         
         try:
             Gain = float(Gain)
-            self.Setpoint[1] = Gain
+            self.__Setpoint[1] = Gain
         except:
             pass
         
-        return self.ConvertForReading(self.Setpoint[1], "gain")
+        return self.__ConvertForReading(self.__Setpoint[1], "gain")
 

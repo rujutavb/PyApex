@@ -12,22 +12,22 @@ class TunableLaser():
         SlotNumber is the number of the slot used by the TLS
         Simulation is a boolean to indicate to the program if it has to run in simulation mode or not
         '''
-        self.Connexion = Equipment.Connexion
-        self.SlotNumber = SlotNumber
-        self.Simulation = Simulation
-        self.Type = self.GetType()
-        self.Unit = "dBm"
-        self.Wavelength = 1550
-        self.Power = 0
-        self.Status = "OFF"
-        self.ValidUnits = ["dbm", "mw"]
+        self.__Connexion = Equipment.Connexion
+        self.__SlotNumber = SlotNumber
+        self.__Simulation = Simulation
+        self.__Type = self.GetType()
+        self.__Unit = "dBm"
+        self.__Wavelength = 1550
+        self.__Power = 0
+        self.__Status = "OFF"
+        self.__ValidUnits = ["dbm", "mw"]
 
 
     def __str__(self):
         '''
         Return the equipement name and the slot number when the 'print()' function is used
         '''
-        return "Tunable Laser in slot " + str(self.SlotNumber)
+        return "Tunable Laser in slot " + str(self.__SlotNumber)
 
 
     def GetType(self):
@@ -41,12 +41,12 @@ class TunableLaser():
         from PyApex.Errors import ApexError
         import re
         
-        if self.Simulation:
+        if self.__Simulation:
             ID = SimuTLS_SlotID
         else:
-            Command = "SLT[" + str(self.SlotNumber).zfill(2) + "]:IDN?\n"
-            Send(self.Connexion, Command)
-            ID = Receive(self.Connexion)
+            Command = "SLT[" + str(self.__SlotNumber).zfill(2) + "]:IDN?\n"
+            Send(self.__Connexion, Command)
+            ID = Receive(self.__Connexion)
 
         if re.findall(str(AP1000_TLS_CBAND), ID.split("/")[1]) != []:
             return 0
@@ -54,11 +54,11 @@ class TunableLaser():
             return 2
         else:
             self.Off()
-            self.Connexion.close()
-            raise ApexError(AP1000_ERROR_SLOT_TYPE_NOT_DEFINED, self.SlotNumber)
+            self.__Connexion.close()
+            raise ApexError(AP1000_ERROR_SLOT_TYPE_NOT_DEFINED, self.__SlotNumber)
             
     
-    def ConvertForWriting(self, Power):
+    def __ConvertForWriting(self, Power):
         '''
         Internal use only
         Convert a dBm power in mW or a mW power in dBm
@@ -67,24 +67,24 @@ class TunableLaser():
         from PyApex.Errors import ApexError
         from math import log10 as log
         
-        if self.Unit.lower() == "dbm":
+        if self.__Unit.lower() == "dbm":
             return Power
-        elif self.Unit.lower() == "mw":
+        elif self.__Unit.lower() == "mw":
             try:
                 log(Power)
             except:
                 self.Off()
-                self.Connexion.close()
+                self.__Connexion.close()
                 raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Power")
             else:
                 return -10 * log(Power/100)
         else:
             self.Off()
-            self.Connexion.close()
-            raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.Unit")
+            self.__Connexion.close()
+            raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.__Unit")
 
 
-    def ConvertForReading(self, Power):
+    def __ConvertForReading(self, Power):
         '''
         Internal use only
         Convert a dBm power in mW or a mW power in dBm
@@ -92,13 +92,13 @@ class TunableLaser():
         from PyApex.Constantes import APXXXX_ERROR_VARIABLE_NOT_DEFINED
         from PyApex.Errors import ApexError
         
-        if self.Unit.lower() == "mw":
+        if self.__Unit.lower() == "mw":
             return 10**(Power / 10)
-        elif self.Unit.lower() == "dbm":
+        elif self.__Unit.lower() == "dbm":
             return Power
         else:
-            self.Connexion.close()
-            raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.Unit")
+            self.__Connexion.close()
+            raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.__Unit")
 
 
     def SetPower(self, Power):
@@ -114,26 +114,25 @@ class TunableLaser():
             Power = float(Power)
         except:
             self.Off()
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Power")
         else:
-            Power = self.ConvertForWriting(Power)
-            if Power < AP1000_TLS_POWMIN[self.Type]:
+            Power = self.__ConvertForWriting(Power)
+            if Power < AP1000_TLS_POWMIN[self.__Type]:
                 print("PyApex Warning. TLS Power is set to its minimum value: " + \
-                      str(AP1000_TLS_POWMIN[self.Type]) + " dBm !")
-                Power = AP1000_TLS_POWMIN[self.Type]
-            elif Power > AP1000_TLS_POWMAX[self.Type]:
+                      str(AP1000_TLS_POWMIN[self.__Type]) + " dBm !")
+                Power = AP1000_TLS_POWMIN[self.__Type]
+            elif Power > AP1000_TLS_POWMAX[self.__Type]:
                 print("PyApex Warning. TLS Power is set to its maximum value: " + \
-                      str(AP1000_TLS_POWMIN[self.Type]) + " dBm !")
-                Power = AP1000_TLS_POWMAX[self.Type]
+                      str(AP1000_TLS_POWMIN[self.__Type]) + " dBm !")
+                Power = AP1000_TLS_POWMAX[self.__Type]
                 
-            if self.Simulation:
-                self.Power = Power
-            else:
-                Command = "TLS[" + str(self.SlotNumber).zfill(2) + "]:TPDB" + \
+            if not self.__Simulation:
+                Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:TPDB" + \
                           ("%.1f" % Power) + "\n"
-                Send(self.Connexion, Command)
-                self.Power = Power
+                Send(self.__Connexion, Command)
+            
+            self.__Power = Power
 
 
     def GetPower(self):
@@ -141,16 +140,13 @@ class TunableLaser():
         Get output power of the TLS equipment
         The return power is expressed in the unit defined by the GetUnit() method
         '''
-        from PyApex.Constantes import SimuTLS_Power
         
-        if self.Simulation:
-            Power = SimuTLS_Power
-        else:
-            Command = "TLS[" + str(self.SlotNumber).zfill(2) + "]:TPDB?\n"
-            Send(self.Connexion, Command)
-            Power = Receive(self.Connexion)
+        if not self.__Simulation:
+            Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:TPDB?\n"
+            Send(self.__Connexion, Command)
+            self.__Power = self.__ConvertForReading(float(Receive(self.__Connexion)[:-1]))
         
-        return self.ConvertForReading(float(Power[:-1]))
+        return self.__Power
 
 
     def SetUnit(self, Unit):
@@ -165,11 +161,11 @@ class TunableLaser():
             Unit = str(Unit)
         except:
             self.Off()
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Unit")
         else:
-            if Unit.lower() in self.ValidUnits:
-                self.Unit = Unit
+            if Unit.lower() in self.__ValidUnits:
+                self.__Unit = Unit
 
 
     def GetUnit(self):
@@ -177,7 +173,7 @@ class TunableLaser():
         Get power unit of the TLS equipment
         The return unit is a string
         '''
-        return self.Unit
+        return self.__Unit
 
 
     def On(self):
@@ -187,10 +183,10 @@ class TunableLaser():
         '''
         from time import sleep
         
-        if not self.Simulation:
-            Command = "TLS[" + str(self.SlotNumber).zfill(2) + "]:L1\n"
-            Send(self.Connexion, Command)
-        self.Status = "ON"
+        if not self.__Simulation:
+            Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:L1\n"
+            Send(self.__Connexion, Command)
+        self.__Status = "ON"
         sleep(0.2)
 
 
@@ -198,17 +194,17 @@ class TunableLaser():
         '''
         Shut down the output power of the TLS equipment
         '''
-        if not self.Simulation:
-            Command = "TLS[" + str(self.SlotNumber).zfill(2) + "]:L0\n"
-            Send(self.Connexion, Command)
-        self.Status = "OFF"
+        if not self.__Simulation:
+            Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:L0\n"
+            Send(self.__Connexion, Command)
+        self.__Status = "OFF"
 
 
     def GetStatus(self):
         '''
         Return the status ("ON" or "OFF") of the TLS equipment
         '''
-        return self.Status
+        return self.__Status
 
 
     def SetWavelength(self, Wavelength):
@@ -224,24 +220,24 @@ class TunableLaser():
             Wavelength = float(Wavelength)
         except:
             self.Off()
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
         else:
-            if Wavelength < AP1000_TLS_WLMIN[self.Type]:
+            if Wavelength < AP1000_TLS_WLMIN[self.__Type]:
                 print("PyApex Warning. TLS Wavelength is set to its minimum value: " + \
-                      str(AP1000_TLS_WLMIN[self.Type]) + " nm !")
-                Wavelength = AP1000_TLS_WLMIN[self.Type]
-            if Wavelength > AP1000_TLS_WLMAX[self.Type]:
+                      str(AP1000_TLS_WLMIN[self.__Type]) + " nm !")
+                Wavelength = AP1000_TLS_WLMIN[self.__Type]
+            if Wavelength > AP1000_TLS_WLMAX[self.__Type]:
                 print("PyApex Warning. TLS Wavelength is set to its maximum value: " + \
-                      str(AP1000_TLS_WLMAX[self.Type]) + " nm !")
-                Wavelength = AP1000_TLS_WLMAX[self.Type]
+                      str(AP1000_TLS_WLMAX[self.__Type]) + " nm !")
+                Wavelength = AP1000_TLS_WLMAX[self.__Type]
             
-            if not self.Simulation:
-                Command = "TLS[" + str(self.SlotNumber).zfill(2) + "]:TWL" + \
+            if not self.__Simulation:
+                Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:TWL" + \
                           ("%4.3f" % Wavelength).zfill(8) + "\n"
-                Send(self.Connexion, Command)
+                Send(self.__Connexion, Command)
             
-            self.Wavelength = Wavelength
+            self.__Wavelength = Wavelength
 
 
     def GetWavelength(self):
@@ -249,16 +245,13 @@ class TunableLaser():
         Get wavelength of the TLS equipment
         The return wavelength is expressed in nm
         '''
-        from PyApex.Constantes import SimuTLS_Wavelength
         
-        if self.Simulation:
-            Wavelength = SimuTLS_Wavelength
-        else:
-            Command = "TLS[" + str(self.SlotNumber).zfill(2) + "]:TWL?\n"
-            Send(self.Connexion, Command)
-            Wavelength = Receive(self.Connexion)
+        if not self.__Simulation:
+            Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:TWL?\n"
+            Send(self.__Connexion, Command)
+            self.__Wavelength = float(Receive(self.__Connexion)[:-1])
             
-        return float(Wavelength[:-1])
+        return self.__Wavelength
 
 
     def SetFrequency(self, Frequency):
@@ -274,15 +267,15 @@ class TunableLaser():
             Frequency = float(Frequency)
         except:
             self.Off()
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Frequency")
         else:
             if Frequency > 0:
                 self.SetWavelength(VACCUM_LIGHT_SPEED / Frequency)
             else:
                 print("PyApex Warning. TLS Frequency is set to its minimum value: " + \
-                      str(AP1000_TLS_WLMAX[self.Type] / VACCUM_LIGHT_SPEED) + " GHz !")
-                self.SetWavelength(AP1000_TLS_WLMAX[self.Type])
+                      str(AP1000_TLS_WLMAX[self.__Type] / VACCUM_LIGHT_SPEED) + " GHz !")
+                self.SetWavelength(AP1000_TLS_WLMAX[self.__Type])
 
 
     def GetFrequency(self):
@@ -307,19 +300,19 @@ class TunableLaser():
         
         if not isinstance(Current, (float, int)):
             self.Off()
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Current")
             
         if Current < AP1000_TLS_SOAMIN or Current > AP1000_TLS_SOAMAX:
             self.Off()
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Current")
             
-        if not self.Simulation:
-            Command = "TLS[" + str(self.SlotNumber).zfill(2) + "]:SETSOAVALUE" + str(Current) + "\n"
-            Send(self.Connexion, Command)
+        if not self.__Simulation:
+            Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:SETSOAVALUE" + str(Current) + "\n"
+            Send(self.__Connexion, Command)
             
-        self.SOACurrent = Current
+        self.__SOACurrent = Current
     
     
     def SetDiodeTemp(self, DiodeNumber, Temperature, SweepSpeed, SOAComp):
@@ -336,29 +329,29 @@ class TunableLaser():
 
         if not isinstance(DiodeNumber, int):
             self.Off()
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "DiodeNumber")
         
         if not isinstance(Temperature, (float, int)):
             self.Off()
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Temperature")
         
         if DiodeNumber < 1 or DiodeNumber > 12:
             self.Off()
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "DiodeNumber")
         
         if Temperature < AP1000_TLS_TMIN or Temperature > AP1000_TLS_TMAX:
             self.Off()
-            self.Connexion.close()
+            self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Temperature")
             
-        if not self.Simulation:
-            Command = "TLS[" + str(self.SlotNumber).zfill(2) + "]:SETTARGETPARAM" + str(DiodeNumber) + ";" + str(Temperature) + ";"+ str(SweepSpeed) + ";" + str(SOAComp) + "\n"
-            Send(self.Connexion, Command)
+        if not self.__Simulation:
+            Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:SETTARGETPARAM" + str(DiodeNumber) + ";" + str(Temperature) + ";"+ str(SweepSpeed) + ";" + str(SOAComp) + "\n"
+            Send(self.__Connexion, Command)
             
-        self.DiodeNumber = DiodeNumber
-        self.DiodeTemp = Temperature
-        self.SweepSpeed = SweepSpeed
-        self.SOAComp = SOAComp
+        self.__DiodeNumber = DiodeNumber
+        self.__DiodeTemp = Temperature
+        self.__SweepSpeed = SweepSpeed
+        self.__SOAComp = SOAComp

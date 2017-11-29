@@ -9,12 +9,12 @@ class AP2XXX():
         Elementary functions to communicate with Apex AP2XXX equipment (OSA and OCSA)
         This class can control :
             - The heterodyne OSA
-            - The polarimeter
-            - The optical filter
-        This class cannot yet control :
-            - The filters OSA (AP207X)
+            - The polarimeter (option)
+            - The optical filter (option)
+            - The filters OSA (option)
             - The powermeter
-            - The tunable laser
+        This class cannot yet control :
+            - The tunable laser (option)
         
     VERSION
         2.0
@@ -32,9 +32,9 @@ class AP2XXX():
         Simulation is a boolean to indicate to the program if it has to run in simulation mode or not
         '''
         
-        self.IPAddress = IPaddress
-        self.PortNumber = PortNumber
-        self.Simulation = Simulation
+        self.__IPAddress = IPaddress
+        self.__PortNumber = PortNumber
+        self.__Simulation = Simulation
         
         # Connexion to the equipment
         self.Open()
@@ -49,11 +49,11 @@ class AP2XXX():
         self.Connexion.settimeout(10)
         self.Connexion.setblocking(True)
         
-        if self.Simulation:
+        if self.__Simulation:
             print("Connected successfully to the equipment")
         else:
             try:
-                self.Connexion.connect((self.IPAddress, self.PortNumber))
+                self.Connexion.connect((self.__IPAddress, self.__PortNumber))
                 print("Connected successfully to the equipment")
             except:
                 print("Cannot connect to the equipment")
@@ -67,7 +67,7 @@ class AP2XXX():
         from PyApex.Constantes import APXXXX_ERROR_COMMUNICATION 
         from PyApex.Errors import ApexError
         
-        if not self.Simulation:
+        if not self.__Simulation:
             try:
                 self.Connexion.close()
             except:
@@ -81,7 +81,7 @@ class AP2XXX():
         '''
         from PyApex.Constantes import SimuAP2XXX_ID
         
-        if self.Simulation:
+        if self.__Simulation:
             return SimuAP2XXX_ID
         else:
             Send(self.Connexion, "*IDN?\n")
@@ -94,7 +94,7 @@ class AP2XXX():
         Return an OSA object for using the Heterodyne AP2XXX OSA
         '''
         from PyApex.AP2XXX.osa import OSA
-        return OSA(self, self.Simulation)
+        return OSA(self, self.__Simulation)
         
         
     def Powermeter(self):
@@ -102,7 +102,7 @@ class AP2XXX():
         Return a Powermeter object for using the embedded powermeter of the AP2XXX
         '''
         from PyApex.AP2XXX.powermeter import Powermeter
-        return Powermeter(self, self.Simulation)
+        return Powermeter(self, self.__Simulation)
         
         
     def OsaFs(self):
@@ -111,7 +111,7 @@ class AP2XXX():
         Only available with the AP207X equipment
         '''
         from PyApex.AP2XXX.osafs import OsaFs
-        return OsaFs(self, self.Simulation)
+        return OsaFs(self, self.__Simulation)
         
         
     def Polarimeter(self):
@@ -120,7 +120,7 @@ class AP2XXX():
         Available only with the option OSA-12
         '''
         from PyApex.AP2XXX.polarimeter import Polarimeter
-        return Polarimeter(self, self.Simulation)
+        return Polarimeter(self, self.__Simulation)
         
         
     def Filter(self):
@@ -129,7 +129,7 @@ class AP2XXX():
         Available only with the option OSA-12
         '''
         from PyApex.AP2XXX.filter import Filter
-        return Filter(self, self.Simulation)
+        return Filter(self, self.__Simulation)
     
     
     

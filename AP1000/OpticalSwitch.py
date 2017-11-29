@@ -10,18 +10,18 @@ class OpticalSwitch():
         SlotNumber is the number of the slot used by the OSW
         Simulation is a boolean to indicate to the program if it has to run in simulation mode or not
         '''
-        self.Connexion = Equipment.Connexion
-        self.Simulation = Simulation
-        self.SlotNumber = SlotNumber
-        self.Type = self.GetType()
-        self.Path = 0
+        self.__Connexion = Equipment.Connexion
+        self.__Simulation = Simulation
+        self.__SlotNumber = SlotNumber
+        self.__Type = self.GetType()
+        self.__Path = 0
 
 
     def __str__(self):
         '''
         Return the equipment name and the slot number when the 'print()' function is used
         '''
-        return "Optical Switch in slot " + str(self.SlotNumber)
+        return "Optical Switch in slot " + str(self.__SlotNumber)
     
     
     def GetType(self, type="d"):
@@ -41,12 +41,12 @@ class OpticalSwitch():
         from PyApex.Errors import ApexError
         import re
         
-        if self.Simulation:
+        if self.__Simulation:
             ID = SimuOSW_SlotID
         else:
-            Command = "SLT[" + str(self.SlotNumber).zfill(2) + "]:IDN?\n"
-            Send(self.Connexion, Command)
-            ID = Receive(self.Connexion)
+            Command = "SLT[" + str(self.__SlotNumber).zfill(2) + "]:IDN?\n"
+            Send(self.__Connexion, Command)
+            ID = Receive(self.__Connexion)
         
         if re.findall("x2", ID.split("/")[2].split("-")[3].lower()) != []:
             if type.lower() == "s":
@@ -64,8 +64,8 @@ class OpticalSwitch():
             else:
                 return 2
         else:
-            self.Connexion.close()
-            raise ApexError(AP1000_ERROR_SLOT_TYPE_NOT_DEFINED, self.SlotNumber)
+            self.__Connexion.close()
+            raise ApexError(AP1000_ERROR_SLOT_TYPE_NOT_DEFINED, self.__SlotNumber)
 
 
     def SetPath(self, Path):
@@ -85,80 +85,84 @@ class OpticalSwitch():
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
         from PyApex.Errors import ApexError
         
-        if self.Type == 0:
+        if self.__Type == 0:
             if type(Path) == str:
                 if Path.lower() == "crossed":
-                    self.Path = 1
+                    self.__Path = 1
                 else:
-                    self.Path = 0
+                    self.__Path = 0
             elif type(Path) == int:
                 if Path == 1:
-                    self.Path = 1
+                    self.__Path = 1
                 else:
-                    self.Path = 0
+                    self.__Path = 0
             elif type(Path) == bool:
                 if Path == True:
-                    self.Path = 1
+                    self.__Path = 1
                 else:
-                    self.Path = 0
+                    self.__Path = 0
             else:
-                self.Path = 0
+                self.__Path = 0
                 
-            if not self.Simulation:
-                Command = "SWI[" + str(self.SlotNumber).zfill(2) + "]:CONF" + str(self.Path) + "\n"
-                Send(self.Connexion, Command)
+            if not self.__Simulation:
+                Command = "SWI[" + str(self.__SlotNumber).zfill(2) + "]:CONF" + str(self.__Path) + "\n"
+                Send(self.__Connexion, Command)
                 
-        elif self.Type == 1:
+        elif self.__Type == 1:
             if type(Path) == str:
                 if Path.lower() == "B":
-                    self.Path = 2
+                    self.__Path = 2
                 elif Path.lower() == "C":
-                    self.Path = 3
+                    self.__Path = 3
                 elif Path.lower() == "D":
-                    self.Path = 4
+                    self.__Path = 4
                 else:
-                    self.Path = 1
+                    self.__Path = 1
             elif type(Path) == int:
                 if Path < 1:
-                    self.Path = 1
+                    self.__Path = 1
                 elif Path > 4:
-                    self.Path = 4
+                    self.__Path = 4
+                else:
+                    self.__Path = Path
             else:
-                self.Path = 1
+                self.__Path = 1
                 
-            if not self.Simulation:
-                Command = "SWx4x8[" + str(self.SlotNumber).zfill(2) + "]:OUTx4" + str(self.Path) + "\n"
-                Send(self.Connexion, Command)
+            if not self.__Simulation:
+                Command = "SWx4x8[" + str(self.__SlotNumber).zfill(2) + "]:OUTx4" + str(self.__Path) + "\n"
+                Send(self.__Connexion, Command)
         
-        elif self.Type == 2:
+        elif self.__Type == 2:
             if type(Path) == str:
                 if Path.lower() == "B":
-                    self.Path = 2
+                    self.__Path = 2
                 elif Path.lower() == "C":
-                    self.Path = 3
+                    self.__Path = 3
                 elif Path.lower() == "D":
-                    self.Path = 4
+                    self.__Path = 4
                 elif Path.lower() == "E":
-                    self.Path = 5
+                    self.__Path = 5
                 elif Path.lower() == "F":
-                    self.Path = 6
+                    self.__Path = 6
                 elif Path.lower() == "G":
-                    self.Path = 7
+                    self.__Path = 7
                 elif Path.lower() == "H":
-                    self.Path = 8
+                    self.__Path = 8
                 else:
-                    self.Path = 1
+                    self.__Path = 1
             elif type(Path) == int:
                 if Path < 1:
-                    self.Path = 1
+                    self.__Path = 1
                 elif Path > 8:
-                    self.Path = 8
+                    self.__Path = 8
+                else:
+                    self.__Path = Path
             else:
-                self.Path = 1
+                self.__Path = 1
                 
-            if not self.Simulation:
-                Command = "SWx4x8[" + str(self.SlotNumber).zfill(2) + "]:OUTx8" + str(self.Path) + "\n"
-                Send(self.Connexion, Command)
+            if not self.__Simulation:
+                Command = "SWx4x8[" + str(self.__SlotNumber).zfill(2) + "]:OUTx8" + str(self.__Path) + "\n"
+                Send(self.__Connexion, Command)
 
 
     def GetPath(self):
@@ -176,20 +180,22 @@ class OpticalSwitch():
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
         from PyApex.Errors import ApexError
         
-        if self.Simulation:
-            Path = str(self.Path) + "\n"
+        if self.__Simulation:
+            Path = str(self.__Path) + "\n"
         else:
-            if self.Type == 0:
-                Command = "SWI[" + str(self.SlotNumber).zfill(2) + "]:CONF?\n"
-                Send(self.Connexion, Command)
-                Path = Receive(self.Connexion)
-            elif self.Type == 1:
-                Command = "SWx4x8[" + str(self.SlotNumber).zfill(2) + "]:GETx4?\n"
-                Send(self.Connexion, Command)
-                Path = Receive(self.Connexion)[3:]
-            elif self.Type == 2:
-                Command = "SWx4x8[" + str(self.SlotNumber).zfill(2) + "]:GETx8?\n"
-                Send(self.Connexion, Command)
-                Path = Receive(self.Connexion)[3:]
+            if self.__Type == 0:
+                Command = "SWI[" + str(self.__SlotNumber).zfill(2) + "]:CONF?\n"
+                Send(self.__Connexion, Command)
+                Path = Receive(self.__Connexion)
+            elif self.__Type == 1:
+                Command = "SWx4x8[" + str(self.__SlotNumber).zfill(2) + "]:GETx4?\n"
+                Send(self.__Connexion, Command)
+                Path = Receive(self.__Connexion)[3:]
+            elif self.__Type == 2:
+                Command = "SWx4x8[" + str(self.__SlotNumber).zfill(2) + "]:GETx8?\n"
+                Send(self.__Connexion, Command)
+                Path = Receive(self.__Connexion)[3:]
         
-        return (int(Path[:-1]))
+        self.__Path = int(Path[:-1])
+        
+        return self.__Path

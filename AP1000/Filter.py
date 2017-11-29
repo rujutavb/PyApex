@@ -11,22 +11,22 @@ class Filter():
         Simulation is a boolean to indicate to the program if it has to run in simulation mode or not
         '''
         
-        self.Connexion = Equipment.Connexion
-        self.Simulation = Simulation
-        self.SlotNumber = SlotNumber
-        self.Unit = "nm"
-        self.Wavelength = 1550.0
-        self.ValidUnits = ["nm", "ghz"]
+        self.__Connexion = Equipment.Connexion
+        self.__Simulation = Simulation
+        self.__SlotNumber = SlotNumber
+        self.__Unit = "nm"
+        self.__Wavelength = 1550.0
+        self.__ValidUnits = ["nm", "ghz"]
 
 
     def __str__(self):
         '''
         Return the equipement name and the slot number when the 'print()' function is used
         '''
-        return "Optical Filter in slot " + str(self.SlotNumber)
+        return "Optical Filter in slot " + str(self.__SlotNumber)
 
 
-    def Convert(self, Value):
+    def __Convert(self, Value):
         '''
         Internal use only
         Convert a wavelength (nm) in frequency (GHz) or a frequency (GHz) in wavelength (nm)
@@ -56,12 +56,12 @@ class Filter():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Wavelength")
             sys.exit()
             
-        if not self.Simulation:
-            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TWL" + \
+        if not self.__Simulation:
+            Command = "FLT[" + str(self.__SlotNumber).zfill(2) + "]:TWL" + \
                       ("%.2f" % Wavelength) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
         
-        self.Wavelength = Wavelength
+        self.__Wavelength = Wavelength
 
 
     def GetWavelength(self):
@@ -70,14 +70,12 @@ class Filter():
         Returns the wavelength in nm
         '''
                            
-        if self.Simulation:
-            Wavelength = self.Wavelength
-        else:
-            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TWL?\n"
-            Send(self.Connexion, Command)
-            Wavelength = Receive(self.Connexion)
+        if not self.__Simulation:
+            Command = "FLT[" + str(self.__SlotNumber).zfill(2) + "]:TWL?\n"
+            Send(self.__Connexion, Command)
+            self.__Wavelength = float(Receive(self.__Connexion)[:-1])
         
-        return float(Wavelength[:-1])
+        return self.__Wavelength
         
 
     def SetFrequency(self, Frequency):
@@ -97,13 +95,13 @@ class Filter():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Frequency")
             sys.exit()
             
-        if not self.Simulation:
-            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TFR" + \
+        if not self.__Simulation:
+            Command = "FLT[" + str(self.__SlotNumber).zfill(2) + "]:TFR" + \
                       ("%.2f" % Frequency) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
         
         
-        self.Wavelength = self.Convert(Frequency)
+        self.__Wavelength = self.__Convert(Frequency)
 
 
     def GetFrequency(self):
@@ -112,14 +110,13 @@ class Filter():
         Returns the Frequency in GHz
         '''
         
-        if self.Simulation:
-            Wavelength = self.Wavelength
-        else:
-            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TFR?\n"
-            Send(self.Connexion, Command)
-            Wavelength = Receive(self.Connexion)
+        if not self.__Simulation:
+            Command = "FLT[" + str(self.__SlotNumber).zfill(2) + "]:TFR?\n"
+            Send(self.__Connexion, Command)
+            Frequency = float(Receive(self.__Connexion)[:-1])
+            self.__Wavelength = self.__Convert(Frequency)
         
-        return float(Wavelength[:-1])
+        return Frequency
     
     
     def GetWavelngthLimits(self):
@@ -130,16 +127,16 @@ class Filter():
         from PyApex.Constantes import AP1000_FIL_WLMIN, AP1000_FIL_WLMAX
         from PyApex.Errors import ApexError
         
-        if self.Simulation:
+        if self.__Simulation:
             WavelengthMin = AP1000_FIL_WLMIN
             WavelengthMax = AP1000_FIL_WLMAX
         else:
-            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:WLMIN?\n"
-            Send(self.Connexion, Command)
-            WavelengthMin = float(Receive(self.Connexion)[:-1])
-            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:WLMAX?\n"
-            Send(self.Connexion, Command)
-            WavelengthMax = float(Receive(self.Connexion)[:-1])
+            Command = "FLT[" + str(self.__SlotNumber).zfill(2) + "]:WLMIN?\n"
+            Send(self.__Connexion, Command)
+            WavelengthMin = float(Receive(self.__Connexion)[:-1])
+            Command = "FLT[" + str(self.__SlotNumber).zfill(2) + "]:WLMAX?\n"
+            Send(self.__Connexion, Command)
+            WavelengthMax = float(Receive(self.__Connexion)[:-1])
         
         return [WavelengthMin, WavelengthMax]
         
@@ -152,16 +149,16 @@ class Filter():
         from PyApex.Constantes import AP1000_FIL_FRMIN, AP1000_FIL_FRMAX
         from PyApex.Errors import ApexError
         
-        if self.Simulation:
+        if self.__Simulation:
             FrequencyMin = AP1000_FIL_FRMIN
             FrequencyMax = AP1000_FIL_FRMAX
         else:
-            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:FRMIN?\n"
-            Send(self.Connexion, Command)
-            FrequencyMin = float(Receive(self.Connexion)[:-1])
-            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:FRMAX?\n"
-            Send(self.Connexion, Command)
-            FrequencyMax = float(Receive(self.Connexion)[:-1])
+            Command = "FLT[" + str(self.__SlotNumber).zfill(2) + "]:FRMIN?\n"
+            Send(self.__Connexion, Command)
+            FrequencyMin = float(Receive(self.__Connexion)[:-1])
+            Command = "FLT[" + str(self.__SlotNumber).zfill(2) + "]:FRMAX?\n"
+            Send(self.__Connexion, Command)
+            FrequencyMax = float(Receive(self.__Connexion)[:-1])
         
         return [FrequencyMin, FrequencyMax]
         
@@ -183,10 +180,10 @@ class Filter():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Wavelength")
             sys.exit()
             
-        if not self.Simulation:
-            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TSTAWL" + \
+        if not self.__Simulation:
+            Command = "FLT[" + str(self.__SlotNumber).zfill(2) + "]:TSTAWL" + \
                       ("%.2f" % Wavelength) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
     
     
     def GetStartWavelength(self):
@@ -196,12 +193,12 @@ class Filter():
         '''
         from PyApex.Constantes import AP1000_FIL_WLMIN
         
-        if self.Simulation:
+        if self.__Simulation:
             Wavelength = AP1000_FIL_WLMIN
         else:
-            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TSTAWL?\n"
-            Send(self.Connexion, Command)
-            Wavelength = Receive(self.Connexion)
+            Command = "FLT[" + str(self.__SlotNumber).zfill(2) + "]:TSTAWL?\n"
+            Send(self.__Connexion, Command)
+            Wavelength = Receive(self.__Connexion)
         
         return float(Wavelength[:-1])
     
@@ -223,10 +220,10 @@ class Filter():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Wavelength")
             sys.exit()
             
-        if not self.Simulation:
-            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TSTPWL" + \
+        if not self.__Simulation:
+            Command = "FLT[" + str(self.__SlotNumber).zfill(2) + "]:TSTPWL" + \
                       ("%.2f" % Wavelength) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
     
     def GetStopWavelength(self):
@@ -236,12 +233,12 @@ class Filter():
         '''
         from PyApex.Constantes import AP1000_FIL_WLMAX
         
-        if self.Simulation:
+        if self.__Simulation:
             Wavelength = AP1000_FIL_WLMAX
         else:
-            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TSTPWL?\n"
-            Send(self.Connexion, Command)
-            Wavelength = Receive(self.Connexion)
+            Command = "FLT[" + str(self.__SlotNumber).zfill(2) + "]:TSTPWL?\n"
+            Send(self.__Connexion, Command)
+            Wavelength = Receive(self.__Connexion)
         
         return float(Wavelength[:-1])
     
@@ -263,10 +260,10 @@ class Filter():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "SweepSpeed")
             sys.exit()
             
-        if not self.Simulation:
-            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TSWES" + \
+        if not self.__Simulation:
+            Command = "FLT[" + str(self.__SlotNumber).zfill(2) + "]:TSWES" + \
                       ("%.2f" % SweepSpeed) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
     
     def GetSweepSpeed(self):
@@ -276,12 +273,12 @@ class Filter():
         '''
         from PyApex.Constantes import AP1000_FIL_SPEEDMIN
         
-        if self.Simulation:
+        if self.__Simulation:
             Speed = AP1000_FIL_SPEEDMIN
         else:
-            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TSWES?\n"
-            Send(self.Connexion, Command)
-            Speed = Receive(self.Connexion)
+            Command = "FLT[" + str(self.__SlotNumber).zfill(2) + "]:TSWES?\n"
+            Send(self.__Connexion, Command)
+            Speed = Receive(self.__Connexion)
         
         return float(Speed[:-1])
     
@@ -294,9 +291,9 @@ class Filter():
             - "repeat" or 1, a repeat sweep is running
         '''
         
-        Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:"
+        Command = "FLT[" + str(self.__SlotNumber).zfill(2) + "]:"
         
-        if not self.Simulation:
+        if not self.__Simulation:
             if isinstance(Type, str):
                 if Type.lower() == "repeat":
                     Command += "TRET\n"                    
@@ -308,7 +305,7 @@ class Filter():
                 else:
                     Command += "TSGL\n"
             
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
     
     
     def StopSweep(self):
@@ -316,9 +313,9 @@ class Filter():
         Stop a sweep
         '''
         
-        if not self.Simulation:
-            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:TSTO\n"
-            Send(self.Connexion, Command)
+        if not self.__Simulation:
+            Command = "FLT[" + str(self.__SlotNumber).zfill(2) + "]:TSTO\n"
+            Send(self.__Connexion, Command)
     
     
     def SetUnit(self, Unit):
@@ -333,8 +330,8 @@ class Filter():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Unit")
             sys.exit()
         
-        if Unit.lower() in self.ValidUnits:
-            self.Unit = Unit
+        if Unit.lower() in self.__ValidUnits:
+            self.__Unit = Unit
 
 
     def GetUnit(self):
@@ -342,10 +339,10 @@ class Filter():
         Get the unit of the FIL equipment
         Unit is a string which could be "nm" for wavelength or "GHz" for frequency
         '''
-        return self.Unit
+        return self.__Unit
     
     
-    def SetVoltage(self, Voltage, Filter=1):
+    def __SetVoltage(self, Voltage, Filter=1):
         '''
         Calibration use only
         Set Voltage of the FIL equipment (DAC binary value)
@@ -371,13 +368,13 @@ class Filter():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Filter")
             sys.exit()
             
-        if not self.Simulation:
-            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:SETV" + \
+        if not self.__Simulation:
+            Command = "FLT[" + str(self.__SlotNumber).zfill(2) + "]:SETV" + \
                       str(Filter) + str(Voltage) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
     
     
-    def SetSwitch(self, Value, Filter=1):
+    def __SetSwitch(self, Value, Filter=1):
         '''
         Calibration use only
         Set connection of the switch in the FIL equipment
@@ -399,8 +396,8 @@ class Filter():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Filter")
             sys.exit()
             
-        if not self.Simulation:
-            Command = "FLT[" + str(self.SlotNumber).zfill(2) + "]:SWITCH" + \
+        if not self.__Simulation:
+            Command = "FLT[" + str(self.__SlotNumber).zfill(2) + "]:SWITCH" + \
                       str(Filter) + str(int(Value)) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
         

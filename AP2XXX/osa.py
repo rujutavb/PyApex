@@ -13,34 +13,35 @@ class OSA():
         '''
         from PyApex.Constantes import AP2XXX_WLMIN, AP2XXX_WLMAX   
         
-        self.Connexion = Equipment.Connexion
-        self.Simulation = Simulation
-        self.ID = Equipment.GetID()
-        self.Type = self.GetType()
+        self.__Connexion = Equipment.Connexion
+        self.__Simulation = Simulation
+        self.__ID = Equipment.GetID()
+        self.__Type = self.GetType()
         
         # Variables and constants of the equipment
-        self.StartWavelength = AP2XXX_WLMIN
-        self.StopWavelength = AP2XXX_WLMAX
-        self.Span = AP2XXX_WLMAX - AP2XXX_WLMIN
-        self.Center = AP2XXX_WLMIN + (self.Span / 2)
-        self.SweepResolution = 1.12 
-        self.ValidSweepResolutions = [0 , 1 , 2]
-        self.NoiseMaskValue = -70
-        self.ValidScaleUnits = [0 , 1]
-        self.ScaleXUnit = 1
-        self.ScaleYUnit = 1
-        self.ValidPolarizationModes = [0 , 1 , 2 , 3]
-        self.PolarizationMode = 0
-        self.Validtracenumbers = [0 , 1 , 2 , 3 , 4 , 5 , 6]
-        self.tracenumber = 1
-        self.NAverageOSA = 5
+        self.__StartWavelength = AP2XXX_WLMIN
+        self.__StopWavelength = AP2XXX_WLMAX
+        self.__Span = AP2XXX_WLMAX - AP2XXX_WLMIN
+        self.__Center = AP2XXX_WLMIN + (self.__Span / 2)
+        self.__SweepResolution = 1.12 
+        self.__ValidSweepResolutions = [0 , 1 , 2]
+        self.__NPoints = 1000
+        self.__NoiseMaskValue = -70
+        self.__ValidScaleUnits = [0 , 1]
+        self.__ScaleXUnit = 1
+        self.__ScaleYUnit = 1
+        self.__ValidPolarizationModes = [0 , 1 , 2 , 3]
+        self.__PolarizationMode = 0
+        self.__Validtracenumbers = [0 , 1 , 2 , 3 , 4 , 5 , 6]
+        self.__tracenumber = 1
+        self.__NAverageOSA = 5
 
 
     def __str__(self):
         '''
         Return the equipment type and the AP2XXX ID
         '''
-        return "Heterodyne OSA " + str(self.ID)
+        return "Heterodyne OSA " + str(self.__ID)
     
     
     def GetType(self):
@@ -50,7 +51,7 @@ class OSA():
         from PyApex.Errors import ApexError
         import re
         
-        Type = self.ID.split("/")[1]
+        Type = self.__ID.split("/")[1]
         Type = "AP" + Type
         return Type
         
@@ -71,13 +72,13 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Wavelength")
             sys.exit()
 
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPSTRTWL" + str(Wavelength) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
-        self.StartWavelength = Wavelength
-        self.Span = self.StopWavelength - self.StartWavelength
-        self.Center = self.StartWavelength + (self.Span / 2)
+        self.__StartWavelength = Wavelength
+        self.__Span = self.__StopWavelength - self.__StartWavelength
+        self.__Center = self.__StartWavelength + (self.__Span / 2)
 
 
     def GetStartWavelength(self):
@@ -85,16 +86,13 @@ class OSA():
         Get the start wavelength of the measurement span
         Wavelength is expressed in nm
         '''
-        from PyApex.Constantes import SimuAP2XXX_StartWavelength
         
-        if self.Simulation:
-            Wavelength = SimuAP2XXX_StartWavelength
-        else:
+        if not self.__Simulation:
             Command = "SPSTRTWL?\n"
-            Send(self.Connexion, Command)
-            Wavelength = Receive(self.Connexion)
+            Send(self.__Connexion, Command)
+            self.__StartWavelength = float(Receive(self.__Connexion)[:-1])
 
-        return float(Wavelength[:-1])
+        return self.__StartWavelength
 
 
     def SetStopWavelength(self, Wavelength):
@@ -113,13 +111,13 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Wavelength")
             sys.exit()
 
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPSTOPWL" + str(Wavelength) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
-        self.StopWavelength = Wavelength
-        self.Span = self.StopWavelength - self.StartWavelength
-        self.Center = self.StartWavelength + (self.Span / 2)
+        self.__StopWavelength = Wavelength
+        self.__Span = self.__StopWavelength - self.__StartWavelength
+        self.__Center = self.__StartWavelength + (self.__Span / 2)
 
 
     def GetStopWavelength(self):
@@ -127,16 +125,13 @@ class OSA():
         Get the stop wavelength of the measurement span
         Wavelength is expressed in nm
         '''
-        from PyApex.Constantes import SimuAP2XXX_StopWavelength
         
-        if self.Simulation:
-            Wavelength = SimuAP2XXX_StopWavelength
-        else:
+        if not self.__Simulation:
             Command = "SPSTOPWL?\n"
-            Send(self.Connexion, Command)
-            Wavelength = Receive(self.Connexion)
+            Send(self.__Connexion, Command)
+            self.__StopWavelength = float(Receive(self.__Connexion)[:-1])
 
-        return float(Wavelength[:-1])
+        return self.__StopWavelength
 
         
     def SetSpan(self, Span):
@@ -155,14 +150,13 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Span")
             sys.exit()
 
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPSPANWL" + str(Span) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
-        self.StopWavelength
-        self.Span = Span
-        self.StopWavelength = self.Center + (self.Span / 2)
-        self.StartWavelength = self.Center - (self.Span / 2)
+        self.__Span = Span
+        self.__StopWavelength = self.__Center + (self.__Span / 2)
+        self.__StartWavelength = self.__Center - (self.__Span / 2)
 
         
     def GetSpan(self):
@@ -170,16 +164,13 @@ class OSA():
         Get the wavelength measurement span
         Span is expressed in nm
         '''
-        from PyApex.Constantes import SimuAP2XXX_Span
         
-        if self.Simulation:
-            Span = SimuAP2XXX_Span
-        else:
+        if not self.__Simulation:
             Command = "SPSPANWL?\n"
-            Send(self.Connexion, Command)
-            Span = Receive(self.Connexion)
+            Send(self.__Connexion, Command)
+            self.__Span = float(Receive(self.__Connexion)[:-1])
 
-        return float(Span[:-1])
+        return self.__Span
 
         
     def SetCenter(self, Center):
@@ -198,13 +189,13 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Center")
             sys.exit()
 
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPCTRWL" + str(Center) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
-        self.Center = Center
-        self.StopWavelength = self.Center + (self.Span / 2)
-        self.StartWavelength = self.Center - (self.Span / 2)
+        self.__Center = Center
+        self.__StopWavelength = self.__Center + (self.__Span / 2)
+        self.__StartWavelength = self.__Center - (self.__Span / 2)
 
         
     def GetCenter(self):
@@ -212,16 +203,13 @@ class OSA():
         Get the wavelength measurement center
         Center is expressed in nm
         '''
-        from PyApex.Constantes import SimuAP2XXX_Center
         
-        if self.Simulation:
-            Center = SimuAP2XXX_Center
-        else:
+        if not self.__Simulation:
             Command = "SPCTRWL?\n"
-            Send(self.Connexion, Command)
-            Center = Receive(self.Connexion)
+            Send(self.__Connexion, Command)
+            self.__Center = float(Receive(self.__Connexion)[:-1])
 
-        return float(Center[:-1])
+        return self.__Center
 
         
     def SetXResolution(self, Resolution):
@@ -229,9 +217,11 @@ class OSA():
         Set the wavelength measurement resolution
         Resolution is expressed in the value of 'ScaleXUnit'
         '''
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPSWPRES" + str(Resolution) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
+        
+        self.__SweepResolution = Resolution
 
             
     def GetXResolution(self):
@@ -239,16 +229,13 @@ class OSA():
         Get the wavelength measurement resolution
         Resolution is expressed in the value of 'ScaleXUnit'
         '''
-        from PyApex.Constantes import SimuAP2XXX_XResolution
         
-        if self.Simulation:
-            Resolution = SimuAP2XXX_XResolution
-        else:
+        if not self.__Simulation:
             Command = "SPSWPRES?\n"
-            Send(self.Connexion, Command)
-            Resolution = Receive(self.Connexion)
+            Send(self.__Connexion, Command)
+            self.__SweepResolution = float(Receive(self.__Connexion)[:-1])
 
-        return float(Resolution[:-1])
+        return self.__SweepResolution
 
         
     def SetYResolution(self, Resolution):
@@ -267,9 +254,9 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Resolution")
             sys.exit()
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPDIVY" + str(Resolution) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
             
     def GetYResolution(self):
@@ -277,14 +264,11 @@ class OSA():
         Get the Y-axis power per division value
         Resolution is expressed in the value of 'ScaleYUnit'
         '''
-        from PyApex.Constantes import SimuAP2XXX_YResolution
         
-        if self.Simulation:
-            Resolution = SimuAP2XXX_YResolution
-        else:
+        if not self.__Simulation:
             Command = "SPDIVY?\n"
-            Send(self.Connexion, Command)
-            Resolution = Receive(self.Connexion)
+            Send(self.__Connexion, Command)
+            Resolution = Receive(self.__Connexion)
 
         return float(Resolution[:-1])
 
@@ -304,36 +288,36 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "NPoints")
             sys.exit()
 
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPNBPTSWP" + str(NPoints) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
+        
+        self.__NPoints = NPoints
 
             
     def GetNPoints(self):
         '''
         Get the number of points for the measurement
         '''
-        from PyApex.Constantes import SimuAP2XXX_NPoints
         
-        if self.Simulation:
-            NPoints = SimuAP2XXX_NPoints
-        else:
+        if not self.__Simulation:
             Command = "SPNBPTSWP?\n"
-            Send(self.Connexion, Command)
-            NPoints = Receive(self.Connexion)
+            Send(self.__Connexion, Command)
+            self.__NPoints = int(Receive(self.__Connexion)[:-1])
 
-        return int(NPoints[:-1])
+        return self.__NPoints
 
         
     def Run(self, Type="single"):
         '''
-        Run a measurement.
+        Runs a measurement and returns the trace of the measurement (between 1 and 6)
         If Type is
             - "auto" or 0, an auto-measurement is running
             - "single" or 1, a single measurement is running (default)
             - "repeat" or 2, a repeat measurement is running
         '''
-        if not self.Simulation:
+        
+        if not self.__Simulation:
             if isinstance(Type, str):
                 if Type.lower() == "auto":
                     Command = "SPSWP0\n"                    
@@ -350,24 +334,24 @@ class OSA():
                     Command = "SPSWP1\n"
             
             
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
             try:
-                status = int(Receive(self.Connexion))
+                trace = int(Receive(self.__Connexion))
             except:
-                status = 0
+                trace = 0
         else:
-            status = 1
+            trace = 1
             
-        return status
+        return trace
 
             
     def Stop(self):
         '''
-        Stop a measurement
+        Stops a measurement
         '''
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPSWP3\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
 
     def GetData(self, Scale="log", TraceNumber=1):
@@ -393,8 +377,8 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TraceNumber")
             sys.exit()
         
-        NPoints = self.GetNPoints()
-        if not self.Simulation:
+        self.__NPoints = self.GetNPoints()
+        if not self.__Simulation:
             YData = []
             XData = []
             
@@ -402,8 +386,8 @@ class OSA():
                 Command = "SPDATAL" + str(int(TraceNumber)) + "\n"
             else:
                 Command = "SPDATAD" + str(int(TraceNumber)) + "\n"
-            Send(self.Connexion, Command)
-            YStr = Receive(self.Connexion, 20 * NPoints)[:-1]
+            Send(self.__Connexion, Command)
+            YStr = Receive(self.__Connexion, 20 * self.__NPoints)[:-1]
             YStr = YStr.split(" ")
             for s in YStr:
                 try:
@@ -412,8 +396,8 @@ class OSA():
                     YData.append(0.0)
                 
             Command = "SPDATAWL" + str(TraceNumber) + "\n"
-            Send(self.Connexion, Command)
-            XStr = Receive(self.Connexion, 20 * NPoints)[:-1]
+            Send(self.__Connexion, Command)
+            XStr = Receive(self.__Connexion, 20 * self.__NPoints)[:-1]
             XStr = XStr.split(" ")
             for s in XStr:
                 try:
@@ -423,13 +407,13 @@ class OSA():
         else:
             YData = [NPoints]
             XData = [NPoints]       
-            DeltaX = (self.StopWavelength - self.StartWavelength) / NPoints
-            for i in range(0, NPoints):
+            DeltaX = (self.__StopWavelength - self.__StartWavelength) / self.__NPoints
+            for i in range(0, self.__NPoints):
                 if Scale.lower() == "lin":
                     YData.append(random())
                 else:
                     YData.append(80.0 * random() - 70.0)
-                XData.append(self.StartWavelength + i * DeltaX)
+                XData.append(self.__StartWavelength + i * DeltaX)
                 
         return [YData[1:], XData[1:]]
 
@@ -446,11 +430,11 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "NoiseMaskValue")
             sys.exit()
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPSWPMSK" + str(NoiseMaskValue) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
-        self.NoiseMaskValue = NoiseMaskValue
+        self.__NoiseMaskValue = NoiseMaskValue
 
 
     def SetScaleXUnit(self, ScaleXUnit=0):
@@ -478,11 +462,11 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "ScaleXUnit")
             sys.exit()
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPXUNT" + str(ScaleXUnit) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
-        self.ScaleXUnit = ScaleXUnit
+        self.__ScaleXUnit = ScaleXUnit
 
 
     def SetScaleYUnit(self, ScaleYUnit=0):
@@ -510,11 +494,11 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "ScaleYUnit")
             sys.exit()
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPLINSC" + str(ScaleYUnit) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
-        self.ScaleYUnit = ScaleYUnit
+        self.__ScaleYUnit = ScaleYUnit
 
 
     def SetPolarizationMode(self, PolarizationMode):
@@ -544,15 +528,15 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "PolarizationMode")
             sys.exit()
 
-        if not PolarizationMode in self.ValidPolarizationModes:
+        if not PolarizationMode in self.__ValidPolarizationModes:
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "PolarizationMode")
             sys.exit()
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPPOLAR" + str(PolarizationMode) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
-        self.PolarizationMode = PolarizationMode
+        self.__PolarizationMode = PolarizationMode
 
 
     def WavelengthCalib(self):
@@ -560,36 +544,36 @@ class OSA():
         Performs a wavelength calibration.
         If a measurement is running, it is previously stopped
         '''
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPWLCALM\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
 
     def DeleteAll(self):
         '''
         Clear all traces
         '''
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPTRDELAL\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
 
     def ActivateAutoNPoints(self):
         '''
         Activates the automatic number of points for measurements
         '''
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPAUTONBPT1\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
 
     def DeactivateAutoNPoints(self):
         '''
         Deactivates the automatic number of points for measurements
         '''
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPAUTONBPT0\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
 
     def FindPeak(self, TraceNumber=1, ThresholdValue=20.0, Axis='X', Find="max"):
@@ -617,7 +601,7 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Axis")
             sys.exit()
 
-        if not TraceNumber in self.Validtracenumbers:
+        if not TraceNumber in self.__Validtracenumbers:
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "TraceNumber")
             sys.exit()
         
@@ -625,9 +609,9 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "ThresholdValue")
             sys.exit()
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPPKFIND" + str(TraceNumber) + "_" + str(ThresholdValue) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
             Peaks = self.GetMarkers(TraceNumber, Axis=Axis)
         
         else:
@@ -665,7 +649,7 @@ class OSA():
             else:
                 return 0.0
         
-        self.tracenumber = TraceNumber
+        self.__tracenumber = TraceNumber
         return Peak
 
 
@@ -673,18 +657,18 @@ class OSA():
         '''
         Activates the average mode
         '''
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPAVERAGE1\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
 
     def DeactivateAverageMode(self):
         '''
         Deactivates the average mode
         '''
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPAVERAGE0\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
 
     def AutoMeasure(self, TraceNumber=1, NbAverage=1):
@@ -709,7 +693,7 @@ class OSA():
         if int(NbAverage) < 1:
             NbAverage = 1
 
-        if not TraceNumber in self.Validtracenumbers:
+        if not TraceNumber in self.__Validtracenumbers:
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "TraceNumber")
             sys.exit()
             
@@ -755,13 +739,13 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Position")
             sys.exit()
         
-        if not TraceNumber in self.Validtracenumbers:
+        if not TraceNumber in self.__Validtracenumbers:
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "TraceNumber")
             sys.exit()
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPMKRAD" + str(TraceNumber) + "_" + str(Position) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
     
     
     def GetMarkers(self, TraceNumber=1, Axis='y'):
@@ -787,7 +771,7 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TraceNumber")
             sys.exit()
         
-        if not TraceNumber in self.Validtracenumbers:
+        if not TraceNumber in self.__Validtracenumbers:
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "TraceNumber")
             sys.exit()
         
@@ -797,13 +781,13 @@ class OSA():
             Axis = 1
         
         Markers = []
-        if not self.Simulation:
+        if not self.__Simulation:
             if Axis:
                 Command = "SPDATAMKRY" + str(TraceNumber) + "\n"
             else:
                 Command = "SPDATAMKRX" + str(TraceNumber) + "\n"
-            Send(self.Connexion, Command)
-            Str = Receive(self.Connexion, 64)[:-1]
+            Send(self.__Connexion, Command)
+            Str = Receive(self.__Connexion, 64)[:-1]
             Str = Str.split(" ")
             Str = Str[1:]
             
@@ -828,14 +812,14 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TraceNumber")
             sys.exit()
         
-        if not TraceNumber in self.Validtracenumbers:
+        if not TraceNumber in self.__Validtracenumbers:
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "TraceNumber")
             sys.exit()
         
         Markers = []
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPMKRDELAL" + str(TraceNumber) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
         
 
     def LineWidth(self, TraceNumber=1, Get="width"):
@@ -856,14 +840,14 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TraceNumber")
             sys.exit()
 
-        if not TraceNumber in self.Validtracenumbers:
+        if not TraceNumber in self.__Validtracenumbers:
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "TraceNumber")
             sys.exit()
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "SPLWTH" + str(TraceNumber) + "_3.0\n"
-            Send(self.Connexion, Command)
-            Str = Receive(self.Connexion, 64)[:-1]
+            Send(self.__Connexion, Command)
+            Str = Receive(self.__Connexion, 64)[:-1]
             Values = []
             Str = Str.split("_")
             
@@ -911,7 +895,7 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TraceNumber")
             sys.exit()
 
-        if not TraceNumber in self.Validtracenumbers:
+        if not TraceNumber in self.__Validtracenumbers:
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "TraceNumber")
             sys.exit()
         
@@ -924,9 +908,9 @@ class OSA():
         else:
             Type = 0
         
-        if not self.Simulation:
+        if not self.__Simulation:
             if Type:
                 Command = "SPSAVEB" + str(TraceNumber) + "_" + str(FileName) + "\n"
             else:
                 Command = "SPSAVEA" + str(TraceNumber) + "_" + str(FileName) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)

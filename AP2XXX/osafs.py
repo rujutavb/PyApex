@@ -11,23 +11,23 @@ class OsaFs():
         Equipment is the AP2XXX class of the equipment
         Simulation is a boolean to indicate to the program if it has to run in simulation mode or not
         '''
-        self.Connexion = Equipment.Connexion
-        self.Simulation = Simulation
-        self.ID = Equipment.GetID()
+        self.__Connexion = Equipment.Connexion
+        self.__Simulation = Simulation
+        self.__ID = Equipment.GetID()
         
         # Variables and constants of the equipment
-        self.StartWavelength = 1530.0
-        self.StopWavelength = 1560.0
-        self.Span = self.StopWavelength - self.StartWavelength
-        self.Center = self.StartWavelength + (self.Span / 2.0)
-        self.Mode = 2
+        self.__StartWavelength = 1530.0
+        self.__StopWavelength = 1560.0
+        self.__Span = self.__StopWavelength - self.__StartWavelength
+        self.__Center = self.__StartWavelength + (self.__Span / 2.0)
+        self.__Mode = 2
 
 
     def __str__(self):
         '''
         Return the equipment type and the AP2XXX ID
         '''
-        return "OSA Fast-Sweep of " + str(self.ID)
+        return "OSA Fast-Sweep of " + str(self.__ID)
         
         
     def SetStartWavelength(self, Wavelength):
@@ -42,13 +42,13 @@ class OsaFs():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
             sys.exit()
 
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "OSAFSSTARTWL" + str(Wavelength) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
-        self.StartWavelength = Wavelength
-        self.Span = self.StopWavelength - self.StartWavelength
-        self.Center = self.StartWavelength + (self.Span / 2.0)
+        self.__StartWavelength = Wavelength
+        self.__Span = self.__StopWavelength - self.__StartWavelength
+        self.__Center = self.__StartWavelength + (self.__Span / 2.0)
 
 
     def GetStartWavelength(self):
@@ -57,14 +57,12 @@ class OsaFs():
         Wavelength is expressed in nm
         '''
         
-        if self.Simulation:
-            Wavelength = self.StartWavelength
-        else:
+        if not self.__Simulation:
             Command = "OSAFSSTARTWL?\n"
-            Send(self.Connexion, Command)
-            Wavelength = Receive(self.Connexion)
+            Send(self.__Connexion, Command)
+            self.__StartWavelength = float(Receive(self.__Connexion)[:-1])
 
-        return float(Wavelength[:-1])
+        return self.__StartWavelength
 
 
     def SetStopWavelength(self, Wavelength):
@@ -79,13 +77,13 @@ class OsaFs():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
             sys.exit()
 
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "OSAFSSTOPWL" + str(Wavelength) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
 
-        self.StopWavelength = Wavelength
-        self.Span = self.StopWavelength - self.StartWavelength
-        self.Center = self.StartWavelength + (self.Span / 2.0)
+        self.__StopWavelength = Wavelength
+        self.__Span = self.__StopWavelength - self.__StartWavelength
+        self.__Center = self.__StartWavelength + (self.__Span / 2.0)
 
 
     def GetStopWavelength(self):
@@ -94,14 +92,12 @@ class OsaFs():
         Wavelength is expressed in nm
         '''
         
-        if self.Simulation:
-            Wavelength = self.StopWavelength
-        else:
+        if not self.__Simulation:
             Command = "OSAFSSTOPWL?\n"
-            Send(self.Connexion, Command)
-            Wavelength = Receive(self.Connexion)
+            Send(self.__Connexion, Command)
+            self.__StopWavelength = float(Receive(self.__Connexion)[:-1])
 
-        return float(Wavelength[:-1])
+        return self.__StopWavelength
 
         
     def SetSpan(self, Span):
@@ -116,13 +112,13 @@ class OsaFs():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Span")
             sys.exit()
 
-        self.SetStartWavelength(self.Center - Span / 2.0)
-        self.SetStopWavelength(self.Center - Span / 2.0)
+        self.SetStartWavelength(self.__Center - Span / 2.0)
+        self.SetStopWavelength(self.__Center - Span / 2.0)
 
-        self.StopWavelength = self.GetStopWavelength()
-        self.StartWavelength = self.GetStartWavelength()
-        self.Span = self.StopWavelength - self.StartWavelength
-        self.Center = self.StartWavelength + (self.Span / 2.0)
+        self.__StopWavelength = self.GetStopWavelength()
+        self.__StartWavelength = self.GetStartWavelength()
+        self.__Span = self.__StopWavelength - self.__StartWavelength
+        self.__Center = self.__StartWavelength + (self.__Span / 2.0)
 
         
     def GetSpan(self):
@@ -131,10 +127,10 @@ class OsaFs():
         Span is expressed in nm
         '''
         
-        self.StopWavelength = self.GetStopWavelength()
-        self.StartWavelength = self.GetStartWavelength()
+        self.__StopWavelength = self.GetStopWavelength()
+        self.__StartWavelength = self.GetStartWavelength()
 
-        return self.StopWavelength - self.StartWavelength
+        return self.__StopWavelength - self.__StartWavelength
 
         
     def SetCenter(self, Center):
@@ -149,13 +145,13 @@ class OsaFs():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Center")
             sys.exit()
 
-        self.SetStartWavelength(Center - self.Span / 2.0)
-        self.SetStopWavelength(Center - self.Span / 2.0)
+        self.SetStartWavelength(Center - self.__Span / 2.0)
+        self.SetStopWavelength(Center - self.__Span / 2.0)
 
-        self.StopWavelength = self.GetStopWavelength()
-        self.StartWavelength = self.GetStartWavelength()
-        self.Span = self.StopWavelength - self.StartWavelength
-        self.Center = self.StartWavelength + (self.Span / 2.0)
+        self.__StopWavelength = self.GetStopWavelength()
+        self.__StartWavelength = self.GetStartWavelength()
+        self.__Span = self.__StopWavelength - self.__StartWavelength
+        self.__Center = self.__StartWavelength + (self.__Span / 2.0)
 
         
     def GetCenter(self):
@@ -164,10 +160,10 @@ class OsaFs():
         Center is expressed in nm
         '''
         
-        self.StopWavelength = self.GetStopWavelength()
-        self.StartWavelength = self.GetStartWavelength()
+        self.__StopWavelength = self.__GetStopWavelength()
+        self.__StartWavelength = self.__GetStartWavelength()
 
-        return (self.StopWavelength + self.StartWavelength) / 2.0
+        return (self.__StopWavelength + self.__StartWavelength) / 2.0
         
     
     def SetOSAMode(self, Mode = "Sensitive"):
@@ -192,11 +188,11 @@ class OsaFs():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Mode")
             sys.exit()
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "OSAFSMODE" + str(Mode) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
         
-        self.Mode = Mode
+        self.__Mode = Mode
     
     
     def GetOSAMode(self, Type = 'd'):
@@ -216,20 +212,20 @@ class OsaFs():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Type")
             sys.exit()
             
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "OSAFSMODE?\n"
-            Send(self.Connexion, Command)
-            self.Mode = int(Receive(self.Connexion)[:-1])
+            Send(self.__Connexion, Command)
+            self.__Mode = int(Receive(self.__Connexion)[:-1])
         
         if str(Type).lower() == 's':
-            if self.Mode == 1:
+            if self.__Mode == 1:
                 return "Fast"
-            elif self.Mode == 2:
+            elif self.__Mode == 2:
                 return "Sensitive"
             else:
                 return "Unknown Mode"
         else:
-            return self.Mode
+            return self.__Mode
     
     
     def Run(self, Type="single"):
@@ -256,17 +252,17 @@ class OsaFs():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Type")
             sys.exit()
         
-        if not self.Simulation:
-            Send(self.Connexion, Command)
+        if not self.__Simulation:
+            Send(self.__Connexion, Command)
     
     
     def Stop(self):
         '''
         Stop a 'repeat' measurement on the OSA Fast-Sweep
         '''
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "OSAFSSTOP\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
     
     
     def GetNPoints(self, TraceNumber = 1):
@@ -286,13 +282,13 @@ class OsaFs():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "TraceNumber")
             sys.exit()
         
-        if self.Simulation:
+        if self.__Simulation:
             NPoints = randint(400, 600)
         else:
             Command = "OSAFSPOINTS" + str(int(TraceNumber)) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
             try:
-                NPoints = int(Receive(self.Connexion)[:-1])
+                NPoints = int(Receive(self.__Connexion)[:-1])
             except:
                 NPoints = 0
 
@@ -320,12 +316,12 @@ class OsaFs():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TraceNumber")
             sys.exit()
         
-        if TraceNumber < 0 or TraceNumber > 6:
+        if TraceNumber <= 0 or TraceNumber > 6:
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "TraceNumber")
             sys.exit()
         
         NPoints = self.GetNPoints()
-        if not self.Simulation:
+        if not self.__Simulation:
             YData = []
             XData = []
             
@@ -333,8 +329,8 @@ class OsaFs():
                 Command = "OSAFSDATAL" + str(int(TraceNumber)) + "\n"
             else:
                 Command = "OSAFSDATAD" + str(int(TraceNumber)) + "\n"
-            Send(self.Connexion, Command)
-            YStr = Receive(self.Connexion, 20 * NPoints)[:-1]
+            Send(self.__Connexion, Command)
+            YStr = Receive(self.__Connexion, 20 * NPoints)[:-1]
             print(YStr)
             YStr = YStr.split(" ")
             print(YStr)
@@ -345,8 +341,8 @@ class OsaFs():
                     YData.append(0.0)
                 
             Command = "OSAFSDATAWL" + str(int(TraceNumber)) + "\n"
-            Send(self.Connexion, Command)
-            XStr = Receive(self.Connexion, 20 * NPoints)[:-1]
+            Send(self.__Connexion, Command)
+            XStr = Receive(self.__Connexion, 20 * NPoints)[:-1]
             print(XStr)
             XStr = XStr.split(" ")
             print(XStr)
@@ -358,40 +354,14 @@ class OsaFs():
         else:
             YData = []
             XData = []
-            DeltaX = (self.StopWavelength - self.StartWavelength) / NPoints
+            DeltaX = (self.__StopWavelength - self.__StartWavelength) / NPoints
             for i in range(0, NPoints):
                 if Scale.lower() == "lin":
                     YData.append(10.0 * random())
                 else:
                     YData.append(60.0 * random() - 50.0)
-                XData.append(self.StartWavelength + i * DeltaX)
+                XData.append(self.__StartWavelength + i * DeltaX)
                 
         return [YData, XData]
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     

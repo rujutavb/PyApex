@@ -11,16 +11,16 @@ class Filter():
         Equipment is the AP2XXX class of the equipment
         Simulation is a boolean to indicate to the program if it has to run in simulation mode or not
         '''
-        self.Connexion = Equipment.Connexion
-        self.Simulation = Simulation
-        self.ID = Equipment.GetID()
+        self.__Connexion = Equipment.Connexion
+        self.__Simulation = Simulation
+        self.__ID = Equipment.GetID()
 
 
     def __str__(self):
         '''
         Return the equipment type and the AP2XXX ID
         '''
-        return "Filter of " + str(self.ID)
+        return "Filter of " + str(self.__ID)
     
     
     def GetFilterIdentity(self):
@@ -30,9 +30,9 @@ class Filter():
         '''
         
         Values = []
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "FILIDN?\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
             value = Receive(self.Connexion, 64)[:-1]
         else:
             value = "XX-3380-A-XSIMUX"
@@ -58,9 +58,9 @@ class Filter():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "State")
             sys.exit()
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "FILOUTENABLE" + str(int(State)) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
     
     
     def GetFilterOutput(self):
@@ -71,10 +71,10 @@ class Filter():
             - State = True : the filter output is enabled
         '''
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "FILOUTENABLE?\n"
-            Send(self.Connexion, Command)
-            State = Receive(self.Connexion, 64)[:-1]
+            Send(self.__Connexion, Command)
+            State = Receive(self.__Connexion, 64)[:-1]
             try:
                 State = bool(int(State))
             except:
@@ -97,9 +97,9 @@ class Filter():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
             sys.exit()
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "FILWL" + str(Wavelength) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
             
         
     def GetFilterWavelength(self):
@@ -109,10 +109,10 @@ class Filter():
         '''
         from random import random
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "FILWL?\n"
-            Send(self.Connexion, Command)
-            Wavelength = Receive(self.Connexion, 64)[:-1]
+            Send(self.__Connexion, Command)
+            Wavelength = Receive(self.__Connexion, 64)[:-1]
             try:
                 Wavelength = float(Wavelength)
             except:
@@ -151,9 +151,9 @@ class Filter():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Mode")
             sys.exit()
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "FILMODE" + str(Mode) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
             
         
     def GetFilterMode(self):
@@ -162,10 +162,10 @@ class Filter():
         the returned Mode is an integer
         '''
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "FILMODE?\n"
-            Send(self.Connexion, Command)
-            Mode = Receive(self.Connexion, 64)[:-1]
+            Send(self.__Connexion, Command)
+            Mode = Receive(self.__Connexion, 64)[:-1]
             try:
                 Mode = int(Mode)
             except:
@@ -188,9 +188,9 @@ class Filter():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
             sys.exit()
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "FILSTARTWL" + str(Wavelength) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
             
         
     def GetFilterStartWavelength(self):
@@ -200,10 +200,10 @@ class Filter():
         '''
         from random import random
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "FILSTARTWL?\n"
-            Send(self.Connexion, Command)
-            Wavelength = Receive(self.Connexion, 64)[:-1]
+            Send(self.__Connexion, Command)
+            Wavelength = Receive(self.__Connexion, 64)[:-1]
             try:
                 Wavelength = float(Wavelength)
             except:
@@ -226,9 +226,9 @@ class Filter():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
             sys.exit()
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "FILSTOPWL" + str(Wavelength) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
             
         
     def GetFilterStopWavelength(self):
@@ -238,10 +238,10 @@ class Filter():
         '''
         from random import random
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "FILSTOPWL?\n"
-            Send(self.Connexion, Command)
-            Wavelength = Receive(self.Connexion, 64)[:-1]
+            Send(self.__Connexion, Command)
+            Wavelength = Receive(self.__Connexion, 64)[:-1]
             try:
                 Wavelength = float(Wavelength)
             except:
@@ -280,9 +280,9 @@ class Filter():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Type")
             sys.exit()
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "FILRUN" + str(Type) + "\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
     
     
     def FilterStop(self):
@@ -292,6 +292,6 @@ class Filter():
         this command has no effect
         '''
         
-        if not self.Simulation:
+        if not self.__Simulation:
             Command = "FILSTOP\n"
-            Send(self.Connexion, Command)
+            Send(self.__Connexion, Command)
