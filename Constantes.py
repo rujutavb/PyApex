@@ -160,7 +160,7 @@ AP2XXX_MINYRES = 0.001
 AP2XXX_MAXYRES = 100
 # MIN AND MAX POINTS NUMBER
 AP2XXX_MINNPTS = 2
-AP2XXX_MAXNPTS = 100000
+AP2XXX_MAXNPTS = 1000000
 
 # ------------------------------------------------------------------------------
 #                                   AB3510 CONSTANTS

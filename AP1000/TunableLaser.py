@@ -313,6 +313,24 @@ class TunableLaser():
             Send(self.__Connexion, Command)
             
         self.__SOACurrent = Current
+        
+        
+    def GetSOALimit(self):
+        '''
+        !!! FOR TLS CALIBRATION ONLY !!!
+        Get the SOA Degrade status. Returns True if the SOA is out
+        of bounds, False otherwise
+        '''
+        from PyApex.Errors import ApexError
+            
+        if not self.__Simulation:
+            Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:TLIMIT?\n"
+            Send(self.__Connexion, Command)
+            Limit = bool(int(Receive(self.__Connexion)[:-1]))
+        else:
+            Limit = False
+        
+        return Limit
     
     
     def SetDiodeTemp(self, DiodeNumber, Temperature, SweepSpeed, SOAComp):

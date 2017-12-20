@@ -442,7 +442,7 @@ class OSA():
         Defines the unit of the X-Axis
         ScaleXUnit can be a string or an integer
         If ScaleXUnit is :
-            - "ghz" or 0, X-Axis unit is in GHz (default)
+            - "GHz" or 0, X-Axis unit is in GHz (default)
             - "nm" or 1, X-Axis unit is in nm
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE 
@@ -458,7 +458,7 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "ScaleXUnit")
             sys.exit()
 
-        if not ScaleXUnit in self.ValidScaleUnits:
+        if not ScaleXUnit in self.__ValidScaleUnits:
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "ScaleXUnit")
             sys.exit()
         
