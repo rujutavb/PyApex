@@ -22,6 +22,7 @@ class AP2XXX():
     CONTRIBUTORS
         Maxime FONTAINE
         Khalil KECHAOU
+        Vincent PERNET
     '''
 
     def __init__(self, IPaddress, PortNumber=5900, Simulation=False):
