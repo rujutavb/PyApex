@@ -490,7 +490,7 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "ScaleYUnit")
             sys.exit()
 
-        if not ScaleYUnit in self.ValidScaleUnits:
+        if not ScaleYUnit in self.__ValidScaleUnits:
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "ScaleYUnit")
             sys.exit()
         
