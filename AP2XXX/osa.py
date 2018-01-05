@@ -537,6 +537,28 @@ class OSA():
             Send(self.__Connexion, Command)
 
         self.__PolarizationMode = PolarizationMode
+        
+        
+    def GetPolarizationMode(self):
+        '''
+        Gets the measured polarization channels
+        The returned polarization mode can is a string which can be
+            - "1+2" : the total power is measured (default)
+            - "1&2" : one measure is done for each polarization channel
+            - "1" : just the polarization channel 1 is measured
+            - "2" : just the polarization channel 2 is measured
+        '''
+        
+        if self.__PolarizationMode == 0:
+            PolarizationMode = "1+2"
+        elif self.__PolarizationMode == 1:
+            PolarizationMode = "1&2"
+        elif self.__PolarizationMode == 2:
+            PolarizationMode = "1"
+        elif self.__PolarizationMode == 3:
+            PolarizationMode = "2"
+        
+        return PolarizationMode
 
 
     def WavelengthCalib(self):
@@ -914,3 +936,54 @@ class OSA():
             else:
                 Command = "SPSAVEA" + str(TraceNumber) + "_" + str(FileName) + "\n"
             Send(self.__Connexion, Command)
+
+
+    def LockTrace(self, TraceNumber, Lock):
+        '''
+        Lock or unlock a trace
+        TraceNumber is an integer between 1 and 6
+        Lock is a boolean:
+            - True: the trace TraceNumber is locked
+            - False: the trace TraceNumber is unlocked
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE, APXXXX_ERROR_BAD_FILENAME
+        from PyApex.Errors import ApexError
+
+        if not isinstance(TraceNumber, int):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TraceNumber")
+            sys.exit()
+
+        if not TraceNumber in self.__Validtracenumbers:
+            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "TraceNumber")
+            sys.exit()
+
+        if Lock:
+            Lock = True
+        else:
+            Lock = False
+
+        if not self.__Simulation:
+            if Lock:
+                Command = "SPTRLOCK" + str(TraceNumber) + "\n"
+            else:
+                Command = "SPTRUNLOCK" + str(TraceNumber) + "\n"
+            Send(self.__Connexion, Command)
+
+
+    def SetScrollMode(self, Enable):
+        '''
+        Enable or disable the screll mode
+        Enable is a boolean:
+            - True: the scroll mode is enabled
+            - False: the scroll mode is disabled
+        '''
+
+        if Enable:
+            Enable = 1
+        else:
+            Enable = 0
+
+        if not self.__Simulation:
+            Command = "SPTRSCROLL" + str(Enable) + "\n"
+            Send(self.__Connexion, Command)
+    
