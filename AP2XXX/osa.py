@@ -61,15 +61,11 @@ class OSA():
         Set the start wavelength of the measurement span
         Wavelength is expressed in nm
         '''
-        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
-        from PyApex.Constantes import AP2XXX_WLMIN, AP2XXX_WLMAX        
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE        
         from PyApex.Errors import ApexError
         
         if not isinstance(Wavelength, (float, int)):
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
-            sys.exit()
-        if Wavelength < AP2XXX_WLMIN or Wavelength > AP2XXX_WLMAX:
-            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Wavelength")
             sys.exit()
 
         if not self.__Simulation:
@@ -100,15 +96,11 @@ class OSA():
         Set the stop wavelength of the measurement span
         Wavelength is expressed in nm
         '''
-        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
-        from PyApex.Constantes import AP2XXX_WLMIN, AP2XXX_WLMAX        
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE        
         from PyApex.Errors import ApexError
         
         if not isinstance(Wavelength, (float, int)):
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
-            sys.exit()
-        if Wavelength < AP2XXX_WLMIN or Wavelength > AP2XXX_WLMAX:
-            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Wavelength")
             sys.exit()
 
         if not self.__Simulation:
@@ -139,15 +131,11 @@ class OSA():
         Set the wavelength measurement span
         Span is expressed in nm
         '''
-        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
-        from PyApex.Constantes import AP2XXX_MINSPAN, AP2XXX_MAXSPAN   
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE   
         from PyApex.Errors import ApexError
         
         if not isinstance(Span, (float, int)):
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Span")
-            sys.exit()
-        if Span < AP2XXX_MINSPAN or Span > AP2XXX_MAXSPAN:
-            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Span")
             sys.exit()
 
         if not self.__Simulation:
@@ -178,15 +166,11 @@ class OSA():
         Set the wavelength measurement center
         Center is expressed in nm
         '''
-        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
-        from PyApex.Constantes import AP2XXX_MINCENTER, AP2XXX_MAXCENTER 
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE 
         from PyApex.Errors import ApexError
         
         if not isinstance(Center, (float, int)):
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Center")
-            sys.exit()
-        if Center < AP2XXX_MINCENTER or Center > AP2XXX_MAXCENTER:
-            raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Center")
             sys.exit()
 
         if not self.__Simulation:
@@ -405,8 +389,8 @@ class OSA():
                 except:
                     XData.append(0.0)
         else:
-            YData = [NPoints]
-            XData = [NPoints]       
+            YData = [self.__NPoints]
+            XData = [self.__NPoints]       
             DeltaX = (self.__StopWavelength - self.__StartWavelength) / self.__NPoints
             for i in range(0, self.__NPoints):
                 if Scale.lower() == "lin":
