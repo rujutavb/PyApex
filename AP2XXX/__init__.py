@@ -13,7 +13,6 @@ class AP2XXX():
             - The optical filter (option)
             - The filters OSA (option)
             - The powermeter
-        This class cannot yet control :
             - The tunable laser (option)
         
     VERSION
@@ -88,6 +87,39 @@ class AP2XXX():
             Send(self.Connexion, "*IDN?\n")
             ID = Receive(self.Connexion)
             return ID
+    
+    
+    def ChangeMode(self, Mode):
+        '''
+        Changes the screen mode of the AP2XXX equipment (Apex Start, O.S.A., Powermeter,...)
+        Mode is an integer representing the index of the mode to dsiplay.
+        By convention, the "APEX Start" mode is always 0 index. The index follows the
+        list in the Apex menu box.
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE
+        
+        if not isinstance(Mode, (int)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Mode")
+        
+        if not self.__Simulation:
+            Send(self.Connexion, "CHMOD" + str(Mode) + "\n")
+    
+    
+    def DisplayScreen(self, Display):
+        '''
+        Displays or not the "Remote" window on the AP2XXX equipment.
+        Display is a boolean:
+            - True: the window is displayed
+            - False: the window is hidden
+        '''
+        
+        if Display == False:
+            Display = 0
+        else:
+            Display = 1
+        
+        if not self.__Simulation:
+            Send(self.Connexion, "REMSCREEN" + str(Display) + "\n")
 
     
     def OSA(self):
@@ -96,6 +128,14 @@ class AP2XXX():
         '''
         from PyApex.AP2XXX.osa import OSA
         return OSA(self, self.__Simulation)
+
+
+    def TLS(self):
+        '''
+        Return a TLS object for using the Tunable Laser Source of the AP2XXX
+        '''
+        from PyApex.AP2XXX.tls import TunableLaser
+        return TunableLaser(self, self.__Simulation)
         
         
     def Powermeter(self):

@@ -82,8 +82,14 @@ class Powermeter():
         else:
             Command = "SPMEASDETECTORDBM1\n"               
             Send(self.__Connexion, Command)
-            Power = Receive(self.__Connexion)
-        
-        return float(Power[:-1])
+            Power = Receive(self.__Connexion)[:-1]
+
+            for p in Power.split("_"):
+                try:
+                    Power = float(p)
+                except:
+                    pass
+                
+        return Power
     
     

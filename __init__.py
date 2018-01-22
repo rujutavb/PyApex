@@ -25,20 +25,73 @@ from PyApex.AP2XXX import AP2XXX
 try:
     from PyApex.AB3510 import AB3510
     from PyApex.AB3380 import AB3380
+    __UsbModule = True
 except ImportError:
-    print("No module usb\nAB3510 and AB3380 classes cannot be used")
+    __UsbModule = False
 try:
     from PyApex.Etuve import Etuve
+    __SerialModule = True
 except ImportError:
-    print("No module serial\nEtuve class cannot be used")
+    __SerialModule = False
 
 from PyApex.Constantes import Celerity
 
-Version = 1.01
-PythonVersion = 3.4
+__Version = 1.01
+__PythonVersion = 3.4
+
+__ExpertMode = True
+
 
 def version():
-    return Version
+    '''
+    Gets the version of the PyApex Package
+    '''
+    return __Version
+
 
 def python():
-    return PythonVersion
+    '''
+    Gets the python version needed for the PyApex Package
+    '''
+    return __PythonVersion
+
+    
+def SetExpertMode(Mode):
+    '''
+    !!! NOT YET IMPLEMENTED !!!
+    Sets the using mode of this package.
+    Mode is a boolean:
+        - False: User mode, only instructions present in
+                 the user manual are enabled
+        - True:  Expert mode, all instructions including
+                 calibration instructions are enabled
+    '''
+    if isinstance(Mode, bool):
+        __ExpertMode = Mode
+
+def GetExpertMode():
+    '''
+    Gets the using mode of this package.
+    This function returns a boolean:
+        - False: User mode, only instructions present in
+                 the user manual are enabled
+        - True:  Expert mode, all instructions including
+                 calibration instructions are enabled
+    '''
+    return __ExpertMode
+
+def GetModule(ModName):
+    '''
+    Gets the installed modules.
+    ModName is a string:
+        - "usb":      returns True if the usb module has been
+                      imported, False otherwise
+        - "serial" :  returns True if the serial module has been
+                      imported, False otherwise
+    '''
+    if isinstance(ModName, str):
+        if ModName.lower() == "usb":
+            return __UsbModule
+        elif ModName.lower() == "serial":
+            return __SerialModule
+
