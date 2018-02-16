@@ -46,8 +46,7 @@ class AP2XXX():
         This method is called by the constructor of AP2XXX class
         '''
         self.Connexion = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
-        self.Connexion.settimeout(10)
-        self.Connexion.setblocking(True)
+        self.Connexion.settimeout(10.0)
         
         if self.__Simulation:
             print("Connected successfully to the equipment")
@@ -74,6 +73,30 @@ class AP2XXX():
                 raise ApexError(APXXXX_ERROR_COMMUNICATION, self.Connexion.getsockname()[0])
                 sys.exit()
 
+    
+    def SetTimeOut(self, TimeOut):
+        '''
+        Set the timeout of the Ethernet connection
+        TimeOut is expressed in seconds
+        In some functions like 'OSA.Run()', the timeout is disabled
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE
+        
+        if not isinstance(TimeOut, (int, float)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TimeOut")
+        
+        self.Connexion.settimeout(TimeOut)
+    
+    
+    def GetTimeOut(self):
+        '''
+        Get the timeout of the Ethernet connection
+        The returned value is expressed in seconds
+        '''
+        
+        TimeOut = self.Connexion.gettimeout()
+        return TimeOut
+    
 
     def GetID(self):
         '''
@@ -98,11 +121,16 @@ class AP2XXX():
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE
         
+        TimeOut = self.Connexion.gettimeout()
+        self.Connexion.settimeout(None)
+        
         if not isinstance(Mode, (int)):
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Mode")
         
         if not self.__Simulation:
             Send(self.Connexion, "CHMOD" + str(Mode) + "\n")
+        
+        self.Connexion.settimeout(TimeOut)
     
     
     def DisplayScreen(self, Display):
@@ -128,6 +156,14 @@ class AP2XXX():
         '''
         from PyApex.AP2XXX.osa import OSA
         return OSA(self, self.__Simulation)
+
+
+    def OCSA(self):
+        '''
+        Return an OCSA object for using the Heterodyne AP2XXX OCSA
+        '''
+        from PyApex.AP2XXX.ocsa import OCSA
+        return OCSA(self, self.__Simulation)
 
 
     def TLS(self):

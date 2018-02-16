@@ -31,6 +31,43 @@ and for seeing the different methods and attributs associated to this module, do
 `help(MyPowerMeter)`<br><br>
 5. To close the connection to the equipment, use the Close function. For exemple<br>
 `MyAP1000.Close()`<br><br>
+
+Here is a very simple example for controlling your AP1000:<br>
+```python
+    # Import the AP1000 class from the Apex Driver
+    from PyApex import AP1000
+
+    # Connection to your AP1000 *** SET THE GOOD IP ADDRESS ***
+    MyAP1000 = AP1000("192.168.0.0")
+	
+	# Display the modules of the AP1000
+	for i in range(1, 9):
+		print("Slot", i, "->", MyAP1000.SlotType(i))
+
+    # Say a TLS is in slot 1 and a power meter in slot 2
+    MyTLS = MyAP1000.TunableLaser(1)
+	MyOPM = MyAP1000.PowerMeter(2)
+
+    # Initialize the TLS and the power meter
+    MyTLS.SetWavelength(1550.0)
+	MyTLS.SetUnit("dBm")
+	MyTLS.SetPower(10.0)
+	MyOPM.SetWavelength(1550.0)
+	MyOPM.SetAverageTime(200.0)
+	MyOPM.SetUnit("dBm")
+	
+	# Switch on the TLS output
+	MyTLS.On()
+	
+	# Do some measurement
+	PowerValue = MyOPM.GetPower(1)
+	
+	# Switch off the TLS output
+	MyTLS.Off()
+	
+	# The connection with the AP1000 is closed
+	MyAP1000.Close()
+
 **AP2XXX**<br><br>
 The AP2XXX class allows you to control (via Ethernet) any OSA and OCSA equipment (AP2040, AP2050, AP2060, AP2443,...)<br><br>
 1. In your Python 3.x script, import the PyApex module. For exemple, if you want to remote control an AP2040 equipment, import the AP2XXX sub-module of PyApex as below<br>
@@ -58,7 +95,7 @@ Here is a very simple example for controlling your OSA:<br>
     from matplotlib import pyplot as plt
 
     # Connection to your OSA *** SET THE GOOD IP ADDRESS ***
-    MyAP2XXX = AP2XXX("192.168.0.119")
+    MyAP2XXX = AP2XXX("192.168.0.0")
     MyOSA = MyAP2XXX.OSA()
 
     # Set the parameters of your OSA
@@ -71,16 +108,16 @@ Here is a very simple example for controlling your OSA:<br>
     MyOSA.SetNPoints(2000)
 
     # We run a single
-    Status = MyOSA.Run()
-    # If the single is good (Status = 1), we get the data in a list Data = [[Power Data], [Wavelength Data]]
-    if Status:
+    Trace = MyOSA.Run()
+    # If the single is good (Trace > 0), we get the data in a list Data = [[Power Data], [Wavelength Data]]
+    if Trace > 0:
         Data = MyOSA.GetData()
 
     # The connection with the OSA is closed
     MyAP2XXX.Close()
 
     # The spectrum is displayed
-    if Status:
+    if Trace > 0:
         plt.grid(True)
         plt.plot(Data[1], Data[0])
         plt.xlabel("Wavelength (nm)")

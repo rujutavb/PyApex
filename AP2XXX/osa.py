@@ -1,4 +1,4 @@
-from PyApex.Common import Send, Receive
+from PyApex.Common import Send, Receive, ReceiveUntilChar
 import sys
 
 
@@ -299,9 +299,16 @@ class OSA():
             - "auto" or 0, an auto-measurement is running
             - "single" or 1, a single measurement is running (default)
             - "repeat" or 2, a repeat measurement is running
+        In this function, the connection timeout is disabled and enabled after the
+        execution of the function
         '''
         
-        if not self.__Simulation:
+        if self.__Simulation:
+            trace = 1
+        else:
+            TimeOut = self.__Connexion.gettimeout()
+            self.__Connexion.settimeout(None)
+            
             if isinstance(Type, str):
                 if Type.lower() == "auto":
                     Command = "SPSWP0\n"                    
@@ -323,8 +330,8 @@ class OSA():
                 trace = int(Receive(self.__Connexion))
             except:
                 trace = 0
-        else:
-            trace = 1
+        
+            self.__Connexion.settimeout(TimeOut)
             
         return trace
 
@@ -338,11 +345,14 @@ class OSA():
             Send(self.__Connexion, Command)
 
 
-    def GetData(self, Scale="log", TraceNumber=1):
+    def GetData(self, ScaleX = "nm", ScaleY = "log", TraceNumber = 1):
         '''
         Get the spectrum data of a measurement
         returns a 2D list [Y-axis Data, X-Axis Data]
-        Scale is a string which can be :
+        ScaleX is a string which can be :
+            - "nm" : get the X-Axis Data in nm (default)
+            - "GHz": get the X-Axis Data in GHz
+        ScaleY is a string which can be :
             - "log" : get the Y-Axis Data in dBm (default)
             - "lin" : get the Y-Axis Data in mW
         TraceNumber is an integer between 1 (default) and 6
@@ -353,8 +363,12 @@ class OSA():
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE 
         from PyApex.Errors import ApexError
         
-        if not isinstance(Scale, str):
-            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Scale")
+        if not isinstance(ScaleX, str):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "ScaleX")
+            sys.exit()
+        
+        if not isinstance(ScaleY, str):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "ScaleY")
             sys.exit()
             
         if not isinstance(TraceNumber, (float, int)):
@@ -366,22 +380,25 @@ class OSA():
             YData = []
             XData = []
             
-            if Scale.lower() == "lin":
+            if ScaleY.lower() == "lin":
                 Command = "SPDATAL" + str(int(TraceNumber)) + "\n"
             else:
                 Command = "SPDATAD" + str(int(TraceNumber)) + "\n"
             Send(self.__Connexion, Command)
-            YStr = Receive(self.__Connexion, 20 * self.__NPoints)[:-1]
+            YStr = ReceiveUntilChar(self.__Connexion)[:-1]
             YStr = YStr.split(" ")
             for s in YStr:
                 try:
                     YData.append(float(s))
                 except:
                     YData.append(0.0)
-                
-            Command = "SPDATAWL" + str(TraceNumber) + "\n"
+            
+            if ScaleX.lower() == "ghz":
+                Command = "SPDATAF" + str(int(TraceNumber)) + "\n"
+            else:
+                Command = "SPDATAWL" + str(int(TraceNumber)) + "\n"
             Send(self.__Connexion, Command)
-            XStr = Receive(self.__Connexion, 20 * self.__NPoints)[:-1]
+            XStr = ReceiveUntilChar(self.__Connexion)[:-1]
             XStr = XStr.split(" ")
             for s in XStr:
                 try:

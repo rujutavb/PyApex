@@ -45,8 +45,7 @@ class AP1000():
         This method is called by the constructor of AP1000 class
         '''
         self.Connexion = socket.socket(socket.AF_INET , socket.SOCK_STREAM)
-        self.Connexion.settimeout(10)
-        self.Connexion.setblocking(True)
+        self.Connexion.settimeout(10.0)
         
         if self.__Simulation:
             print("Connected successfully to the equipment")
@@ -70,6 +69,29 @@ class AP1000():
                 self.Connexion.close()
             except:
                 raise ApexError(APXXXX_ERROR_COMMUNICATION, self.Connexion.getsockname()[0])
+
+
+    def SetTimeOut(self, TimeOut):
+        '''
+        Set the timeout of the Ethernet connection
+        TimeOut is expressed in seconds
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE
+        
+        if not isinstance(TimeOut, (int, float)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TimeOut")
+        
+        self.Connexion.settimeout(TimeOut)
+    
+    
+    def GetTimeOut(self):
+        '''
+        Get the timeout of the Ethernet connection
+        The returned value is expressed in seconds
+        '''
+        
+        TimeOut = self.Connexion.gettimeout()
+        return TimeOut
 
 
     def GetID(self):
