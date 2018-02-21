@@ -112,12 +112,31 @@ class AP2XXX():
             return ID
     
     
+    def ListModes(self):
+        '''
+        Gets a list of all modes in the AP2XXX equipment.
+        These modes are expressed as string. The index of the element in the list
+        follows the list in the AP2XXX menu box
+        '''
+        
+        if self.__Simulation:
+            Modes = ["Apex Start", "General Settings", "Powermeter", "T.L.S", "O.S.A."]
+        else:
+            Send(self.Connexion, "LSMODES?\n")
+            Modes = Receive(self.Connexion)[:-1]
+            Modes = Modes.split(",")
+            for i in range(len(Modes)):
+                Modes[i] = Modes[i].strip()
+        
+        return Modes
+    
+    
     def ChangeMode(self, Mode):
         '''
-        Changes the screen mode of the AP2XXX equipment (Apex Start, O.S.A., Powermeter,...)
-        Mode is an integer representing the index of the mode to dsiplay.
+        Changes the screen mode of the AP2XXX equipment (Apex Start, O.S.A., Powermeter)
+        Mode is an integer representing the index of the mode to display.
         By convention, the "APEX Start" mode is always 0 index. The index follows the
-        list in the Apex menu box.
+        list in the AP2XXX menu box.
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE
         
@@ -131,6 +150,29 @@ class AP2XXX():
             Send(self.Connexion, "CHMOD" + str(Mode) + "\n")
         
         self.Connexion.settimeout(TimeOut)
+    
+    
+    def GetMode(self):
+        '''
+        Gets the actual mode of the AP2XXX equipment (Apex Start, O.S.A., Powermeter...)
+        The returned mode is an integer representing the index of the displayed mode.
+        The mode string can be defined by finding the element in the list returned by
+        the function ListModes()
+        '''
+        from random import randint
+        
+        if self.__Simulation:
+            Mode = randint(0, 6)
+        else:
+            Send(self.Connexion, "CHMOD?\n")
+            Mode = Receive(self.Connexion)[:-1]
+            try:
+                Mode = int(Mode)
+            except:
+                Mode = 0
+        
+        return Mode
+        
     
     
     def DisplayScreen(self, Display):
