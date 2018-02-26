@@ -67,7 +67,7 @@ Here is a very simple example for controlling your AP1000:<br>
 	
 	# The connection with the AP1000 is closed
 	MyAP1000.Close()
-
+```
 **AP2XXX**<br><br>
 The AP2XXX class allows you to control (via Ethernet) any OSA and OCSA equipment (AP2040, AP2050, AP2060, AP2443,...)<br><br>
 1. In your Python 3.x script, import the PyApex module. For exemple, if you want to remote control an AP2040 equipment, import the AP2XXX sub-module of PyApex as below<br>
@@ -125,3 +125,4 @@ Here is a very simple example for controlling your OSA:<br>
         plt.show()
     else:
         print("No spectrum acquired")
+```
