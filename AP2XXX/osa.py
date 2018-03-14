@@ -607,6 +607,7 @@ class OSA():
         Axis is a string or an integer for selecting the axis:
             Axis = 0 or 'X' : get the X-axis values of the markers (default)
             Axis = 1 or 'Y' : get the Y-axis values of the markers
+            Axis = 2 or 'XY': get the X-axis and Y-axis values of the markers
         Find is a string between the following values:
             - Find = "MAX" : only the max peak is returned (default)
             - Find = "MIN" : only the min peak is returned
@@ -620,7 +621,7 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TraceNumber")
             sys.exit()
             
-        if not Axis in [0, 1] and not str(Axis).lower() in ['x', 'y'] :
+        if not Axis in [0, 1, 2] and not str(Axis).lower() in ['x', 'y', 'xy'] :
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Axis")
             sys.exit()
 
@@ -637,6 +638,10 @@ class OSA():
             Send(self.__Connexion, Command)
             Peaks = self.GetMarkers(TraceNumber, Axis=Axis)
         
+        Dual = False
+        if Axis == 2 or str(Axis).lower() == 'xy':
+            Dual = True
+        
         else:
             Peaks = [1545.000, 1550.000, 1555.000]
             
@@ -644,33 +649,62 @@ class OSA():
             return Peaks
         
         elif str(Find).lower() == "mean":
-            if len(Peaks) > 0:
-                Sum = 0
-                for p in Peaks:
-                    Sum += p
-                return Sum / len(Peaks)
+            Length = len(Peaks)
+            if Dual:
+                Length = len(Peaks[0])
+            if Length > 0:
+                if Dual:
+                    Mean = [0.0, 0.0]
+                    for i in Length:
+                        Mean[0] += Peaks[0][i]
+                        Mean[1] += Peaks[1][i]
+                    Mean[0] /= Length
+                    Mean[1] /= Length
+                    return Mean
+                else:
+                    Sum = 0.0
+                    for p in Peaks:
+                        Sum += p
+                    return Sum / len(Peaks)
             else:
-                return 0.0
+                if Dual:
+                    return [0.0, 0.0]
+                else:
+                    return 0.0
         
         elif str(Find).lower() == "min":
-            if len(Peaks) > 0:
-                Min = Peaks[0]
-                for p in Peaks:
-                    if Min > p:
-                        Min = p
+            Length = len(Peaks)
+            if Dual:
+                Length = len(Peaks[0])
+            if Length > 0:
+                if Dual:
+                    Index = Peaks[0].index(min(Peaks[0]))
+                    Min = [Peaks[0][Index], Peaks[1][Index]]
+                else:
+                    Min = min(Peaks)
                 return Min
             else:
-                return 0.0
+                if Dual:
+                    return [0.0, 0.0]
+                else:
+                    return 0.0
         
         else:
-            if len(Peaks) > 0:
-                Max = Peaks[0]
-                for p in Peaks:
-                    if Max < p:
-                        Max = p
+            Length = len(Peaks)
+            if Dual:
+                Length = len(Peaks[0])
+            if Length > 0:
+                if Dual:
+                    Index = Peaks[0].index(max(Peaks[0]))
+                    Max = [Peaks[0][Index], Peaks[1][Index]]
+                else:
+                    Max = max(Peaks)
                 return Max
             else:
-                return 0.0
+                if Dual:
+                    return [0.0, 0.0]
+                else:
+                    return 0.0
         
         self.__tracenumber = TraceNumber
         return Peak
@@ -778,6 +812,7 @@ class OSA():
         Axis is a string or an integer for selecting the axis:
             Axis = 0 or 'X' : get the X-axis values of the markers
             Axis = 1 or 'Y' : get the Y-axis values of the markers (default)
+            Axis = 2 or 'XY': get the X-axis and Y-axis values of the markers
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE 
         from PyApex.Errors import ApexError
@@ -786,7 +821,7 @@ class OSA():
             raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Axis")
             sys.exit()
         
-        if not Axis in [0, 1] and not str(Axis).lower() in ['x', 'y'] :
+        if not Axis in [0, 1, 2] and not str(Axis).lower() in ['x', 'y', 'xy'] :
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Axis")
             sys.exit()
         
@@ -800,26 +835,53 @@ class OSA():
         
         if str(Axis).lower() == 'x':
             Axis = 0
+        elif str(Axis).lower() == 'xy':
+            Axis = 2
         else:
             Axis = 1
         
+        if Axis == 2:
+            XYMarkers = [[], []]
+        
         Markers = []
         if not self.__Simulation:
-            if Axis:
-                Command = "SPDATAMKRY" + str(TraceNumber) + "\n"
-            else:
+            Markers = []
+            if Axis in [1, 2]:
                 Command = "SPDATAMKRX" + str(TraceNumber) + "\n"
-            Send(self.__Connexion, Command)
-            Str = Receive(self.__Connexion, 64)[:-1]
-            Str = Str.split(" ")
-            Str = Str[1:]
-            
-            for v in Str:
-                if v.lower() not in ["dbm", "mw", "nm", "ghz"]:
+                Send(self.__Connexion, Command)
+                Str = Receive(self.__Connexion, 64)[:-1]
+                Str = Str.split(" ")
+                Str = Str[1:]
+                
+                for v in Str:
+                if v.lower() not in ["nm", "ghz"]:
                     try:
                         Markers.append(float(v))
                     except:
                         pass
+            
+            if Axis == 2:
+                XYMarkers[0] = Markers
+            
+            Markers = []
+            if Axis in [0, 2]:
+                Command = "SPDATAMKRY" + str(TraceNumber) + "\n"
+                Send(self.__Connexion, Command)
+                Str = Receive(self.__Connexion, 64)[:-1]
+                Str = Str.split(" ")
+                Str = Str[1:]
+            
+                for v in Str:
+                    if v.lower() not in ["dbm", "mw"]:
+                        try:
+                            Markers.append(float(v))
+                        except:
+                            pass
+            
+            if Axis == 2:
+                XYMarkers[1] = Markers
+                Markers = XYMarkers
+            
         return Markers
     
     

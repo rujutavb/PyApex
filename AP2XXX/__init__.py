@@ -35,6 +35,7 @@ class AP2XXX():
         self.__IPAddress = IPaddress
         self.__PortNumber = PortNumber
         self.__Simulation = Simulation
+        self.__Connected = False
         
         # Connexion to the equipment
         self.Open()
@@ -49,10 +50,12 @@ class AP2XXX():
         self.Connexion.settimeout(10.0)
         
         if self.__Simulation:
+            self.__Connected = True
             print("Connected successfully to the equipment")
         else:
             try:
                 self.Connexion.connect((self.__IPAddress, self.__PortNumber))
+                self.__Connected = True
                 print("Connected successfully to the equipment")
             except:
                 print("Cannot connect to the equipment")
@@ -66,12 +69,23 @@ class AP2XXX():
         from PyApex.Constantes import APXXXX_ERROR_COMMUNICATION 
         from PyApex.Errors import ApexError
         
-        if not self.__Simulation:
+        if self.__Simulation:
+            self.__Connected = False
+        else:
             try:
                 self.Connexion.close()
+                self.__Connected = False
             except:
                 raise ApexError(APXXXX_ERROR_COMMUNICATION, self.Connexion.getsockname()[0])
                 sys.exit()
+    
+    
+    def IsConnected(self):
+        '''
+        Returns the status of the connection. True if an equipment
+        is connected, False otherwise.
+        '''
+        return self.__Connected
 
     
     def SetTimeOut(self, TimeOut):
@@ -110,6 +124,19 @@ class AP2XXX():
             Send(self.Connexion, "*IDN?\n")
             ID = Receive(self.Connexion)
             return ID
+    
+    
+    def GetType(self):
+        '''
+        Return the type of the OSA. For example "AP2061" for an AP2061
+        '''
+        from PyApex.Errors import ApexError
+        import re
+        
+        Type = self.GetID()
+        Type = self.__ID.split("/")[1]
+        Type = "AP" + Type
+        return Type
     
     
     def ListModes(self):
@@ -172,7 +199,6 @@ class AP2XXX():
                 Mode = 0
         
         return Mode
-        
     
     
     def DisplayScreen(self, Display):

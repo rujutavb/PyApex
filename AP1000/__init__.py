@@ -36,6 +36,7 @@ class AP1000():
         self.__IPAddress = IPaddress
         self.__PortNumber = PortNumber
         self.__Simulation = Simulation
+        self.__Connected = False
         self.Open()
         
 
@@ -48,10 +49,12 @@ class AP1000():
         self.Connexion.settimeout(10.0)
         
         if self.__Simulation:
+            self.__Connected = True
             print("Connected successfully to the equipment")
         else:
             try:
                 self.Connexion.connect((self.__IPAddress, self.__PortNumber))
+                self.__Connected = True
                 print("Connected successfully to the equipment")
             except:
                 print("Cannot connect to the equipment")
@@ -64,11 +67,22 @@ class AP1000():
         from PyApex.Constantes import APXXXX_ERROR_COMMUNICATION
         from PyApex.Errors import ApexError
         
-        if not self.__Simulation:
+        if self.__Simulation:
+            self.__Connected = False
+        else:
             try:
                 self.Connexion.close()
+                self.__Connected = False
             except:
                 raise ApexError(APXXXX_ERROR_COMMUNICATION, self.Connexion.getsockname()[0])
+
+
+    def IsConnected(self):
+        '''
+        Returns the status of the connection. True if an equipment
+        is connected, False otherwise.
+        '''
+        return self.__Connected
 
 
     def SetTimeOut(self, TimeOut):
