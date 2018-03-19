@@ -9,11 +9,11 @@ class AP2XXX():
         Elementary functions to communicate with Apex AP2XXX equipment (OSA and OCSA)
         This class can control :
             - The heterodyne OSA
-            - The polarimeter (option)
+            - The polarimeter without spectrum (option)
             - The optical filter (option)
             - The filters OSA (option)
             - The powermeter
-            - The tunable laser (option)
+            - The tunable laser in static mode (option)
         
     VERSION
         2.0
@@ -59,7 +59,6 @@ class AP2XXX():
                 print("Connected successfully to the equipment")
             except:
                 print("Cannot connect to the equipment")
-                sys.exit()
 
 
     def Close(self):

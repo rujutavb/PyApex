@@ -6,6 +6,9 @@ Python 3 package for controlling Apex Technologies equipments
 
     PyApex.AP2XXX allows to control an AP2XXX OSA or OCSA via Ethernet protocol
     "help(PyApex.AP2XXX)" for more details
+    
+    PyApex.Terminal allows to send and receive data from an AP2XXX or an AP1000
+    directly.
 
     PyApex.AB3510 allows to control a board AB3510 quad photodetectors via USB 2.0 protocol
     this class requires PyUSB module installed
@@ -22,6 +25,7 @@ Python 3 package for controlling Apex Technologies equipments
 
 from PyApex.AP1000 import AP1000
 from PyApex.AP2XXX import AP2XXX
+from PyApex.Console import Terminal
 try:
     from PyApex.AB3510 import AB3510
     from PyApex.AB3380 import AB3380
