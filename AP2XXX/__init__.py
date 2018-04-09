@@ -215,7 +215,67 @@ class AP2XXX():
         
         if not self.__Simulation:
             Send(self.Connexion, "REMSCREEN" + str(Display) + "\n")
-
+    
+    
+    def ListBands(self):
+        '''
+        Gets a list of all optical bands in the AP2XXX equipment.
+        The optical band choice is only available for AP2X8X
+        '''
+        
+        if self.__Simulation:
+            Bands = ["O", "C&L"]
+        else:
+            Send(self.Connexion, "LSBANDS?\n")
+            Bands = Receive(self.Connexion)[:-1]
+            Bands = Bands.split(",")
+            for i in range(len(Bands)):
+                Bands[i] = Bands[i].replace("&&", "&")
+                Bands[i] = Bands[i].strip()
+        
+        return Bands
+    
+    
+    def GetOpticalBand(self):
+        '''
+        Gets the actual optical band. The band can be:
+            - O
+            - C&L
+        The optical band choice is only available for AP2X8X
+        '''
+        from random import randint
+        
+        if self.__Simulation:
+            Bands = ["0", "C&L"]
+            Band = Bands[randint(0, 1)]
+        else:
+            Send(self.Connexion, "CHBAND?\n")
+            Band = Receive(self.Connexion)[:-1]
+        
+        return Band
+    
+    
+    def SetOpticalBand(self, Band):
+        '''
+        Sets the optical band. The band can be:
+        The available bands can be listed by the 'ListBands' command
+        The optical band choice is only available for AP2X8X
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE
+        
+        if not isinstance(Band, (str)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Band")
+        
+        ValidBands = self.ListBands()
+        index = -1
+        for vb in ValidBands:
+            if Band.lower() == vb.lower():
+                index = ValidBands.index(vb)
+        
+        if not self.__Simulation and index >= 0:
+            Send(self.Connexion, "CHBAND" + str(index) + "\n")
+        
+        
     
     def OSA(self):
         '''
