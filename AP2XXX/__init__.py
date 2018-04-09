@@ -251,6 +251,7 @@ class AP2XXX():
         else:
             Send(self.Connexion, "CHBAND?\n")
             Band = Receive(self.Connexion)[:-1]
+            Band = Band.replace("&&", "&")
         
         return Band
     

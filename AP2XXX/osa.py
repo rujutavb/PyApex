@@ -854,11 +854,11 @@ class OSA():
                 Str = Str[1:]
                 
                 for v in Str:
-                if v.lower() not in ["nm", "ghz"]:
-                    try:
-                        Markers.append(float(v))
-                    except:
-                        pass
+                    if v.lower() not in ["nm", "ghz"]:
+                        try:
+                            Markers.append(float(v))
+                        except:
+                            pass
             
             if Axis == 2:
                 XYMarkers[0] = Markers
