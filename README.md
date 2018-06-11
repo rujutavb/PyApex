@@ -34,37 +34,37 @@ and for seeing the different methods and attributs associated to this module, do
 
 Here is a very simple example for controlling your AP1000:<br>
 ```python
-    # Import the AP1000 class from the Apex Driver
-    from PyApex import AP1000
+	# Import the AP1000 class from the Apex Driver
+	from PyApex import AP1000
 
-    # Connection to your AP1000 *** SET THE GOOD IP ADDRESS ***
-    MyAP1000 = AP1000("192.168.0.0")
-	
+	# Connection to your AP1000 *** SET THE GOOD IP ADDRESS ***
+	MyAP1000 = AP1000("192.168.0.0")
+
 	# Display the modules of the AP1000
 	for i in range(1, 9):
 		print("Slot", i, "->", MyAP1000.SlotType(i))
 
-    # Say a TLS is in slot 1 and a power meter in slot 2
-    MyTLS = MyAP1000.TunableLaser(1)
+	# Say a TLS is in slot 1 and a power meter in slot 2
+	MyTLS = MyAP1000.TunableLaser(1)
 	MyOPM = MyAP1000.PowerMeter(2)
 
-    # Initialize the TLS and the power meter
-    MyTLS.SetWavelength(1550.0)
+	# Initialize the TLS and the power meter
+	MyTLS.SetWavelength(1550.0)
 	MyTLS.SetUnit("dBm")
 	MyTLS.SetPower(10.0)
 	MyOPM.SetWavelength(1550.0)
 	MyOPM.SetAverageTime(200.0)
 	MyOPM.SetUnit("dBm")
-	
+
 	# Switch on the TLS output
 	MyTLS.On()
-	
+
 	# Do some measurement
 	PowerValue = MyOPM.GetPower(1)
-	
+
 	# Switch off the TLS output
 	MyTLS.Off()
-	
+
 	# The connection with the AP1000 is closed
 	MyAP1000.Close()
 ```
