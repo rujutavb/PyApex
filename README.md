@@ -34,39 +34,39 @@ and for seeing the different methods and attributs associated to this module, do
 
 Here is a very simple example for controlling your AP1000:<br>
 ```python
-	# Import the AP1000 class from the Apex Driver
-	from PyApex import AP1000
+# Import the AP1000 class from the Apex Driver
+from PyApex import AP1000
 
-	# Connection to your AP1000 *** SET THE GOOD IP ADDRESS ***
-	MyAP1000 = AP1000("192.168.0.0")
+# Connection to your AP1000 *** SET THE GOOD IP ADDRESS ***
+MyAP1000 = AP1000("192.168.0.0")
 
-	# Display the modules of the AP1000
-	for i in range(1, 9):
-		print("Slot", i, "->", MyAP1000.SlotType(i))
+# Display the modules of the AP1000
+for i in range(1, 9):
+	print("Slot", i, "->", MyAP1000.SlotType(i))
 
-	# Say a TLS is in slot 1 and a power meter in slot 2
-	MyTLS = MyAP1000.TunableLaser(1)
-	MyOPM = MyAP1000.PowerMeter(2)
+# Say a TLS is in slot 1 and a power meter in slot 2
+MyTLS = MyAP1000.TunableLaser(1)
+MyOPM = MyAP1000.PowerMeter(2)
 
-	# Initialize the TLS and the power meter
-	MyTLS.SetWavelength(1550.0)
-	MyTLS.SetUnit("dBm")
-	MyTLS.SetPower(10.0)
-	MyOPM.SetWavelength(1550.0)
-	MyOPM.SetAverageTime(200.0)
-	MyOPM.SetUnit("dBm")
+# Initialize the TLS and the power meter
+MyTLS.SetWavelength(1550.0)
+MyTLS.SetUnit("dBm")
+MyTLS.SetPower(10.0)
+MyOPM.SetWavelength(1550.0)
+MyOPM.SetAverageTime(200.0)
+MyOPM.SetUnit("dBm")
 
-	# Switch on the TLS output
-	MyTLS.On()
+# Switch on the TLS output
+MyTLS.On()
 
-	# Do some measurement
-	PowerValue = MyOPM.GetPower(1)
+# Do some measurement
+PowerValue = MyOPM.GetPower(1)
 
-	# Switch off the TLS output
-	MyTLS.Off()
+# Switch off the TLS output
+MyTLS.Off()
 
-	# The connection with the AP1000 is closed
-	MyAP1000.Close()
+# The connection with the AP1000 is closed
+MyAP1000.Close()
 ```
 **AP2XXX**<br><br>
 The AP2XXX class allows you to control (via Ethernet) any OSA and OCSA equipment (AP2040, AP2050, AP2060, AP2443,...)<br><br>
@@ -89,40 +89,40 @@ And, to see the methods and attributs of these sub-classes :<br>
 
 Here is a very simple example for controlling your OSA:<br>
 ```python
-    # Import the AP2XXX class from the Apex Driver
-    from PyApex import AP2XXX
-    # Import pyplot for displaying the data
-    from matplotlib import pyplot as plt
+# Import the AP2XXX class from the Apex Driver
+from PyApex import AP2XXX
+# Import pyplot for displaying the data
+from matplotlib import pyplot as plt
 
-    # Connection to your OSA *** SET THE GOOD IP ADDRESS ***
-    MyAP2XXX = AP2XXX("192.168.0.0")
-    MyOSA = MyAP2XXX.OSA()
+# Connection to your OSA *** SET THE GOOD IP ADDRESS ***
+MyAP2XXX = AP2XXX("192.168.0.0")
+MyOSA = MyAP2XXX.OSA()
 
-    # Set the parameters of your OSA
-    # Here, we use wavelength X-Axis and set the span from 1532 to 1563 nm
-    # We also set the number of points to 2000
-    MyOSA.SetScaleXUnit("nm")
-    MyOSA.SetStartWavelength(1532.0)
-    MyOSA.SetStopWavelength(1563.0)
-    MyOSA.DeactivateAutoNPoints()
-    MyOSA.SetNPoints(2000)
+# Set the parameters of your OSA
+# Here, we use wavelength X-Axis and set the span from 1532 to 1563 nm
+# We also set the number of points to 2000
+MyOSA.SetScaleXUnit("nm")
+MyOSA.SetStartWavelength(1532.0)
+MyOSA.SetStopWavelength(1563.0)
+MyOSA.DeactivateAutoNPoints()
+MyOSA.SetNPoints(2000)
 
-    # We run a single
-    Trace = MyOSA.Run()
-    # If the single is good (Trace > 0), we get the data in a list Data = [[Power Data], [Wavelength Data]]
-    if Trace > 0:
-        Data = MyOSA.GetData()
+# We run a single
+Trace = MyOSA.Run()
+# If the single is good (Trace > 0), we get the data in a list Data = [[Power Data], [Wavelength Data]]
+if Trace > 0:
+	Data = MyOSA.GetData()
 
-    # The connection with the OSA is closed
-    MyAP2XXX.Close()
+# The connection with the OSA is closed
+MyAP2XXX.Close()
 
-    # The spectrum is displayed
-    if Trace > 0:
-        plt.grid(True)
-        plt.plot(Data[1], Data[0])
-        plt.xlabel("Wavelength (nm)")
-        plt.ylabel("Power (dBm)")
-        plt.show()
-    else:
-        print("No spectrum acquired")
+# The spectrum is displayed
+if Trace > 0:
+	plt.grid(True)
+	plt.plot(Data[1], Data[0])
+	plt.xlabel("Wavelength (nm)")
+	plt.ylabel("Power (dBm)")
+	plt.show()
+else:
+	print("No spectrum acquired")
 ```
