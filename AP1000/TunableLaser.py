@@ -28,8 +28,16 @@ class TunableLaser():
         Return the equipement name and the slot number when the 'print()' function is used
         '''
         return "Tunable Laser in slot " + str(self.__SlotNumber)
-
-
+    
+    
+    def GetSlotNumber(self):
+        '''
+        Returns the slot number of the module
+        '''
+        
+        return self.__SlotNumber
+    
+    
     def GetType(self):
         '''
         Return the type of the TLS

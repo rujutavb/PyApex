@@ -224,13 +224,14 @@ class AP1000():
             SN = int(re.findall("\d+", SN)[0])
             return int(SN)
         except:
-            self.Connexion.close() 
-            raise ApexError(AP1000_ERROR_SLOT_NOT_DEFINED, SlotNumber)
+            print("PyApex Warning. Slot", SlotNumber, "not defined")
     
 
-    def SlotType(self, SlotNumber):
+    def SlotType(self, SlotNumber, Type="string"):
         '''
-        Return a string describing the module in the slot 'SlotNumber'
+        Return a description of the module in the slot 'SlotNumber'
+        If Type = 'string' or 'str' or 's', the function returns a string (default)
+        If Type = 'integer' or 'int' or 'i', the function returns the module number type
         '''
         from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
         from PyApex.Constantes import AP1000_SLOT_MIN, AP1000_SLOT_MAX
@@ -246,6 +247,12 @@ class AP1000():
             raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "SlotNumber")
             sys.exit()
         
+        if not isinstance(Type, str):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Type")
+            sys.exit()
+        
+        Type = Type.lower()
+        
         if self.__Simulation:
             ID = sample(list(Modules), 1)
             return Modules[ID[0]]
@@ -258,10 +265,12 @@ class AP1000():
         try:
             ID = ID.lower().split("/")[1].split("-")[0]
             ID = int(re.findall("\d+", ID)[0])
-            return Modules[ID]
+            if Type == "integer" or Type == "int" or Type == "i":
+                return ID
+            else:
+                return Modules[ID]
         except:
-            self.Connexion.close()
-            raise ApexError(AP1000_ERROR_SLOT_NOT_DEFINED, SlotNumber)
+            print("PyApex Warning. Slot", SlotNumber, "not defined")
 
 
     def PowerMeter(self, SlotNumber, Force=False):

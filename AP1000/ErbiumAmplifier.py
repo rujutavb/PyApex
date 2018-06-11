@@ -31,8 +31,16 @@ class ErbiumAmplifier():
         Return the equipement name and the slot number when the 'print()' function is used
         '''
         return "Erbium Amplifier in slot " + str(self.__SlotNumber)
-
-
+    
+    
+    def GetSlotNumber(self):
+        '''
+        Returns the slot number of the module
+        '''
+        
+        return self.__SlotNumber
+    
+    
     def GetType(self, type="d"):
         '''
         Return the type of the EFA

@@ -64,8 +64,16 @@ class Attenuator():
         else:
             self.__Connexion.close()
             raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.__Unit")
-
-
+            
+            
+    def GetSlotNumber(self):
+        '''
+        Returns the slot number of the module
+        '''
+        
+        return self.__SlotNumber
+    
+    
     def SetAttenuation(self, Attenuation, ChNumber=1):
         '''
         Set attenuation power of the ATT equipment

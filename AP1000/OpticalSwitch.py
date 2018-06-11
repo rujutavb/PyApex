@@ -24,6 +24,14 @@ class OpticalSwitch():
         return "Optical Switch in slot " + str(self.__SlotNumber)
     
     
+    def GetSlotNumber(self):
+        '''
+        Returns the slot number of the module
+        '''
+        
+        return self.__SlotNumber
+    
+    
     def GetType(self, type="d"):
         '''
         Return the type of the OSW

@@ -24,8 +24,16 @@ class Filter():
         Return the equipement name and the slot number when the 'print()' function is used
         '''
         return "Optical Filter in slot " + str(self.__SlotNumber)
-
-
+    
+    
+    def GetSlotNumber(self):
+        '''
+        Returns the slot number of the module
+        '''
+        
+        return self.__SlotNumber
+    
+    
     def __Convert(self, Value):
         '''
         Internal use only

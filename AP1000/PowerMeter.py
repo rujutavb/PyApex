@@ -27,8 +27,16 @@ class PowerMeter():
         Return the equipement name and the slot number when the 'print()' function is used
         '''
         return "Optical Power Meter in slot " + str(self.__SlotNumber)
-
-
+    
+    
+    def GetSlotNumber(self):
+        '''
+        Returns the slot number of the module
+        '''
+        
+        return self.__SlotNumber
+    
+    
     def GetChannels(self):
         '''
         Return the type(s) of the PWM in a list
