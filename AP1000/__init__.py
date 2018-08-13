@@ -128,6 +128,23 @@ class AP1000():
         '''
         if not self.__Simulation:
             Send(self.Connexion, "*RST\n")
+    
+    
+    def DisplayScreen(self, Display):
+        '''
+        Displays or not the "Remote" window on the AP1000 equipment.
+        Display is a boolean:
+            - True: the window is displayed
+            - False: the window is hidden
+        '''
+        
+        if Display == False:
+            Display = 0
+        else:
+            Display = 1
+        
+        if not self.__Simulation:
+            Send(self.Connexion, "REMSCREEN" + str(Display) + "\n")
 
 
     def SlotUsed(self, SlotNumber):
@@ -397,6 +414,43 @@ class AP1000():
            or self.SlotType(SlotNumber) == AP1000_DFB_LBAND_NAME or \
            self.SlotType(SlotNumber) == AP1000_DFB_OBAND_NAME:
             return DfbLaser(self, SlotNumber, self.__Simulation)
+        else:
+            print("PyApex Warning. Wrong module")
+            return None
+    
+    
+    def Polarimeter(self, SlotNumber, Force=False):
+        '''
+        Return a Polarimeter class for the module in the slot 'SlotNumber'
+        if Force is True, a Polarimeter class is returned even if the module isn't a Polarimeter
+        '''
+        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE, AP1000_POL_NAME
+        from PyApex.Errors import ApexError
+        from PyApex.AP1000.Polarimeter import Polarimeter
+        
+        if Force:
+            return Polarimeter(self, SlotNumber, self.__Simulation)
+        if self.__Simulation or self.SlotType(SlotNumber) == AP1000_POL_NAME:
+            return Polarimeter(self, SlotNumber, self.__Simulation)
+        else:
+            print("PyApex Warning. Wrong module")
+            return None
+    
+    
+    def OSA(self, SlotNumber, Force=False):
+        '''
+        Return an OSA class for the OSA module
+        SlotNumber is the slot of the polarimeter or the power-meter used for the OSA module
+        if Force is True, an OSA class is returned even if the module isn't a Polarimeter or a Power-Meter
+        '''
+        from PyApex.Constantes import AP1000_ERROR_SLOT_NOT_GOOD_TYPE, AP1000_POL_NAME, AP1000_PWM_NAME
+        from PyApex.Errors import ApexError
+        from PyApex.AP1000.OSA import OSA
+        
+        if Force:
+            return OSA(self, SlotNumber, self.__Simulation)
+        if self.__Simulation or self.SlotType(SlotNumber) == AP1000_POL_NAME or self.SlotType(SlotNumber) == AP1000_PWM_NAME:
+            return OSA(self, SlotNumber, self.__Simulation)
         else:
             print("PyApex Warning. Wrong module")
             return None

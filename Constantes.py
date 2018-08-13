@@ -44,6 +44,8 @@ AP1000_DFB_LBAND = 3392
 AP1000_DFB_LBAND_NAME = "L Band DFB Laser Source"
 AP1000_DFB_OBAND = 3395
 AP1000_DFB_OBAND_NAME = "O Band DFB Laser Source"
+AP1000_POL = 3510
+AP1000_POL_NAME = "Polarimeter"
 
 Modules = {\
     AP1000_TLS_CBAND : AP1000_TLS_CBAND_NAME, \
@@ -56,6 +58,7 @@ Modules = {\
     AP1000_DFB_CBAND : AP1000_DFB_CBAND_NAME, \
     AP1000_DFB_LBAND : AP1000_DFB_LBAND_NAME, \
     AP1000_DFB_OBAND : AP1000_DFB_OBAND_NAME, \
+    AP1000_POL : AP1000_POL_NAME, \
 }
 
 #                           SLOTS NUMBER MIN AND MAX
@@ -141,6 +144,16 @@ AP1000_DFB_FRMAX = [VACCUM_LIGHT_SPEED / AP1000_DFB_WLMAX[0], None, VACCUM_LIGHT
 # MIN AND MAX TEMPERATURE BINARY VALUES
 AP1000_DFB_TMIN = 0
 AP1000_DFB_TMAX = 65535
+
+#                           POLARIMETER CONSTANTS
+# ------------------------------------------------------------------------------
+
+# MIN AND MAX ACQUISITION TIME IN MS
+AP1000_POL_ACQMIN = 10.0
+AP1000_POL_ACQMAX = 1000.0
+# MIN AND MAX WAVELENGTH IN NM
+AP1000_POL_WLMIN = 800
+AP1000_POL_WLMAX = 1700
 
 # ------------------------------------------------------------------------------
 #                                   AP2XXX CONSTANTS
