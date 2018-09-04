@@ -36,7 +36,7 @@ class Etuve():
         This method is called by the constructor of Etuve class
         '''
         import serial, sys
-        from PyEtuve.Constants import ETUVE_BAUDRATE, ETUVE_NBITS, \
+        from PyApex.Constantes import ETUVE_BAUDRATE, ETUVE_NBITS, \
              ETUVE_STOPBIT, ETUVE_FLOWCONTROL
         
         try:
@@ -61,8 +61,8 @@ class Etuve():
         '''
         Send a string Command to the Etuve (ending character must be \'\n')
         '''
-        from PyEtuve.Constants import ETUVE_ERROR_ARGUMENT_TYPE, ETUVE_ERROR_COMMUNICATION
-        from PyEtuve.Errors import EtuveError
+        from PyApex.Constantes import ETUVE_ERROR_ARGUMENT_TYPE, ETUVE_ERROR_COMMUNICATION
+        from PyApex.Errors import EtuveError
         
         if not isinstance(Command, str):
             self.Close(True)
@@ -82,8 +82,8 @@ class Etuve():
         Receive a string from the Etuve
         ByteNumber is an integer (default to 56) representing the number of bytes to receive
         '''
-        from PyEtuve.Constants import ETUVE_ERROR_ARGUMENT_TYPE, ETUVE_ERROR_BADCOMMAND
-        from PyEtuve.Errors import EtuveError
+        from PyApex.Constantes import ETUVE_ERROR_ARGUMENT_TYPE, ETUVE_ERROR_BADCOMMAND
+        from PyApex.Errors import EtuveError
         
         if not isinstance(ByteNumber, int):
             self.Close(True)
