@@ -30,7 +30,7 @@ class DfbLaser():
         return "Tunable Laser in slot " + str(self.__SlotNumber)
     
     
-        def GetSlotNumber(self):
+    def GetSlotNumber(self):
         '''
         Returns the slot number of the module
         '''
