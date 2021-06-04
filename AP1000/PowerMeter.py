@@ -196,7 +196,7 @@ class PowerMeter():
                 ChNumber = 1
             
             if not self.__Simulation:
-                Command = "POW[" + str(slef.__SlotNumber).zfill(2) + "]:WAV[" + \
+                Command = "POW[" + str(self.__SlotNumber).zfill(2) + "]:WAV[" + \
                           str(ChNumber) + "]?\n"
                 Send(self.__Connexion, Command)
                 self.__Wavelength = float(Receive(self.__Connexion)[:-1])
