@@ -100,7 +100,7 @@ class PowerMeter():
         '''
         
         if not self.__Simulation:
-            Command = "POW[" + str(self.__SlotNumber).zfill(2) + "]:SETAVERAGE?\n"
+            Command = "POW[" + str(self.__SlotNumber).zfill(2) + "]:GETAVERAGE\n"
             Send(self.__Connexion, Command)
             self.__AvgTime = float(Receive(self.__Connexion)[:-1])
             
