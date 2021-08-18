@@ -7,7 +7,7 @@ Python3 Library for controlling Apex equipments
 ***
 **Installation**<br><br>
 1. Download the package PyApex<br><br>
-2. Unzip it and move it in the "Lib" directory of your Python 3.x distribution
+2. Unzip it and move it in the "Lib" directory of your Python 3.x distribution or put it in the same folder with your python project. 
 ***
 **Using**<br><br>
 1. To access to the help and see all possibilities of PyApex, import the module :<br> 
@@ -110,8 +110,12 @@ MyOSA.SetNPoints(2000)
 # We run a single
 Trace = MyOSA.Run()
 # If the single is good (Trace > 0), we get the data in a list Data = [[Power Data], [Wavelength Data]]
+bASCII_data = True
 if Trace > 0:
-	Data = MyOSA.GetData()
+	if bASCII_data = True:
+		 Data = MyOSA.GetData("nm","log",1)
+	else:
+		Data = MyOSA.GetDataBin("nm","log",1)
 
 # The connection with the OSA is closed
 MyAP2XXX.Close()
