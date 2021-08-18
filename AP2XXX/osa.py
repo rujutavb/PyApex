@@ -418,7 +418,88 @@ class OSA():
                 
         return [YData[1:], XData[1:]]
 
-
+    
+    def GetDataBin(self, ScaleX = "nm", ScaleY = "log", TraceNumber = 1):
+        '''
+        ASCII data transfer format for xData 
+        Binary data transfer format for yData 
+        
+        Get the spectrum data of a measurement
+        returns a 2D list [Y-axis Data, X-Axis Data]
+        ScaleX is a string which can be :
+            - "nm" : get the X-Axis Data in nm (default)
+            - "GHz": get the X-Axis Data in GHz
+        ScaleY is a string which can be :
+            - "log" : get the Y-Axis Data in dBm (default)
+            - "lin" : get the Y-Axis Data in mW
+        TraceNumber is an integer between 1 (default) and 6
+        '''
+        from random import random
+        # from math import log10
+        # from PyApex.Constantes import SimuAP2XXX_StartWavelength, SimuAP2XXX_StopWavelength
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE 
+        from PyApex.Errors import ApexError
+        
+        if not isinstance(ScaleX, str):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "ScaleX")
+            sys.exit()
+        
+        if not isinstance(ScaleY, str):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "ScaleY")
+            sys.exit()
+            
+        if not isinstance(TraceNumber, (float, int)):
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "TraceNumber")
+            sys.exit()
+        
+        self.__NPoints = self.GetNPoints()
+        if not self.__Simulation:
+            YData = []
+            XData = []
+            
+            if ScaleY.lower() == "lin":
+                Command = "SPDATALB" + str(int(TraceNumber)) + "\n"
+            else:
+                Command = "SPDATADB" + str(int(TraceNumber)) + "\n"
+            
+            Send(self.__Connexion, Command)
+            ByteNumber = 4 * self.__NPoints #array of NbSamples double 
+            YData = recvall(self.__Connexion, ByteNumber)
+            YData = np.array(struct.unpack('f'* self.__NPoints, YData), dtype=np.float32)
+            
+            # YStr = ReceiveUntilChar(self.__Connexion)[:-1]
+            # YStr = YStr.split(" ")
+            # for s in YStr:
+            #     try:
+            #         YData.append(np.float64(s))
+            #     except:
+            #         YData.append(0.0)
+            
+            if ScaleX.lower() == "ghz":
+                Command = "SPDATAFB" + str(int(TraceNumber)) + "\n"
+            else:
+                Command = "SPDATAWLB" + str(int(TraceNumber)) + "\n"
+            
+            Send(self.__Connexion, Command)
+            ByteNumber = 8 * self.__NPoints #array of NbSamples double 
+            XData = recvall(self.__Connexion, ByteNumber)
+            XData = np.array(struct.unpack('d'* self.__NPoints, XData), dtype=np.double)
+            
+        else:
+            YData = [self.__NPoints]
+            XData = [self.__NPoints]       
+            DeltaX = (self.__StopWavelength - self.__StartWavelength) / self.__NPoints
+            for i in range(0, self.__NPoints):
+                if ScaleY.lower() == "lin":
+                    YData.append(random())
+                else:
+                    YData.append(80.0 * random() - 70.0)
+                XData.append(self.__StartWavelength + i * DeltaX)
+                
+        # return [YData[1:], XData[1:]]
+        return np.array([YData,XData],dtype=np.double)
+        # return YData
+        
     def SetNoiseMask(self, NoiseMaskValue):
         '''
         Set the noise mask of the signal (values under this mask are set to this value)
