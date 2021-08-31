@@ -500,6 +500,67 @@ class OSA():
         return np.array([YData,XData],dtype=np.double)
         # return YData
         
+    def GetFPGAS(self, ScaleX = "nm", ScaleY = "log", TraceNumber = 1):
+        '''
+        Get the spectrum data of a measurement
+        returns a 2D list [Y-axis Data, X-Axis Data]
+        ScaleX is a string which can be :
+            - "nm" : get the X-Axis Data in nm (default)
+            - "GHz": get the X-Axis Data in GHz
+        ScaleY is a string which can be :
+            - "log" : get the Y-Axis Data in dBm (default)
+            - "lin" : get the Y-Axis Data in mW
+        TraceNumber is an integer between 1 (default) and 6
+        '''
+        from random import random
+        from math import log10
+        from PyApex.Constantes import SimuAP2XXX_StartWavelength, SimuAP2XXX_StopWavelength
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE 
+        from PyApex.Errors import ApexError
+        
+        if not self.__Simulation:
+            YData = []
+            XData = []
+            
+            if ScaleY.lower() == "lin":
+                Command = "SPFPGASL" + str(int(TraceNumber)) + "\n"
+            else:
+                Command = "SPFPGASD" + str(int(TraceNumber)) + "\n"
+            Send(self.__Connexion, Command)
+            YStr = ReceiveUntilChar(self.__Connexion)[:-1]
+            YStr = YStr.split(" ")
+            for s in YStr:
+                try:
+                    YData.append(float(s))
+                except:
+                    YData.append(0.0)
+            
+            if ScaleX.lower() == "ghz":
+                Command = "SPFPGASF" + str(int(TraceNumber)) + "\n"
+            else:
+                Command = "SPFPGASWL" + str(int(TraceNumber)) + "\n"
+            Send(self.__Connexion, Command)
+            XStr = ReceiveUntilChar(self.__Connexion)[:-1]
+            XStr = XStr.split(" ")
+            for s in XStr:
+                try:
+                    XData.append(float(s))
+                except:
+                    XData.append(0.0)
+        else:
+            YData = [self.__NPoints]
+            XData = [self.__NPoints]       
+            DeltaX = (self.__StopWavelength - self.__StartWavelength) / self.__NPoints
+            for i in range(0, self.__NPoints):
+                if ScaleX.lower() == "lin":
+                    YData.append(random())
+                else:
+                    YData.append(80.0 * random() - 70.0)
+                XData.append(self.__StartWavelength + i * DeltaX)
+                
+        return [YData[1:], XData[1:]]
+        
+    
     def SetNoiseMask(self, NoiseMaskValue):
         '''
         Set the noise mask of the signal (values under this mask are set to this value)
