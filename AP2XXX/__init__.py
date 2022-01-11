@@ -300,7 +300,13 @@ class AP2XXX():
         '''
         from PyApex.AP2XXX.tls import TunableLaser
         return TunableLaser(self, self.__Simulation)
-        
+    
+    def APEXTLS(self):
+        '''
+        Return a TLS object for using the Tunable Laser Source of the AP2XXX
+        '''
+        from PyApex.AP2XXX.apextls import TunableLaser
+        return TunableLaser(self, self.__Simulation)
         
     def Powermeter(self):
         '''
