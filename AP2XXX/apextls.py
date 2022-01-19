@@ -410,8 +410,8 @@ class TunableLaser():
         '''
         Runs a laser sweeping and returns the types of sweep (between 1 and 3)
         If Type is
-            - "single" or 1, a single sweep is running (default)
-            - "repeat" or 2, a repeat sweep is running
+            - "single" or 0, a single sweep is running (default)
+            - "repeat" or 1, a repeat sweep is running
         In this function, the connection timeout is disabled and enabled after the
         execution of the function
         '''
@@ -423,7 +423,7 @@ class TunableLaser():
             self.__Connexion.settimeout(None)
             
             if isinstance(Type, str):
-                if Type.lower() == "auto":
+                if Type.lower() == "single":
                     Command = "TLSSWP0\n"                    
                 else: 
                     Command = "TLSSWP1\n"  # Type.lower() == "repeat":
