@@ -6,8 +6,10 @@ Python3 Library for controlling Apex equipments
 
 ***
 **Installation**<br><br>
-1. Download the package PyApex<br><br>
-2. Unzip it and move it in the "Lib" directory of your Python 3.x distribution or put it in the same folder with your python project. 
+1. You will see a button 'Code' on the right hand corner of the page.
+2. Click on it to access the drop down menu.
+3. Click on the Download ZIP option in the SSH tab.
+4. Unzip it and move it in the "Lib" directory of your Python 3.x distribution or put it in the same folder with your python project. 
 ***
 **Using**<br><br>
 1. To access to the help and see all possibilities of PyApex, import the module :<br> 
