@@ -3,7 +3,7 @@
 from PyApex.Common import Send, Receive
 
 
-class PowerMeter():
+class PowerMeterB():
 
     def __init__(self, Equipment, SlotNumber=1, Simulation=False):
         '''
@@ -86,7 +86,7 @@ class PowerMeter():
                 AvgTime = AP1000_PWM_AVGMAX
             
             if not self.__Simulation:
-                Command = "POW[" + str(self.__SlotNumber).zfill(2) + "]:SETAVERAGE" + \
+                Command = "POWB[" + str(self.__SlotNumber).zfill(2) + "]:SETAVERAGE" + \
                           str(AvgTime) + "\n"
                 Send(self.__Connexion, Command)
             
@@ -100,7 +100,7 @@ class PowerMeter():
         '''
         
         if not self.__Simulation:
-            Command = "POW[" + str(self.__SlotNumber).zfill(2) + "]:SETAVERAGE?\n"
+            Command = "POWB[" + str(self.__SlotNumber).zfill(2) + "]:SETAVERAGE?\n"
             Send(self.__Connexion, Command)
             self.__AvgTime = float(Receive(self.__Connexion)[:-1])
             
@@ -168,7 +168,7 @@ class PowerMeter():
                     ChNumber = 1
                 
                 if not self.__Simulation:
-                    Command = "POW[" + str(self.__SlotNumber).zfill(2) + \
+                    Command = "POWB[" + str(self.__SlotNumber).zfill(2) + \
                               "]:SETWAVELENGTH[" + str(ChNumber) + "]" + \
                               ("%4.3f" % Wavelength).zfill(8) + "\n"
                     Send(self.__Connexion, Command)
@@ -196,7 +196,7 @@ class PowerMeter():
                 ChNumber = 1
             
             if not self.__Simulation:
-                Command = "POW[" + str(self.__SlotNumber).zfill(2) + "]:WAV[" + \
+                Command = "POWB[" + str(self.__SlotNumber).zfill(2) + "]:WAV[" + \
                           str(ChNumber) + "]?\n"
                 Send(self.__Connexion, Command)
                 self.__Wavelength = float(Receive(self.__Connexion)[:-1])
@@ -293,10 +293,10 @@ class PowerMeter():
                     raise ApexError(APXXXX_ERROR_VARIABLE_NOT_DEFINED, "self.__Unit")
             else:
                 if self.__Unit.lower() == "dbm":
-                    Command = "POW[" + str(self.__SlotNumber).zfill(2) + "]:DBM[" + \
+                    Command = "POWB[" + str(self.__SlotNumber).zfill(2) + "]:DBM[" + \
                               str(ChNumber) + "]?\n"
                 elif self.__Unit.lower() == "mw":
-                    Command = "POW[" + str(self.__SlotNumber).zfill(2) + "]:MW[" + \
+                    Command = "POWB[" + str(self.__SlotNumber).zfill(2) + "]:MW[" + \
                               str(ChNumber) + "]?\n"
                 else:
                     self.__Connexion.close()
