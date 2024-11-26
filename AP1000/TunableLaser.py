@@ -381,3 +381,191 @@ class TunableLaser():
         self.__DiodeTemp = Temperature
         self.__SweepSpeed = SweepSpeed
         self.__SOAComp = SOAComp
+
+    def StartSingleSweep(self):
+
+        if not self.__Simulation:
+            Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:TSGL" + "\n"
+            Send(self.__Connexion, Command)
+
+    def StartRepeatSweep(self):
+
+        if not self.__Simulation:
+            Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:TRET" + "\n"
+            Send(self.__Connexion, Command)
+
+    def StopSweep(self):
+
+        if not self.__Simulation:
+            Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:TSTO" + "\n"
+            Send(self.__Connexion, Command)
+
+    def SetSweepMode(self, Mode):
+        """
+        Selects STATIC mode (mode=0) or CONTINUOUS mode (mode=1) or STEP mode
+        (mode=2)
+        """
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Constantes import AP1000_TLS_POWMIN, AP1000_TLS_POWMAX
+        from PyApex.Errors import ApexError
+
+        try:
+            Mode = int(Mode)
+        except:
+            self.Off()
+            self.__Connexion.close()
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Mode")
+        else:
+            if Mode not in [0, 1, 2]:
+                raise ApexError(APXXXX_ERROR_ARGUMENT_VALUE, "Mode")
+            else:
+               Mode = str(Mode)
+
+            if not self.__Simulation:
+                Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:TSWM" + \
+                          Mode + "\n"
+                Send(self.__Connexion, Command)
+
+
+    def GetSweepMode(self):
+        """
+        Get STATIC mode (mode=0) or CONTINUOUS mode (mode=1) or STEP mode
+        (mode=2)
+        """
+        if not self.__Simulation:
+            Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:TSWM?\n"
+            Send(self.__Connexion, Command)
+            Mode = int(Receive(self.__Connexion)[:-1])
+
+        return Mode
+
+    def SetStartSweepWavelength(self, Wavelength):
+        '''
+        Set start wavelength of the TLS equipment
+        Wavelength is expressed in nm
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Constantes import AP1000_TLS_WLMIN, AP1000_TLS_WLMAX
+        from PyApex.Errors import ApexError
+
+        try:
+            Wavelength = float(Wavelength)
+        except:
+            self.Off()
+            self.__Connexion.close()
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
+        else:
+            if Wavelength < AP1000_TLS_WLMIN[self.__Type]:
+                print("PyApex Warning. TLS Wavelength is set to its minimum value: " + \
+                      str(AP1000_TLS_WLMIN[self.__Type]) + " nm !")
+                Wavelength = AP1000_TLS_WLMIN[self.__Type]
+            if Wavelength > AP1000_TLS_WLMAX[self.__Type]:
+                print("PyApex Warning. TLS Wavelength is set to its maximum value: " + \
+                      str(AP1000_TLS_WLMAX[self.__Type]) + " nm !")
+                Wavelength = AP1000_TLS_WLMAX[self.__Type]
+
+            if not self.__Simulation:
+                Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:TSTAWL" + \
+                          ("%4.3f" % Wavelength).zfill(8) + "\n"
+                Send(self.__Connexion, Command)
+
+
+    def GetStartSweepWavelength(self):
+        '''
+        Get start wavelength of the TLS equipment
+        The return wavelength is expressed in nm
+        '''
+
+        if not self.__Simulation:
+            Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:TSTAWL?\n"
+            Send(self.__Connexion, Command)
+            Wavelength = float(Receive(self.__Connexion)[:-1])
+
+        return Wavelength
+
+
+    def SetStopSweepWavelength(self, Wavelength):
+        '''
+        Set stop wavelength of the TLS equipment
+        Wavelength is expressed in nm
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Constantes import AP1000_TLS_WLMIN, AP1000_TLS_WLMAX
+        from PyApex.Errors import ApexError
+
+        try:
+            Wavelength = float(Wavelength)
+        except:
+            self.Off()
+            self.__Connexion.close()
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
+        else:
+            if Wavelength < AP1000_TLS_WLMIN[self.__Type]:
+                print("PyApex Warning. TLS Wavelength is set to its minimum value: " + \
+                      str(AP1000_TLS_WLMIN[self.__Type]) + " nm !")
+                Wavelength = AP1000_TLS_WLMIN[self.__Type]
+            if Wavelength > AP1000_TLS_WLMAX[self.__Type]:
+                print("PyApex Warning. TLS Wavelength is set to its maximum value: " + \
+                      str(AP1000_TLS_WLMAX[self.__Type]) + " nm !")
+                Wavelength = AP1000_TLS_WLMAX[self.__Type]
+
+            if not self.__Simulation:
+                Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:TSTPWL" + \
+                          ("%4.3f" % Wavelength).zfill(8) + "\n"
+                Send(self.__Connexion, Command)
+
+
+    def GetStopSweepWavelength(self):
+        '''
+        Get stopwavelength of the TLS equipment
+        The return wavelength is expressed in nm
+        '''
+
+        if not self.__Simulation:
+            Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:TSTPWL?\n"
+            Send(self.__Connexion, Command)
+            Wavelength = float(Receive(self.__Connexion)[:-1])
+
+        return Wavelength
+
+    def SetSweepSpeed(self, Speed):
+        '''
+        Set stop wavelength of the TLS equipment
+        Wavelength is expressed in nm
+        '''
+        from PyApex.Constantes import APXXXX_ERROR_ARGUMENT_TYPE, APXXXX_ERROR_ARGUMENT_VALUE
+        from PyApex.Constantes import AP1000_TLS_WLMIN, AP1000_TLS_WLMAX
+        from PyApex.Errors import ApexError
+
+        try:
+            Speed = float(Speed)
+        except:
+            self.Off()
+            self.__Connexion.close()
+            raise ApexError(APXXXX_ERROR_ARGUMENT_TYPE, "Wavelength")
+        else:
+            if Speed < 0.10:
+                print("PyApex Warning. TLS speed is set to its minimum value: 0.10")
+                Speed = 0.10
+            if Speed > 1.58:
+                print("PyApex Warning. TLS speed is set to its maximum value: " )
+                Speed = 1.58
+
+            if not self.__Simulation:
+                Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:TSWES" + \
+                          ("%1.2f" % Speed).zfill(8) + "\n"
+                Send(self.__Connexion, Command)
+
+
+    def GetSweepSpeed(self):
+        '''
+        Get stopwavelength of the TLS equipment
+        The return wavelength is expressed in nm
+        '''
+
+        if not self.__Simulation:
+            Command = "TLS[" + str(self.__SlotNumber).zfill(2) + "]:TSWES?\n"
+            Send(self.__Connexion, Command)
+            speed = float(Receive(self.__Connexion)[:-1])
+
+        return speed
